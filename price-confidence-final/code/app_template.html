@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Price Confidence: launch price for new Meesho sellers (demo)</title>
+<title>Price Confidence (synthetic demo)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Hind:wght@400;500;600&display=swap" rel="stylesheet">
@@ -335,6 +335,44 @@ details.how .kv b { display: block; font-family: var(--display); font-size: 22px
   .tag::after { left: 29px; }
   .results h2 { font-size: 23px; }
 }
+
+/* ---------- v2 additions ---------- */
+select {
+  width: 100%; font: 400 16px/1.2 var(--body); color: var(--ink); background: var(--paper);
+  border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; appearance: auto;
+}
+select:hover { border-color: var(--ink2); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 380px) { .row2 { grid-template-columns: 1fr; } }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg .chip { padding: 8px 11px; }
+.pol-desc { font-size: 13px; color: var(--ink2); margin-top: 6px; min-height: 2.6em; }
+.cat-row { flex-wrap: wrap; }
+.synth { display: inline-block; font: 700 12px/1 var(--display); letter-spacing: .04em; text-transform: uppercase;
+  padding: 5px 8px 4px; border-radius: 6px; background: var(--pink-soft); color: var(--pink); margin-left: 8px; vertical-align: 3px; }
+.tag-risk { margin-top: 10px; font-size: 16px; }
+.tag-risk b { font-weight: 600; }
+.tag.test { border-color: var(--plum); }
+.tag.test::before { border-color: var(--plum); }
+.tag.test::after { background: var(--plum); }
+.tag.test .tag-price { font-size: clamp(40px, 7vw, 66px); color: var(--plum); }
+.arms { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0 4px; }
+.arm { font: 800 28px/1 var(--display); padding: 10px 14px; border-radius: 12px; background: var(--paper); border: 1.5px solid var(--line); }
+.arm small { display: block; font: 500 12px/1.2 var(--body); color: var(--ink2); margin-top: 4px; }
+.note.info { background: var(--wash); }
+.note.info b { color: var(--plum); }
+table.risk { min-width: 640px; }
+table.risk td.pick { background: var(--pink-soft); font-weight: 600; }
+table.risk td.out { color: var(--ink2); }
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 6px 0 16px; max-width: 760px; }
+@media (max-width: 620px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.kpi { background: var(--wash); border-radius: 12px; padding: 10px 12px; }
+.kpi b { display: block; font: 700 22px/1.15 var(--display); }
+.kpi span { font-size: 13px; color: var(--ink2); }
+.reasons-list { list-style: none; padding: 0; margin: 0 0 12px; display: grid; gap: 8px; max-width: 72ch; }
+.reasons-list li { padding: 10px 14px; border-radius: 12px; background: var(--floor-soft); }
+.reasons-list li.trade { background: var(--wash); }
+code { font-size: .92em; background: var(--wash); padding: 1px 5px; border-radius: 5px; }
 </style>
 </head>
 <body>
@@ -344,30 +382,36 @@ details.how .kv b { display: block; font-family: var(--display); font-size: 22px
       <path d="M4 16.5 16.5 4H29a1 1 0 0 1 1 1v12.5L17.5 30a1.4 1.4 0 0 1-2 0L4 18.5a1.4 1.4 0 0 1 0-2Z" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--pink)"/>
       <circle cx="23.5" cy="10.5" r="2.6" fill="currentColor" style="color:var(--pink)"/>
     </svg>
-    <span class="brand-name">Price Confidence</span>
+    <span class="brand-name">Price Confidence</span><span class="synth">Synthetic data</span>
   </div>
-  <p class="top-note">Demo for Meesho DICE S3 by <b>Team Edge Case</b>, IIT Roorkee. All data is synthetic.</p>
+  <p class="top-note">Demo for Meesho DICE S3 by <b>Team Edge Case</b>, IIT Roorkee. Not Meesho data; not a forecast.</p>
 </header>
 
 <main class="wrap">
   <form class="form" id="form" novalidate>
     <h1>What should I charge?</h1>
-    <p class="lede">Tell us about one product. We work out your lowest safe price, check it against the market, and suggest where to start.</p>
-    <div class="examples" role="group" aria-label="Load an example">
-      <button type="button" class="chip" data-example="soap">Try the soap example</button>
-      <button type="button" class="chip" data-example="tshirt">Try the t-shirt example</button>
-    </div>
+    <p class="lede">Tell us about one product. We work out your break-even price, simulate many possible futures at each price, and show what you can expect, including the chance of losing money.</p>
+    <div class="examples" role="group" aria-label="Load an example" id="examples"></div>
 
     <fieldset>
       <legend>Your product</legend>
       <div class="field">
         <label for="title">Product title</label>
         <input type="text" id="title" autocomplete="off" placeholder="e.g. Handmade neem soap">
-        <div class="cat-row" role="group" aria-label="Category">
-          <button type="button" class="chip" data-cat="soap" aria-pressed="false">Soap</button>
-          <button type="button" class="chip" data-cat="tshirt" aria-pressed="false">T-shirt</button>
+        <div class="cat-row" role="group" aria-label="Category" id="cats"></div>
+        <p class="err" id="err-cat">Pick a category. This demo covers only these.</p>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="sub">Type</label><select id="sub"></select></div>
+        <div class="field"><label for="attr" id="attr-label">Variant</label><select id="attr"></select></div>
+      </div>
+      <div class="field">
+        <span class="label" id="tier-label">How you position it</span>
+        <div class="seg" role="group" aria-labelledby="tier-label" id="tiers">
+          <button type="button" class="chip" data-tier="basic" aria-pressed="false">Budget</button>
+          <button type="button" class="chip" data-tier="standard" aria-pressed="true">Standard</button>
+          <button type="button" class="chip" data-tier="premium" aria-pressed="false">Premium</button>
         </div>
-        <p class="err" id="err-cat">Pick soap or t-shirt. This demo covers only these two.</p>
       </div>
     </fieldset>
 
@@ -382,7 +426,17 @@ details.how .kv b { display: block; font-family: var(--display); font-size: 22px
         <label for="packaging">Packaging per parcel</label>
         <div class="money"><span>₹</span><input type="number" id="packaging" min="0" step="1" inputmode="decimal"></div>
       </div>
-      <p class="ship-line" id="ship-line">Meesho delivery: <b>₹30</b> per soap parcel, <b>₹70</b> per t-shirt parcel.</p>
+      <p class="ship-line" id="ship-line"></p>
+    </fieldset>
+
+    <fieldset>
+      <legend>How much risk?</legend>
+      <div class="seg" role="group" aria-label="Pricing policy" id="policies">
+        <button type="button" class="chip" data-policy="balanced" aria-pressed="true">Balanced</button>
+        <button type="button" class="chip" data-policy="conservative" aria-pressed="false">Careful</button>
+        <button type="button" class="chip" data-policy="learning" aria-pressed="false">Test first</button>
+      </div>
+      <p class="pol-desc" id="pol-desc"></p>
     </fieldset>
 
     <details class="more" id="more">
@@ -412,9 +466,19 @@ details.how .kv b { display: block; font-family: var(--display); font-size: 22px
           <label for="budget">How much can you afford to lose while building reviews?</label>
           <div class="money"><span>₹</span><input type="number" id="budget" min="0" step="100" inputmode="decimal"></div>
         </div>
+        <div class="row2">
+          <div class="field">
+            <label for="offline">Price you sell at offline</label>
+            <div class="money"><span>₹</span><input type="number" id="offline" min="0" step="1" inputmode="decimal"></div>
+          </div>
+          <div class="field">
+            <label for="launchcost">One-off launch cost</label>
+            <div class="money"><span>₹</span><input type="number" id="launchcost" min="0" step="100" inputmode="decimal"></div>
+          </div>
+        </div>
         <div class="field">
-          <label for="offline">Price you sell at offline</label>
-          <div class="money"><span>₹</span><input type="number" id="offline" min="0" step="1" inputmode="decimal"></div>
+          <label for="days">Delivery promise (days)</label>
+          <input type="number" id="days" min="1" max="9" step="1" value="4" inputmode="numeric">
         </div>
       </div>
     </details>
@@ -424,13 +488,11 @@ details.how .kv b { display: block; font-family: var(--display); font-size: 22px
   <div class="results" id="results" aria-live="polite"></div>
 </main>
 
-<footer class="foot">
-  Built on 300 synthetic listings (150 soap, 150 t-shirt) generated to demonstrate the method. The numbers show how the
-  tool reasons; they are not a forecast for real Meesho sellers.
-</footer>
+<footer class="foot" id="foot"></footer>
 
 <script>
 window.PC_MODEL = /*__MODEL__*/null;
+window.PC_EVAL = /*__EVAL__*/null;
 </script>
 <script>
 /*__ENGINE__*/
@@ -438,76 +500,98 @@ window.PC_MODEL = /*__MODEL__*/null;
 <script>
 (function () {
   "use strict";
-  var M = window.PC_MODEL, E = window.PriceEngine;
+  var M = window.PC_MODEL, E = window.PriceEngine, EV = window.PC_EVAL;
   var $ = function (s, r) { return (r || document).querySelector(s); };
-  if (!M || !E) {
-    document.getElementById("form").addEventListener("submit", function (e) { e.preventDefault(); });
-    document.getElementById("results").innerHTML =
-      '<p class="note bad" style="font-size:17px;max-width:560px"><b>This is the unbuilt template, not the demo.</b> ' +
-      'Open <b>OPEN_THIS_Price_Confidence_demo.html</b> instead. To rebuild it yourself, run <code>python build_app.py</code>.</p>';
-    return;
-  }
-  if (!M || !E) {
-    document.getElementById("form").addEventListener("submit", function (e) { e.preventDefault(); });
-    document.getElementById("results").innerHTML =
-      '<p class="note bad" style="max-width:640px"><b>This file is the unbuilt template, so it has no data.</b> ' +
-      'Close it and open <b>OPEN_THIS_Price_Confidence_demo.html</b> from the same folder (or run <code>python build_app.py</code>).</p>';
-    return;
-  }
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
-  var state = { cat: null, img: null, last: null, open: {} };
+  if (!M || !E) {
+    $("#form").addEventListener("submit", function (e) { e.preventDefault(); });
+    $("#results").innerHTML = '<p class="note bad" style="font-size:17px;max-width:560px"><b>This is the unbuilt template, not the demo.</b> ' +
+      'Open <b>OPEN_THIS_Price_Confidence_demo.html</b> instead. To rebuild it, run <code>python build_app.py</code>.</p>';
+    return;
+  }
+  try { E.validateModel(M); } catch (err) {
+    $("#results").innerHTML = '<p class="note bad" style="max-width:640px"><b>The model file does not match this app.</b> ' + String(err.message).replace(/</g, "&lt;") + "</p>";
+    return;
+  }
+  var state = { cat: null, tier: "standard", policy: "balanced", img: null, last: null, open: {} };
   var CHEV = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 6 8 10.5 12.5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var CATS = Object.keys(M.categories);
+  var POL = {
+    balanced: "Highest expected profit over 12 weeks among prices that pass your limits: at most a " + Math.round(M.assumptions.policy.max_loss_probability * 100) + "% chance of losing money, and your loss budget.",
+    conservative: "The price whose bad case (the worst 1 in 10 futures) is best. Usually gives up a little expected profit for a steadier result.",
+    learning: "If we can't tell which price is best for your product, we suggest a short price test instead of guessing, or say plainly that we can't recommend one."
+  };
 
   var inr = function (x) {
+    if (x === null || x === undefined || !isFinite(x)) return "–";
     var v = Math.round(x), s = Math.abs(v).toLocaleString("en-IN");
-    return (v < 0 ? "−\u2060₹\u2060" : "₹\u2060") + s;
+    return (v < 0 ? "−⁠₹⁠" : "₹⁠") + s;
   };
-  var signed = function (x) { var v = Math.round(x); return (v > 0 ? "+\u2060" : v < 0 ? "−\u2060" : "") + "₹\u2060" + Math.abs(v).toLocaleString("en-IN"); };
-  var pct = function (x, d) { var s = (Math.abs(x) * 100).toFixed(d || 0) + "%"; return (x < 0 && s !== "0%" ? "−" : "") + s; };
-  var catName = function (c, plural) { return c === "soap" ? (plural ? "soaps" : "soap") : (plural ? "t-shirts" : "t-shirt"); };
+  var signed = function (x) { var v = Math.round(x); return (v > 0 ? "+⁠" : v < 0 ? "−⁠" : "") + "₹⁠" + Math.abs(v).toLocaleString("en-IN"); };
+  var pct = function (x, d) { if (x === null || x === undefined) return "–"; var s = (Math.abs(x) * 100).toFixed(d || 0) + "%"; return (x < 0 && s !== "0%" ? "−" : "") + s; };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  var catName = function (c, plural) { var C = M.categories[c]; return plural ? C.plural : C.label.toLowerCase(); };
+  var weeksTxt = function (n) { return n + (n === 1 ? " week" : " weeks"); };
 
   var EXAMPLES = {
-    soap: { title: "Handmade herbal soap, 200 g", product: 64, packaging: 12, gift: 15, checks: 2, budget: 3000, offline: 134 },
-    tshirt: { title: "Cotton round-neck t-shirt", product: 120, packaging: 10, gift: 0, checks: 2, budget: 5000, offline: 250 }
+    soap: { label: "soap", title: "Handmade herbal soap, 200 g", sub: "herbal", attr: "200", tier: "standard", product: 64, packaging: 12, gift: 15, checks: 2, budget: 3000, offline: 134 },
+    tshirt: { label: "t-shirt", title: "Cotton round-neck t-shirt", sub: "cotton_basic", attr: "cotton_180gsm", tier: "standard", product: 120, packaging: 10, gift: 0, checks: 2, budget: 5000, offline: 250 },
+    bedsheet: { label: "bedsheet", title: "Double cotton bedsheet with 2 pillow covers", sub: "double_cotton", attr: "210", tier: "premium", product: 300, packaging: 25, gift: 0, checks: 3, budget: 8000, offline: 0 },
+    earrings: { label: "earrings", title: "Oxidised jhumka earrings", sub: "oxidised", attr: "oxidised_brass", tier: "basic", product: 40, packaging: 8, gift: 0, checks: 2, budget: 2000, offline: 99 }
   };
 
   // ---------------------------------------------------------------- form
-  function setCat(c) {
+  $("#examples").innerHTML = ["soap", "tshirt", "bedsheet", "earrings"].filter(function (c) { return EXAMPLES[c] && M.categories[c]; }).map(function (c) {
+    return '<button type="button" class="chip" data-example="' + c + '">Try the ' + EXAMPLES[c].label + " example</button>";
+  }).join("");
+  $("#cats").innerHTML = CATS.map(function (c) { return '<button type="button" class="chip" data-cat="' + c + '" aria-pressed="false">' + esc(M.categories[c].label) + "</button>"; }).join("");
+  $("#err-cat").textContent = "Pick one: " + CATS.map(function (c) { return M.categories[c].label.toLowerCase(); }).join(", ") + ". This demo covers only these.";
+
+  function setCat(c, sub, attr) {
     state.cat = c;
     $$("[data-cat]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.cat === c)); });
     var line = $("#ship-line");
-    if (c) line.innerHTML = "Meesho delivery: <b>" + inr(M.categories[c].ship) + "</b> per " + catName(c) + " parcel, paid on every parcel you send.";
+    if (!c) { line.textContent = ""; return; }
+    var C = M.categories[c];
+    line.innerHTML = "Delivery charge (our assumption, not Meesho's rate card): <b>" + inr(C.ship) + "</b> per " + catName(c) + " parcel, paid on every parcel you send.";
+    $("#sub").innerHTML = C.levels.sub.map(function (s) { return '<option value="' + s + '">' + esc(C.subcats[s].label) + "</option>"; }).join("");
+    if (sub && C.subcats[sub]) $("#sub").value = sub;
+    $("#attr-label").textContent = C.attr_name.replace(/_/g, " ").replace(/^\w/, function (x) { return x.toUpperCase(); });
+    $("#attr").innerHTML = C.levels.attr.map(function (a) { return '<option value="' + esc(a) + '">' + esc(a.replace(/_/g, " ")) + "</option>"; }).join("");
+    var common = Object.keys(C.attr_freq).sort(function (a, b) { return C.attr_freq[b] - C.attr_freq[a]; })[0];
+    $("#attr").value = attr !== undefined && C.levels.attr.indexOf(String(attr)) >= 0 ? String(attr) : common;
     $("#err-cat").classList.remove("on");
   }
-  function fill(ex) {
+  function setTier(t) { state.tier = t; $$("[data-tier]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.tier === t)); }); }
+  function setPolicy(p) { state.policy = p; $$("[data-policy]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.policy === p)); }); $("#pol-desc").textContent = POL[p]; }
+  function fill(ex, cat) {
     $("#title").value = ex.title;
     ["product", "packaging", "gift", "budget", "offline"].forEach(function (k) { $("#" + k).value = (k === "offline" && !ex[k]) ? "" : ex[k]; });
+    $("#launchcost").value = ""; $("#days").value = 4;
     $$("#checks input").forEach(function (c, i) { c.checked = i < ex.checks; });
-    setCat(E.detectCategory(ex.title));
+    setCat(cat, ex.sub, ex.attr); setTier(ex.tier);
     moreTeaser();
   }
   function moreTeaser() {
-    var bits = [], g = parseFloat($("#gift").value), b = $("#budget").value.trim(), o = parseFloat($("#offline").value);
+    var bits = [], g = parseFloat($("#gift").value), b = $("#budget").value.trim(), o = parseFloat($("#offline").value), lc = parseFloat($("#launchcost").value);
     var n = $$("#checks input").filter(function (c) { return c.checked; }).length;
     if (state.img) bits.push("photo added");
     if (g > 0) bits.push("free gift " + inr(g));
     bits.push(n + " of 4 listing boxes ticked");
     if (b !== "") bits.push("loss budget " + inr(parseFloat(b) || 0));
     if (o > 0) bits.push("offline " + inr(o));
+    if (lc > 0) bits.push("launch cost " + inr(lc));
     var s = bits.join(", ");
     $("#more-teaser").textContent = s.charAt(0).toUpperCase() + s.slice(1);
   }
   function read() {
     return {
-      category: state.cat,
-      title: $("#title").value.trim(),
-      product: parseFloat($("#product").value),
-      packaging: parseFloat($("#packaging").value) || 0,
-      gift: parseFloat($("#gift").value) || 0,
-      checks: $$("#checks input").filter(function (c) { return c.checked; }).length,
+      category: state.cat, subcategory: $("#sub").value, tier: state.tier, attribute: $("#attr").value, policy: state.policy,
+      title: $("#title").value.trim(), product: parseFloat($("#product").value), packaging: parseFloat($("#packaging").value) || 0,
+      gift: parseFloat($("#gift").value) || 0, checks: $$("#checks input").filter(function (c) { return c.checked; }).length,
       budget: $("#budget").value.trim() === "" ? null : (parseFloat($("#budget").value) || 0),
-      offline: parseFloat($("#offline").value) || 0
+      offline: parseFloat($("#offline").value) || 0, launchCost: parseFloat($("#launchcost").value) || 0,
+      deliveryDays: Math.min(9, Math.max(1, parseInt($("#days").value, 10) || 4))
     };
   }
   function validate(inp) {
@@ -516,24 +600,22 @@ window.PC_MODEL = /*__MODEL__*/null;
     var bad = !(inp.product > 0);
     $("#err-product").classList.toggle("on", bad);
     $("#product").setAttribute("aria-invalid", String(bad));
-    if (bad) ok = false;
-    return ok;
+    return ok && !bad;
   }
 
-  $("#title").addEventListener("input", function () {
-    var c = E.detectCategory(this.value);
-    if (c) setCat(c);
-  });
+  $("#title").addEventListener("input", function () { var c = E.detectCategory(M, this.value); if (c && c !== state.cat) setCat(c); });
   $$("[data-cat]").forEach(function (b) { b.addEventListener("click", function () { setCat(b.dataset.cat); }); });
+  $$("[data-tier]").forEach(function (b) { b.addEventListener("click", function () { setTier(b.dataset.tier); }); });
+  $$("[data-policy]").forEach(function (b) { b.addEventListener("click", function () { setPolicy(b.dataset.policy); if (state.last) run(false); }); });
   $$("[data-example]").forEach(function (b) {
     b.addEventListener("click", function () {
       $$("[data-example]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
-      fill(EXAMPLES[b.dataset.example]);
+      fill(EXAMPLES[b.dataset.example], b.dataset.example);
       state.img = null; $("#thumb").textContent = "No photo";
       run(true);
     });
   });
-  ["#gift", "#budget", "#offline"].forEach(function (id) { $(id).addEventListener("input", moreTeaser); });
+  ["#gift", "#budget", "#offline", "#launchcost"].forEach(function (id) { $(id).addEventListener("input", moreTeaser); });
   $$("#checks input").forEach(function (c) { c.addEventListener("change", moreTeaser); });
   $("#photo").addEventListener("change", function () {
     var f = this.files && this.files[0];
@@ -549,7 +631,7 @@ window.PC_MODEL = /*__MODEL__*/null;
   });
   $("#form").addEventListener("submit", function (e) {
     e.preventDefault();
-    if (!state.cat) { var c = E.detectCategory($("#title").value); if (c) setCat(c); }
+    if (!state.cat) { var c = E.detectCategory(M, $("#title").value); if (c) setCat(c); }
     run(true, true);
   });
 
@@ -559,8 +641,7 @@ window.PC_MODEL = /*__MODEL__*/null;
     var r;
     try { r = E.recommend(M, inp); }
     catch (err) {
-      $("#results").innerHTML = '<p class="note bad" style="max-width:640px"><b>Could not calculate a price.</b> ' + esc(err.message) +
-        '. Check that every cost is a number and try again.</p>';
+      $("#results").innerHTML = '<p class="note bad" style="max-width:640px"><b>Could not calculate a price.</b> ' + esc(err.message) + ". Check that every cost is a number and try again.</p>";
       return;
     }
     state.last = { inp: inp, r: r };
@@ -588,16 +669,15 @@ window.PC_MODEL = /*__MODEL__*/null;
     var P = { l: 58, r: 18, t: 26, b: 42 };
     var xs = [], ys = [];
     o.series.forEach(function (s) { s.pts.forEach(function (p) { xs.push(p[0]); ys.push(p[1]); }); });
+    (o.areas || []).forEach(function (a) { a.lo.concat(a.hi).forEach(function (p) { xs.push(p[0]); ys.push(p[1]); }); });
     (o.hlines || []).forEach(function (hl) { ys.push(hl.y); });
     var x0 = o.xMin !== undefined ? o.xMin : Math.min.apply(null, xs), x1 = o.xMax !== undefined ? o.xMax : Math.max.apply(null, xs);
     var y0 = Math.min(0, Math.min.apply(null, ys)), y1 = Math.max(0, Math.max.apply(null, ys));
-    if (o.yFloor !== undefined) y0 = Math.max(y0, o.yFloor);
     var pad = (y1 - y0) * 0.08; y1 += pad; if (y0 < 0) y0 -= pad;
     var X = function (v) { return P.l + (v - x0) / (x1 - x0 || 1) * (W - P.l - P.r); };
     var Y = function (v) { return P.t + (1 - (Math.max(v, y0) - y0) / (y1 - y0 || 1)) * (H - P.t - P.b); };
-    var g = [];
-    g.push('<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(o.label) + '">');
-    if (o.band) g.push('<rect x="' + X(o.band[0]) + '" y="' + P.t + '" width="' + (X(o.band[1]) - X(o.band[0])) + '" height="' + (H - P.t - P.b) + '" style="fill:var(--band);opacity:.55"/>');
+    var g = ['<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(o.label) + '">'];
+    if (o.band) g.push('<rect x="' + X(o.band[0]) + '" y="' + P.t + '" width="' + Math.max(0, X(o.band[1]) - X(o.band[0])) + '" height="' + (H - P.t - P.b) + '" style="fill:var(--band);opacity:.55"/>');
     niceTicks(y0, y1, 5).forEach(function (t) {
       g.push('<line x1="' + P.l + '" x2="' + (W - P.r) + '" y1="' + Y(t) + '" y2="' + Y(t) + '" class="' + (t === 0 ? "zero" : "grid") + '"/>');
       g.push('<text x="' + (P.l - 8) + '" y="' + (Y(t) + 4) + '" text-anchor="end">' + kfmt(t) + "</text>");
@@ -606,6 +686,11 @@ window.PC_MODEL = /*__MODEL__*/null;
       g.push('<text x="' + X(t) + '" y="' + (H - P.b + 18) + '" text-anchor="middle">' + (o.xFmt ? o.xFmt(t) : t) + "</text>");
     });
     if (o.xLabel) g.push('<text x="' + ((P.l + W - P.r) / 2) + '" y="' + (H - 4) + '" text-anchor="middle">' + esc(o.xLabel) + "</text>");
+    (o.areas || []).forEach(function (a) {
+      var d = a.hi.map(function (p, i) { return (i ? "L" : "M") + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1); }).join(" ") + " " +
+        a.lo.slice().reverse().map(function (p) { return "L" + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1); }).join(" ") + " Z";
+      g.push('<path d="' + d + '" style="fill:' + a.color + ';opacity:' + (a.opacity || 0.18) + ';stroke:none"/>');
+    });
     (o.hlines || []).forEach(function (hl) {
       if (hl.y < y0 || hl.y > y1) return;
       g.push('<line x1="' + P.l + '" x2="' + (W - P.r) + '" y1="' + Y(hl.y) + '" y2="' + Y(hl.y) + '" style="stroke:' + hl.color + ';stroke-width:2;stroke-dasharray:6 4"/>');
@@ -615,7 +700,7 @@ window.PC_MODEL = /*__MODEL__*/null;
       if (v.x < x0 || v.x > x1) return;
       g.push('<line x1="' + X(v.x) + '" x2="' + X(v.x) + '" y1="' + (P.t - 6) + '" y2="' + (H - P.b) + '" style="stroke:' + v.color + ';stroke-width:2' + (v.dash ? ";stroke-dasharray:5 4" : "") + '"/>');
       var anchor = X(v.x) > W - 90 ? "end" : X(v.x) < P.l + 60 ? "start" : "middle";
-      g.push('<text x="' + X(v.x) + '" y="' + (P.t - 10) + '" text-anchor="' + anchor + '" style="fill:' + v.color + ';font-weight:600">' + esc(v.label) + "</text>");
+      g.push('<text x="' + X(v.x) + '" y="' + (P.t - 10 + (v.row || 0) * 14) + '" text-anchor="' + anchor + '" style="fill:' + v.color + ';font-weight:600">' + esc(v.label) + "</text>");
     });
     o.series.forEach(function (s) {
       var d = s.pts.map(function (p, i) { return (i ? "L" : "M") + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1); }).join(" ");
@@ -629,190 +714,232 @@ window.PC_MODEL = /*__MODEL__*/null;
     host.innerHTML = g.join("");
   }
 
-  // ---------------------------------------------------------------- sections
+  // ---------------------------------------------------------------- hero
   function ruler(r, inp) {
-    var mk = r.market, pts = [mk.p25, mk.p75, r.floor || mk.p25];
-    if (r.status === "ok") pts.push(r.range[0], r.range[1], r.start);
+    var mk = r.market, ok = r.status === "ok" || r.status === "experiment" || r.status === "abstain";
+    var pts = [mk.p25, mk.p75, r.floor || mk.p25];
+    if (ok && r.range) pts.push(r.range[0], r.range[1], r.start);
+    if (r.status === "experiment") pts = pts.concat(r.experiment.arms);
     if (inp.offline) pts.push(inp.offline);
     var lo = Math.min.apply(null, pts) * 0.88, hi = Math.max.apply(null, pts) * 1.08;
     var X = function (v) { return ((v - lo) / (hi - lo) * 100).toFixed(2) + "%"; };
     var fx = function (v) { return (v - lo) / (hi - lo) * 100; };
-    var h = ['<div class="ruler" role="img" aria-label="Price scale: floor ' + inr(r.floor) + ", market middle half " + inr(mk.p25) + " to " + inr(mk.p75) +
-      (r.status === "ok" ? ", suggested start " + inr(r.start) : "") + '">'];
+    var h = ['<div class="ruler" role="img" aria-label="Price scale: break-even ' + inr(r.floor) + ", market middle half " + inr(mk.p25) + " to " + inr(mk.p75) + (r.status === "ok" ? ", suggested start " + inr(r.start) : "") + '">'];
     h.push('<div class="r-track"></div>');
     h.push('<div class="r-band" style="left:' + X(mk.p25) + ";width:" + (fx(mk.p75) - fx(mk.p25)).toFixed(2) + '%"></div>');
     h.push('<div class="r-med" style="left:' + X(mk.median) + '"></div>');
     if (r.status === "ok") h.push('<div class="r-range" style="left:' + X(r.range[0]) + ";width:" + Math.max(1.2, fx(r.range[1]) - fx(r.range[0])).toFixed(2) + '%"></div>');
     if (inp.offline) h.push('<div class="r-off" style="left:' + X(inp.offline) + '"></div>');
-    h.push('<div class="r-floor" style="left:' + X(r.floor) + '"></div>');
+    if (r.floor) h.push('<div class="r-floor" style="left:' + X(r.floor) + '"></div>');
+    var top = [], bot = [];
     if (r.status === "ok") {
       h.push('<svg class="r-start" style="left:' + X(r.start) + '" viewBox="0 0 20 24" aria-hidden="true"><path d="M10 24 2 12V2h16v10Z" style="fill:var(--pink)"/><circle cx="10" cy="7" r="2.4" style="fill:var(--paper)"/></svg>');
+      top.push({ x: fx(r.start), html: "<b>Start " + inr(r.start) + "</b>", cls: "start" });
     }
-    // labels: top row = start + offline, bottom row = floor + market
-    var top = [], bot = [];
-    if (r.status === "ok") top.push({ x: fx(r.start), html: "<b>Start " + inr(r.start) + "</b>", cls: "start" });
+    if (r.status === "experiment") r.experiment.arms.forEach(function (a, i) { top.push({ x: fx(a), html: "<b>" + inr(a) + "</b>", cls: "start" }); });
     if (inp.offline) top.push({ x: fx(inp.offline), html: "Offline " + inr(inp.offline), cls: "muted" });
-    bot.push({ x: fx(r.floor), html: "<b>Floor " + inr(r.floor) + "</b>", cls: "floor" });
+    if (r.floor) bot.push({ x: fx(r.floor), html: "<b>Break-even " + inr(r.floor) + "</b>", cls: "floor" });
     [top, bot].forEach(function (row) {
       row.sort(function (a, b) { return a.x - b.x; });
-      for (var i = 1; i < row.length; i++) if (row[i].x - row[i - 1].x < 26) { row[i - 1].x -= 6; row[i].x = row[i - 1].x + 26; }
+      for (var i = 1; i < row.length; i++) if (row[i].x - row[i - 1].x < 18) row[i].x = row[i - 1].x + 18;
     });
     top.forEach(function (l) { h.push('<div class="r-lab top ' + l.cls + '" style="left:' + Math.min(92, Math.max(8, l.x)) + '%">' + l.html + "</div>"); });
     bot.forEach(function (l) { h.push('<div class="r-lab bot ' + l.cls + '" style="left:' + Math.min(88, Math.max(10, l.x)) + '%">' + l.html + "</div>"); });
     h.push("</div>");
-    h.push('<p class="r-cap"><i class="sw"></i>Where most ' + catName(r.category, true) + " sell: " + inr(mk.p25) + " to " + inr(mk.p75) + '. <i class="tick"></i>Typical price ' + inr(mk.median) + ".</p>");
+    h.push('<p class="r-cap"><i class="sw"></i>Where most comparable listings (' + esc(M.categories[r.category].subcat_labels[r.subcategory]) + ") sell in the synthetic market: " + inr(mk.p25) + " to " + inr(mk.p75) + '. <i class="tick"></i>Typical price ' + inr(mk.median) + ".</p>");
     return h.join("");
   }
 
   function heroHTML(inp, r) {
     var img = state.img ? '<img class="tag-img" alt="" src="' + state.img + '">' : "";
-    var head = '<div class="tag-top">' + img + '<div><p class="tag-title">' + esc(inp.title || "Your " + catName(r.category)) + '</p></div></div>';
-    var h = ['<section class="hero" aria-labelledby="hero-h"><h2 id="hero-h" class="sr" style="position:absolute;left:-9999px">Suggested price</h2>'];
+    var head = '<div class="tag-top">' + img + '<div><p class="tag-title">' + esc(inp.title || "Your " + catName(r.category)) + "</p></div></div>";
+    var h = ['<section class="hero" aria-labelledby="hero-h"><h2 id="hero-h" style="position:absolute;left:-9999px">Suggested price</h2>'];
+    var be = r.floor ? "Break-even about <b>" + inr(r.floor) + "</b>" + (r.floorRange && r.floorRange[0] !== r.floorRange[1] ? " (likely " + inr(r.floorRange[0]) + " to " + inr(r.floorRange[1]) + ", depending on your return and RTO rates)" : "") +
+      ". Below it an average order loses money; above it you can still lose money in a bad stretch." : "";
     if (r.status === "ok") {
+      var pk = r.pick, label = r.policy === "conservative" ? "Careful start" : "Start at";
       h.push('<div class="tag" id="tag">' + head +
-        '<p class="tag-kicker" style="margin-top:14px">Start at</p>' +
+        '<p class="tag-kicker" style="margin-top:14px">' + label + "</p>" +
         '<p class="tag-price num"><span class="rs">₹</span>' + r.start.toLocaleString("en-IN") + "</p>" +
-        '<p class="tag-range">Good range <b>' + inr(r.range[0]) + " to " + inr(r.range[1]) + "</b>. You keep about <b>" + inr(r.startEcon.profit / r.startEcon.kept) + "</b> on each paid order.</p>" +
-        '<p class="tag-floor"><b>Never list below ' + inr(r.floor) + ".</b> Below this, every order loses money.</p></div>");
+        '<p class="tag-range">Good range <b>' + inr(r.range[0]) + " to " + inr(r.range[1]) + "</b>. You keep about <b>" + inr(r.startEcon.contribution_per_kept) + "</b> on each sale the buyer keeps.</p>" +
+        '<p class="tag-risk">12 weeks at this price: <b>' + inr(pk.median) + "</b> profit in a typical future, " + inr(pk.p10) + " to " + inr(pk.p90) + " in 8 of 10 futures. Chance of a loss: <b>" + pct(pk.probLoss) + "</b>.</p>" +
+        '<p class="tag-floor">' + be + "</p></div>");
       h.push(ruler(r, inp));
-      var note = null;
-      if (r.offline && r.offline.econ.profit < 0) note = '<p class="note bad"><b>Your offline price loses money online.</b> At ' + inr(r.offline.price) + " you lose about " + inr(-r.offline.econ.profit / r.offline.econ.kept) + " on every paid order.</p>";
-      else if (r.thinMargin) note = '<p class="note bad"><b>Thin margin.</b> You keep under 8% of the price, so one bad week of returns wipes it out.</p>';
-      if (note) h.push('<div class="notes">' + note + "</div>");
+      var notes = [];
+      if (!r.confident) notes.push('<p class="note info"><b>We are not sure this is the best price for your product.</b> Depending on how your buyers react to price, the best price could be anywhere from ' + inr(r.decision.p10) + " to " + inr(r.decision.p90) + ". " +
+        (r.experiment && r.experiment.affordable ? "Choose <b>Test first</b> to see a short price test that would tell you." : "A price test does not fit your limits, so treat this as a starting point and watch your orders.") + "</p>");
+      if (r.boundary && r.boundary.optimumBeyondCap) notes.push('<p class="note info"><b>The numbers point higher.</b> We stop at ' + inr(r.grid.cap) + ", the top of what most buyers pay, because a new listing has no reviews yet. Revisit once you have good ratings.</p>");
+      if (r.offline && r.offline.econ.contribution_per_order < 0) notes.push('<p class="note bad"><b>Your offline price loses money online.</b> At ' + inr(r.offline.price) + " an average order loses about " + inr(-r.offline.econ.contribution_per_order) + ".</p>");
+      else if (r.thinMargin) notes.push('<p class="note bad"><b>Thin margin.</b> You keep under 8% of the price on each kept sale, so a bad week of returns wipes it out.</p>');
+      if (notes.length) h.push('<div class="notes">' + notes.join("") + "</div>");
+    } else if (r.status === "experiment") {
+      var x = r.experiment;
+      h.push('<div class="tag test" id="tag">' + head + '<p class="tag-kicker" style="margin-top:14px">Test before you settle on a price</p>' +
+        '<div class="arms">' + x.arms.map(function (a, i) { return '<span class="arm num">' + inr(a) + "<small>" + ["lower", "middle", "higher"][i] + "</small></span>"; }).join("") + "</div>" +
+        '<p class="tag-range">Run each price for ' + weeksTxt(x.blockWeeks) + " (" + weeksTxt(x.weeks) + " in all, starting with the middle one), then move to <b>" + inr(x.after) + "</b> unless your own orders say otherwise.</p>" +
+        '<p class="tag-risk">Over 12 weeks the test costs about <b>' + inr(Math.max(0, x.costVsFlat || 0)) + "</b> of expected profit compared with simply listing at " + inr(x.after) + ". Chance of a loss: <b>" + pct(x.summary.probLoss) + "</b>.</p>" +
+        '<p class="tag-floor">' + be + "</p></div>");
+      h.push(ruler(r, inp));
+      h.push('<div class="notes"><p class="note info"><b>Why test?</b> Listings like yours react to price very differently. Here the best price could be anywhere from ' + inr(r.decision.p10) + " to " + inr(r.decision.p90) +
+        ". The test narrows how sensitive your buyers are by about " + pct(1 - x.slopeSdAfter / x.slopeSdBefore) + ". Keep everything else (photos, title, stock) the same while it runs.</p></div>");
+    } else if (r.status === "abstain") {
+      h.push('<div class="tag warn" id="tag">' + head + '<p class="tag-kicker" style="margin-top:14px">No confident price yet</p>' +
+        '<p class="tag-price num">' + inr(r.decision.p10) + "–" + inr(r.decision.p90).replace("₹⁠", "") + "</p>" +
+        '<p class="tag-range">The best price for your product could be anywhere in this range, and a price test does not fit your limits (' + esc(r.policies.learning.why) + "). The <b>Careful</b> setting shows the price with the steadiest result: " + inr(r.policies.conservative.p) + ".</p>" +
+        '<p class="tag-floor">' + be + "</p></div>");
+      h.push(ruler(r, inp));
     } else {
-      h.push('<div class="tag warn" id="tag">' + head + '<p class="tag-kicker" style="margin-top:14px">No safe price yet</p>' +
-        '<p class="tag-price num">Floor ' + inr(r.floor) + "</p>" +
-        '<p class="tag-range">Most ' + catName(r.category, true) + " sell for " + inr(r.market.p25) + " to " + inr(r.market.p75) + ". At those prices your costs are not covered, so every order loses money.</p></div>");
+      h.push('<div class="tag warn" id="tag">' + head + '<p class="tag-kicker" style="margin-top:14px">No feasible price under your limits</p>' +
+        '<p class="tag-price num">' + (r.floor ? "Break-even " + inr(r.floor) : "No break-even") + "</p>" +
+        '<p class="tag-range">' + esc(r.message) + ". We don't loosen your limits on our own; here is what blocks every price, and what would change it.</p></div>");
       h.push(ruler(r, inp));
     }
     h.push("</section>");
     return h.join("");
   }
 
-
-  function bleedHTML(r) {
-    var b = r.bleed, tr = r.trust, top = b.top, cn = catName(r.category), cns = catName(r.category, true);
-    var h = ['<div class="bleed">'];
-    var p1 = "At " + inr(top.price) + ", about the most buyers pay for a " + cn + ", you lose <b>" + inr(top.lossPerPaid) + "</b> on every paid order. ";
-    if (b.noBudget) p1 += "";
-    else if (b.budget <= 0) p1 += "You said you can't afford any loss, so this product should not go live at these costs. ";
-    else if (top.weeksBudget) p1 += "Your budget runs out in about <b>" + top.weeksBudget + (top.weeksBudget === 1 ? " week" : " weeks") + "</b>. ";
-    else p1 += "Your budget lasts beyond " + b.horizon + " weeks, but you lose money every single week. ";
-    p1 += "After " + b.horizon + " weeks you would be <b>" + inr(top.sim.total) + "</b>. Good ratings make it worse, not better: more orders, each one losing money (" + inr(b.topGood.sim.total) + " at " + r.rating.good.toFixed(1) + "★).";
-    h.push("<p>" + p1 + "</p>");
-    var room = tr.room.map(function (x) { return "about " + pct(x.pct) + " at " + x.rating.toFixed(1) + "★"; }).join(", ");
-    var need = tr.needRating > 5 ? "more than a perfect 5★, so no rating closes it" : "about a <b>" + tr.needRating.toFixed(1) + "★</b> average, and only the top quarter of " + cns + " even reach " + tr.good.toFixed(1) + "★";
-    h.push("<p>The loss does not turn around by itself. To reach your " + inr(r.floor) + " floor, buyers would have to pay <b>" + pct(tr.needPct) + " more</b> than " + inr(tr.top) +
-      ". Good ratings do buy some room (" + room + "), but closing this gap needs " + need + ". <b>A loss budget buys time, not profit.</b> Fix the cost first.</p>");
-    h.push('<figure><div class="chart" id="chart-bleed"></div><figcaption>Running profit if you list at ' + inr(top.price) + " anyway.</figcaption></figure></div>");
+  // ---------------------------------------------------------------- sections
+  var REASON = {
+    break_even_above_cap: function (x) { return "Your break-even price (" + inr(x.floor) + ") is above the top of what most buyers pay (" + inr(x.cap) + ")."; },
+    below_break_even: function (x) { return x.n + " of " + x.of + " prices buyers accept are below your break-even of " + inr(x.floor) + "."; },
+    loss_probability: function (x) { return x.n + " of " + x.of + " prices have more than a " + pct(x.limit) + " chance of losing money over 12 weeks."; },
+    budget_breach: function (x) { return x.n + " of " + x.of + " prices have more than a " + pct(x.limit) + " chance of losses going past your " + inr(x.budget) + " budget."; }
+  };
+  var TRADE = {
+    accept_loss_probability: function (x) { return "If you accepted a " + pct(x.probLoss) + " chance of losing money, " + inr(x.p) + " would qualify (expected 12-week profit " + inr(x.mean) + ")."; },
+    larger_budget: function (x) { return "A loss budget of about " + inr(x.budgetNeeded) + " would make " + inr(x.p) + " workable."; },
+    lower_unit_cost: function (x) { return "Bring your making cost down to about " + inr(x.unitCost) + ", and the typical price of " + inr(x.atPrice) + " breaks even."; }
+  };
+  function infeasibleHTML(r) {
+    var h = ['<ul class="reasons-list">'];
+    r.reasons.forEach(function (x) { h.push("<li>" + (REASON[x.code] ? REASON[x.code](x) : esc(x.code)) + "</li>"); });
+    r.tradeoffs.forEach(function (x) { h.push('<li class="trade">' + (TRADE[x.code] ? TRADE[x.code](x) : esc(x.code)) + "</li>"); });
+    h.push('<li class="trade">Sell a pack of 2 or 3 so one ' + inr(r.ship) + " delivery charge covers more pieces, or cut packaging and gifts: both are paid on every parcel, even the ones that come back.</li>");
+    h.push("</ul>");
+    if (r.bleed && r.bleed.sim) h.push('<figure><div class="chart" id="chart-bleed"></div><figcaption>Running profit if you list at ' + inr(r.bleed.price) + " anyway: typical future (line) and 8 in 10 futures (shaded), over " + r.bleed.sim.weekly.length + " weeks.</figcaption></figure>");
     return h.join("");
   }
 
-  function receiptHTML(r) {
-    var u = r.floorEcon; if (!u) return "";
-    var k = u.kept, per = function (x) { return Math.round(x / k); };
+  function receiptHTML(r, u, price) {
+    if (!u || !(u.kept > 0)) return "";
+    var k = u.kept, per = function (x) { return x / k; }, P = u.parts;
     var lines = [
-      ["Making cost", "includes pieces lost when a return can't be resold", per(u.parts.product)],
-      ["Packaging", "paid on every parcel", per(u.parts.packaging)],
-      ["Meesho delivery", "paid on every parcel, including ones that come back", per(u.parts.forward)],
-      ["Return pickups", "", per(u.parts.reverse)]
+      ["Making cost", "includes pieces lost when a return can't be resold", per(P.product + P.refurb)],
+      ["Packaging", "paid on every parcel", per(P.packaging)],
+      ["Delivery", "paid on every parcel, including ones that come back", per(P.forward)],
+      ["Return pickups and RTO charges", "", per(P.reverse + P.rto_fee)]
     ];
-    if (u.parts.gift > 0) lines.push(["Free gift", "in every parcel", per(u.parts.gift)]);
+    if (P.gift > 0) lines.push(["Free gift", "in every parcel", per(P.gift)]);
+    if (P.cancel > 0) lines.push(["Cancellations", "", per(P.cancel)]);
     var total = lines.reduce(function (s, l) { return s + l[2]; }, 0);
-    var gst = r.floor - total;
-    var paid = Math.round(k * 100), rto = Math.round(u.rto * 100), ret = Math.round(u.ret * 100);
-    var h = ['<div class="receipt"><p class="intro">Out of every 100 parcels you send, about ' + rto + " come back undelivered (RTO) and " + ret +
-      "% of the delivered ones are returned. Only about <b>" + paid + "</b> get paid for, so their price has to cover all 100.</p>"];
+    var tax = price - u.revenue / k;
+    var h = ['<div class="receipt"><p class="intro">Out of every 100 orders placed, about ' + Math.round(u.cancel * 100) + " are cancelled, " + Math.round(u.rto * 100) + "% of the parcels sent come back undelivered (RTO) and " + Math.round(u.ret * 100) +
+      "% of delivered ones are returned. Only about <b>" + Math.round(k * 100) + "</b> are kept and paid for, so their price has to cover all 100.</p>"];
     lines.forEach(function (l) {
       h.push('<div class="rline"><span class="l">' + l[0] + (l[1] ? "<small>" + l[1] + "</small>" : "") + '</span><span class="dots"></span><span class="v">' + inr(l[2]) + "</span></div>");
     });
-    h.push('<div class="rline total"><span class="l">Cost of one paid order</span><span class="dots"></span><span class="v">' + inr(total) + "</span></div>");
-    h.push('<div class="rline"><span class="l">GST (5%)</span><span class="dots"></span><span class="v">' + inr(gst) + "</span></div>");
-    h.push('<div class="rline floor"><span class="l">Your floor price</span><span class="dots"></span><span class="v">' + inr(r.floor) + "</span></div></div>");
+    h.push('<div class="rline total"><span class="l">Cost behind one kept sale</span><span class="dots"></span><span class="v">' + inr(total) + "</span></div>");
+    h.push('<div class="rline"><span class="l">GST and fees in the price<small>assumed rates; see How this works</small></span><span class="dots"></span><span class="v">' + inr(tax) + "</span></div>");
+    h.push('<div class="rline floor"><span class="l">' + (price === r.floor ? "Break-even price" : "Price") + '</span><span class="dots"></span><span class="v">' + inr(price) + "</span></div></div>");
+    return h.join("");
+  }
+
+  function sureHTML(r) {
+    if (r.status === "no_feasible_candidate") return "";
+    var pk = r.pick, pol = M.assumptions.policy;
+    var h = ['<div class="kpis">',
+      '<div class="kpi"><b>' + inr(pk.median) + "</b><span>12-week profit, typical future</span></div>",
+      '<div class="kpi"><b>' + inr(pk.p10) + "</b><span>bad case (1 in 10 futures worse)</span></div>",
+      '<div class="kpi"><b>' + pct(pk.probLoss) + "</b><span>chance of losing money</span></div>",
+      '<div class="kpi"><b>' + (pk.probBudget === null ? "–" : pct(pk.probBudget)) + "</b><span>" + (pk.probBudget === null ? "add a loss budget to check it" : "chance losses pass your budget") + "</span></div></div>"];
+    if (pk.mean > 1.25 * pk.median && pk.median > 0) h.push('<p class="small" style="margin-bottom:8px">The average over all futures (' + inr(pk.mean) + ") is well above the typical one because a few futures go very well. Plan on the typical figure: in our tests on synthetic data, the simulated good futures were more optimistic than what actually happened.</p>");
+    h.push('<figure><div class="chart" id="chart-fan"></div><figcaption>Running profit at ' + inr(r.start) + ": typical future (line) and the middle 8 in 10 of " + (r.startFan ? r.startFan.n : "") + " simulated futures (shaded).</figcaption></figure>");
+    var rows = r.curve.filter(function (c) { return c.inSupport && Math.abs(c.p - r.start) <= 60; });
+    h.push('<p class="small" style="margin:18px 0 8px">Prices near ' + inr(r.start) + ". Every price is simulated with the same " + rows[0].n + " futures, so the differences between rows are not noise. Greyed rows fail a limit.</p>");
+    h.push('<div class="tbl-wrap"><table class="risk"><thead><tr><th>Price</th><th>Expected 12-wk profit</th><th>Bad case (P10)</th><th>Good case (P90)</th><th>Chance of loss</th><th>Passes budget</th><th>Beats ' + inr(r.baseline.p) + "</th></tr></thead><tbody>");
+    rows.forEach(function (c) {
+      var cls = c.p === r.start ? ' class="pick"' : c.eligible ? "" : ' class="out"';
+      h.push("<tr><td" + cls + ">" + inr(c.p) + "</td><td" + cls + ">" + inr(c.mean) + "</td><td" + cls + ">" + inr(c.p10) + "</td><td" + cls + ">" + inr(c.p90) + "</td><td" + cls + ">" + pct(c.probLoss) +
+        "</td><td" + cls + ">" + (c.probBudget === null ? "–" : pct(1 - c.probBudget)) + "</td><td" + cls + ">" + pct(c.probBeatBaseline) + "</td></tr>");
+    });
+    h.push("</tbody></table></div>");
+    var d = r.decision, li = [];
+    li.push("<b>Which price is best depends on how your buyers react to price, which we can't see before launch.</b> Across " + d.draws + " plausible versions of your listing, the best price ranged from " + inr(d.p10) + " to " + inr(d.p90) +
+      " (8 in 10). " + (d.confident ? "That is narrow enough to recommend a price." : "That is wider than " + pct(d.threshold) + " of the typical price, so the <b>Test first</b> setting suggests a price test."));
+    li.push("<b>Balanced</b> picks " + inr(r.policies.balanced.p) + " (highest expected profit), <b>Careful</b> picks " + inr(r.policies.conservative.p) + " (best bad case)" +
+      (r.policies.learning.action === "experiment" ? ", <b>Test first</b> suggests testing " + r.experiment.arms.map(inr).join(", ") : r.policies.learning.action === "abstain" ? ", <b>Test first</b> would not recommend a price" : ", <b>Test first</b> agrees with Balanced") + ".");
+    if (r.boundary) {
+      var bd = r.boundary;
+      li.push("Prices we consider run from " + inr(bd.eligibleMin) + " to " + inr(bd.eligibleMax) + ": the bottom is set by " + ({ break_even: "your break-even", observed_prices: "the lowest prices seen in the data", risk_limits: "your risk limits" }[bd.lowerLimitedBy]) +
+        ", the top by " + ({ cap: "the top of the market band (a new listing has no reviews)", observed_prices: "the highest prices seen in the data", risk_limits: "your risk limits" }[bd.upperLimitedBy]) + ". We don't extrapolate the price curve beyond prices sellers in the data actually charged.");
+    }
+    li.push("These ranges come from the synthetic data and our assumptions. They include uncertainty in the fitted models, how your listing differs from similar ones, and week-to-week luck; they do not include changes to Meesho's fees or rules, or a new competitor.");
+    h.push('<ul class="reasons" style="margin-top:16px">' + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>");
     return h.join("");
   }
 
   function whyHTML(r) {
     if (r.status !== "ok") return "";
-    var mk = r.market, s = r.startSim, cn = catName(r.category, true);
-    var li = [];
-    li.push("<b>Your floor is " + inr(r.floor) + ".</b> Packaging" + (r.costs.gift > 0 ? ", the free gift" : "") + ", delivery, returns and GST add " + inr(r.floor - r.costs.product) + " on top of your making cost of " + inr(r.costs.product) + ".");
+    var mk = r.market, s = r.startSim, cn = catName(r.category, true), li = [];
+    li.push("<b>Your break-even is " + inr(r.floor) + ".</b> Packaging" + (r.costs.gift > 0 ? ", the free gift" : "") + ", delivery, cancellations, RTO, returns and GST add " + inr(r.floor - r.costs.unit) + " on top of your making cost of " + inr(r.costs.unit) + ".");
     var trend = mk.demand_last4 / mk.demand_prev4 - 1;
-    li.push("<b>Most " + cn + " on Meesho sell for " + inr(mk.p25) + " to " + inr(mk.p75) + "</b>, typically around " + inr(mk.median) + ". Over the last 4 weeks the typical price " +
-      (Math.abs(mk.median_last4 - mk.median_prev4) < 3 ? "held steady" : "moved from " + inr(mk.median_prev4) + " to " + inr(mk.median_last4)) +
-      " and demand " + (Math.abs(trend) < 0.01 ? "was flat" : (trend > 0 ? "rose " : "fell ") + pct(Math.abs(trend)) ) + ".");
-    var paid = Math.round(s.orders * r.startEcon.kept);
-    var t = "<b>At " + inr(r.start) + " we expect about " + Math.round(s.orders) + " orders placed in your first 12 weeks, about " + paid + " of them paid, and " + inr(s.total) + " profit</b> (" + paid + " paid orders × about " + inr(r.startEcon.profit / r.startEcon.kept) + " each).";
-    if (r.compareLower) t += " At " + inr(r.compareLower.p) + " you would get more orders (" + Math.round(r.compareLower.orders) + " placed) but " + (r.compareLower.total < 0 ? "lose " + inr(-r.compareLower.total) : "only " + inr(r.compareLower.total) + " profit") + ".";
-    li.push(t);
-    if (r.modelBest !== r.start) li.push("A slightly higher price earns a little more, but within 5% we pick the lower one: more orders means reviews arrive sooner.");
+    li.push("<b>Comparable " + cn + " sell for " + inr(mk.p25) + " to " + inr(mk.p75) + "</b>, typically around " + inr(mk.median) + ". Over the last 4 weeks the typical price " +
+      (Math.abs(mk.median_last4 - mk.median_prev4) < 3 ? "held steady" : "moved from " + inr(mk.median_prev4) + " to " + inr(mk.median_last4)) + " and demand " + (Math.abs(trend) < 0.01 ? "was flat" : (trend > 0 ? "rose " : "fell ") + pct(Math.abs(trend))) + ".");
+    li.push("<b>At " + inr(r.start) + " a typical listing like yours gets about " + Math.round(s.orders) + " orders in 12 weeks, about " + Math.round(s.kept) + " of them kept,</b> and " + inr(s.total) + " profit if nothing unusual happens. Across all simulated futures the average is " + inr(r.pick.mean) + ".");
+    if (r.compareLower) li.push("At " + inr(r.compareLower.p) + " you would get more orders (about " + Math.round(r.compareLower.orders) + " on average) but " + (r.compareLower.total < r.pick.mean ? "less profit (" + inr(r.compareLower.total) + " on average)" : "about the same profit") + ", with a " + pct(r.compareLower.probLoss) + " chance of a loss.");
     var c = r.complaint;
-    if (c.at && c.at.price_share !== null) {
-      li.push("At this price level, <b>" + pct(c.at.price_share) + " of negative reviews complain about price</b>, against " + pct(c.base.price_share) + " for " + cn + " priced near the typical price" +
-        (c.at.n < 40 ? " (based on only " + c.at.n + " reviews)" : "") + ".");
-    }
-    li.push("Expect about " + pct(r.triggers.expectedReturnRate) + " returns and " + pct(r.triggers.expectedRto) + " RTO for " + cn + ". Both are already inside your floor.");
-    if (r.cappedAtBand) li.push("The numbers point even higher, but a new listing has no reviews yet, so we stop at the top of what most buyers pay (" + inr(mk.p75) + ").");
-    if (r.offline && r.offline.econ.profit >= 0) li.push("At your offline price of " + inr(r.offline.price) + " you would keep about " + inr(r.offline.econ.profit / r.offline.econ.kept) + " per paid order, less than at " + inr(r.start) + ".");
+    if (c.at && c.at.price_share !== null) li.push("In the synthetic reviews, " + pct(c.at.price_share) + " of negative reviews at this price level mention price, against " + pct(c.base.price_share) + " near the typical price" + (c.at.n < 40 ? " (only " + c.at.n + " reviews)" : "") + ".");
+    li.push("Expected for " + cn + " like yours: " + pct(r.triggers.expectedCancel) + " cancelled, " + pct(r.triggers.expectedRto) + " RTO, " + pct(r.triggers.expectedReturnRate) + " returned. All three are already inside your break-even.");
+    if (r.offline && r.offline.econ.contribution_per_order >= 0) li.push("At your offline price of " + inr(r.offline.price) + " an average order earns about " + inr(r.offline.econ.contribution_per_order) + ".");
     return '<ul class="reasons">' + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>" +
-      '<figure><div class="chart" id="chart-price"></div><figcaption>Profit over your first 12 weeks if you launch at each price and keep it there. Shaded: where most ' + cn + " sell. Red line: your floor.</figcaption></figure>";
+      '<figure><div class="chart" id="chart-price"></div><figcaption>Expected 12-week profit at each launch price held for 12 weeks (line) and the range covering 8 in 10 futures (shaded). Band: where most ' + cn + " sell. Red: break-even. Dashed: the cap for a new listing.</figcaption></figure>";
   }
 
   function launchHTML(r) {
-    if (r.status !== "ok") return "";
+    if (r.status !== "ok" || !r.launch) return "";
     var b = r.launchBounds, l = r.launch;
-    return '<p class="sub">Pick a launch price and how long to hold it before moving to ' + inr(r.start) + ". We follow your next " + l.horizon +
-      " weeks for good and weak ratings. It starts 10% below your floor.</p>" +
+    return '<p class="sub">Pick a launch price and how long to hold it before moving to ' + inr(r.start) + ". We compare " + l.horizon + " weeks of each plan in the same " + l.launchPlan.n + " simulated futures." +
+      (l.budget !== null ? " If losses reach half your budget during the launch weeks, the simulation moves you to " + inr(r.start) + " early, as a careful seller would." : "") + "</p>" +
       '<div class="controls"><div class="ctl"><label for="lp"><span>Launch price</span><output id="lp-out"></output></label>' +
       '<input type="range" id="lp" min="' + b.min + '" max="' + b.max + '" step="10" value="' + l.launch + '">' +
       '<div class="ctl-scale"><span>' + inr(b.min) + "</span><span>" + inr(b.max) + "</span></div></div>" +
       '<div class="ctl"><label for="lw"><span>Hold it for</span><output id="lw-out"></output></label>' +
       '<input type="range" id="lw" min="1" max="8" step="1" value="' + l.weeks + '">' +
-      '<div class="ctl-scale"><span>1 week</span><span>8 weeks</span></div></div></div>' +
-      '<div id="launch-body"></div>';
+      '<div class="ctl-scale"><span>1 week</span><span>8 weeks</span></div></div></div><div id="launch-body"></div>';
+  }
+  function launchBodyHTML(r, l) {
+    var T = inr(r.start);
+    var head = l.worthIt
+      ? '<span class="pill yes">Worth trying</span> Over ' + l.horizon + " weeks it adds <b>" + signed(l.gainMean) + "</b> on average compared with starting at " + T + ", and comes out ahead in " + pct(l.probBetter) + " of futures."
+      : '<span class="pill no">Not worth it for your costs</span> Over ' + l.horizon + " weeks it changes profit by <b>" + signed(l.gainMean) + "</b> on average compared with starting at " + T + " (ahead in only " + pct(l.probBetter) + " of futures).";
+    var f = [];
+    f.push(l.belowFloor ? ["bad", "<b>An average order at " + inr(l.launch) + " loses " + inr(-l.perOrder) + ".</b> Your break-even is " + inr(r.floor) + "."]
+                        : ["", "An average order at " + inr(l.launch) + " still earns " + inr(l.perOrder) + ". This is a cheaper launch, not a loss."]);
+    f.push(["", "By week " + l.weeks + " you have about " + Math.round(l.reviewsLaunch) + " reviews instead of " + Math.round(l.reviewsFlat) +
+      (l.costPerReview ? ", and the extra " + Math.round(l.extraReviews) + " cost about " + inr(l.costPerReview) + " each" : "") + "."]);
+    if (l.budget === null) f.push(["", "Add a loss budget under More details to check whether you can afford the dip. Worst 1 in 10 futures: you are " + inr(-Math.min(0, l.launchPlan.minCumP10)) + " down at the lowest point."]);
+    else f.push([l.launchPlan.probBudget > M.assumptions.policy.max_budget_breach_probability ? "bad" : "", "Chance that losses pass your " + inr(l.budget) + " budget: <b>" + pct(l.launchPlan.probBudget) + "</b> (holding " + T + " from the start: " + pct(l.flatPlan.probBudget) + "). The early move to " + T + " happened in " + pct(l.stopShare) + " of futures."]);
+    var h = ['<p class="verdict">' + head + "</p>", '<ul class="facts">' + f.map(function (x) { return '<li class="' + x[0] + '">' + x[1] + "</li>"; }).join("") + "</ul>"];
+    h.push('<div class="legend"><span><i style="border-color:var(--pink)"></i>Start at ' + T + "</span><span><i style=\"border-color:var(--plum)\"></i>Launch at " + inr(l.launch) + "</span><span>Shaded: 8 in 10 futures</span></div>");
+    h.push('<figure><div class="chart" id="chart-invest"></div><figcaption>Average running profit over ' + l.horizon + " weeks for each plan.</figcaption></figure>");
+    return h.join("");
   }
 
-  function launchBodyHTML(r, l) {
-    var R = r.rating, T = inr(r.start);
-    var head = l.worthIt
-      ? '<span class="pill yes">Worth trying</span> With good ratings you end ' + l.horizon + " weeks <b>" + signed(l.gainIfGood) + "</b> compared with starting at " + T + ". With weak ratings the change is <b>" + signed(l.changeIfWeak) + "</b>, so set the stop below." +
-        (l.withinBudget === false ? " <b>But the worst-case dip is more than your budget.</b>" : "")
-      : '<span class="pill no">Not worth it for your costs</span> The reviews you would buy don\'t earn the money back within ' + l.horizon + " weeks: <b>" + signed(l.gainIfGood) + "</b> with good ratings (" + R.good.toFixed(1) + "★) and <b>" + signed(l.changeIfWeak) + "</b> with weak ones (" + R.weak.toFixed(1) + "★), compared with starting at " + T + ".";
-    var f = [];
-    f.push(l.belowFloor
-      ? ['bad', "<b>Each paid order at " + inr(l.launch) + " loses " + inr(-l.perPaid) + ".</b> Your floor is " + inr(r.floor) + "."]
-      : ['', "Each paid order at " + inr(l.launch) + " still earns " + inr(l.perPaid) + ". This is a cheaper launch, not a loss."]);
-    var rv = "With good ratings (the solid lines), in those " + l.weeks + (l.weeks === 1 ? " week" : " weeks") + ": about " + Math.round(l.ordersLaunch) + " orders placed and " + Math.round(l.reviewsLaunch) + " reviews, against " + Math.round(l.reviewsFlat) + " reviews if you started at " + T + ".";
-    if (l.costPerReview) rv += " By week " + l.weeks + " you are at " + inr(l.cumAtK.launch) + " instead of " + inr(l.cumAtK.flat) + ": the extra " + Math.round(l.extraReviews) + " reviews cost " + inr(l.launchCost) + ", <b>about " + inr(l.costPerReview) + " per review</b>.";
-    f.push(['', rv]);
-    if (l.worstDip <= 0) f.push(['', "You never go below zero at this price."]);
-    else if (l.budget === null) f.push(['', "Worst case you are <b>" + inr(l.worstDip) + " down</b> before it turns around. Add a loss budget under More details to check whether you can afford that."]);
-    else if (l.budget <= 0) f.push(['bad', "Worst case you are " + inr(l.worstDip) + " down, and you said you can't afford any loss. Keep the launch at or above " + inr(r.floor) + "."]);
-    else if (l.withinBudget) f.push(['', "Worst case you are <b>" + inr(l.worstDip) + " down</b>. Your " + inr(l.budget) + " budget covers that, and up to " + (l.maxWeeks >= 12 ? "12 or more" : l.maxWeeks) + " weeks at this price even if ratings come in weak."]);
-    else f.push(['bad', "Worst case you are <b>" + inr(l.worstDip) + " down</b>, more than your " + inr(l.budget) + " budget. At this price you can afford " + (l.maxWeeks ? "at most " + l.maxWeeks + (l.maxWeeks === 1 ? " week" : " weeks") : "no weeks at all") + "."]);
-    if (l.worstDip > 0) {
-      var back = function (w) { return w === null ? "not within " + l.horizon + " weeks" : "by week " + w; };
-      f.push(['', "You are back above zero " + back(l.backToZeroGood) + " with good ratings, " + back(l.backToZeroWeak) + " with weak ones. " +
-        (l.catchUpGood ? "With good ratings you overtake simply starting at " + T + " by week " + l.catchUpGood + "." : "Either way, you never catch up with simply starting at " + T + " within " + l.horizon + " weeks.")]);
-    }
-    var alt = r.launchAlt;
-    if (l.belowFloor && alt && alt.worstDip <= 0) {
-      f.push(['', "<b>Gentler option:</b> stay just above your floor at " + inr(alt.launch) + " for " + alt.weeks + " weeks. You get about " + Math.round(alt.reviewsLaunch) + " reviews instead of " + Math.round(alt.reviewsFlat) +
-        (alt.costPerReview ? ", at about " + inr(alt.costPerReview) + " per extra review," : "") + " and you never go below zero (26-week change " + signed(alt.gainIfGood) + " with good ratings)."]);
-    }
-    var h = ['<p class="verdict">' + head + "</p>", '<ul class="facts">' + f.map(function (x) { return '<li class="' + x[0] + '">' + x[1] + "</li>"; }).join("") + "</ul>"];
-    h.push('<div class="legend"><span><i style="border-color:var(--pink)"></i>Start at ' + T + ", good ratings</span>" +
-      '<span><i class="dash" style="border-color:var(--pink)"></i>Start at ' + T + ", weak ratings</span>" +
-      '<span><i style="border-color:var(--plum)"></i>Launch at ' + inr(l.launch) + ", good ratings</span>" +
-      '<span><i class="dash" style="border-color:var(--plum)"></i>Launch at ' + inr(l.launch) + ", weak ratings</span></div>");
-    var cap = "Running profit over " + l.horizon + " weeks.";
-    if (Math.abs(l.flatGood.total - l.flatWeak.total) > 3 * Math.abs(l.gainIfGood)) cap += " The gap between good and weak ratings is bigger than the gap between the two launch plans: how buyers rate the product matters more than the launch discount.";
-    h.push('<figure><div class="chart" id="chart-invest"></div><figcaption>' + cap + "</figcaption></figure>");
+  function strategiesHTML(r) {
+    if (!r.strategies) return "";
+    var s = r.strategies, h = ['<p class="small" style="margin-bottom:10px">Every plan below faces the same ' + s.n + " simulated futures, costs, market and limits, over " + s.horizon + " weeks.</p>"];
+    h.push('<div class="tbl-wrap"><table class="risk"><thead><tr><th>Plan</th><th>Expected profit</th><th>Bad case (P10)</th><th>Chance of loss</th><th>Passes budget</th><th>Beats the recommended plan</th></tr></thead><tbody>');
+    s.results.forEach(function (x) {
+      var name = { flat_recommended: "Recommended " + inr(x.firstPrice) + ", held", flat_median: "Typical price " + inr(x.firstPrice) + ", held",
+                   launch_at_loss: "4 weeks at " + inr(x.firstPrice) + ", then " + inr(r.start) + (x.budgetEnforced ? " (stop at half budget)" : ""), no_change_offline: "Your offline price " + inr(x.firstPrice) + ", held" }[x.key] || x.label;
+      h.push("<tr><td>" + name + "</td><td>" + inr(x.mean) + "</td><td>" + inr(x.p10) + "</td><td>" + pct(x.probLoss) + "</td><td>" + (x.probBudget === null ? "–" : pct(1 - x.probBudget)) + "</td><td>" + (x.key === "flat_recommended" ? "–" : pct(x.probBeatRecommended)) + "</td></tr>");
+    });
+    h.push("</tbody></table></div>");
     return h.join("");
   }
 
   function cohortHTML(r) {
-    var R = r.rating, l = r.launch;
+    var R = r.rating;
     var g = function (pos, good) { return r.cohorts.filter(function (x) { return x.pos === pos && x.good === good; })[0]; };
     var rowName = { below: "Below the typical price", at: "Near the typical price", above: "Above the typical price" };
     var cell = function (x, mine) {
@@ -820,8 +947,7 @@ window.PC_MODEL = /*__MODEL__*/null;
       var cls = mine ? ' class="mine"' : "";
       return "<td" + cls + ">" + x.n + "</td><td" + cls + ">" + pct(x.survival) + "</td><td" + (x.profit < 0 ? ' class="neg' + (mine ? " mine" : "") + '"' : cls) + ">" + inr(x.profit) + "</td>";
     };
-    var h = [];
-    h.push('<p class="small" style="margin-bottom:10px">Every listing in the data, grouped by where it launched and how buyers rated it later. Profit is recalculated with <b>your</b> costs, because other sellers\' costs are unknown. Your start price falls in the highlighted row.</p>');
+    var h = ['<p class="small" style="margin-bottom:10px">Every synthetic listing in this category, grouped by where it launched and how buyers rated it later. Profit is recalculated with <b>your</b> costs, because other sellers\' costs are unknown. These are descriptive: better products tend to launch higher and sell more, so the rows do not show the effect of the launch price by itself.</p>'];
     h.push('<div class="tbl-wrap"><table><thead><tr class="grp"><th></th><th colspan="3">Rated ' + R.expected.toFixed(1) + '★ or better</th><th colspan="3">Rated below ' + R.expected.toFixed(1) + "★</th></tr>" +
       "<tr><th>Launched</th><th>Listings</th><th>Still live at week 12</th><th>12-week profit, your costs</th><th>Listings</th><th>Still live at week 12</th><th>12-week profit, your costs</th></tr></thead><tbody>");
     ["below", "at", "above"].forEach(function (pos) {
@@ -829,116 +955,103 @@ window.PC_MODEL = /*__MODEL__*/null;
       h.push("<tr><td" + (mine ? ' class="mine"' : "") + ">" + rowName[pos] + "</td>" + cell(g(pos, true), mine) + cell(g(pos, false), mine) + "</tr>");
     });
     h.push("</tbody></table></div>");
-    var bg = g("below", true), bw = g("below", false), ag = g("at", true);
-    var stop = " If you do launch low to build reviews, <b>set a stop: go back to " + inr(r.start) + " if you are under " + R.expected.toFixed(1) + "★ after 15 reviews.</b>";
-    var take;
-    if (bg && ag && bw && bg.profit > ag.profit) {
-      take = "Listings that launched below the typical price and went on to earn good ratings made the most (" + inr(bg.profit) + ", against " + inr(ag.profit) +
-        " for well-rated ones that launched near it). Poorly rated ones that launched low made " + inr(bw.profit) + ". Part of that gap is simply better products selling more; the simulation above separates out the effect of the launch price itself." + stop;
-    } else {
-      take = "In this data, launching below the typical price did not beat launching near it, even for well-rated listings (" + inr(bg ? bg.profit : 0) + " against " + inr(ag ? ag.profit : 0) + ")." + stop;
-    }
-    h.push('<p class="verdict" style="margin-top:14px">' + take + "</p>");
     return h.join("");
   }
 
   function triggersHTML(r) {
     if (r.status !== "ok") return "";
-    var t = r.triggers, R = r.rating, mk = r.market, cn = catName(r.category, true);
-    var li = [];
-    li.push("<b>You reach " + R.good.toFixed(1) + "★ with 30 or more reviews.</b> In our demo data, " + cn + " at that rating sell as well about " + pct(t.raisePct) + " higher. Try " + inr(t.raiseTo) + ", and keep it only if orders hold up.");
-    li.push("<b>Meesho offers you a sale.</b> A 20% discount takes " + inr(r.start) + " to " + inr(t.saleFloorCheck.priceAfter) + ". " +
-      (t.saleFloorCheck.breaksFloor ? "That is below your " + inr(r.floor) + " floor, so skip it or offer 10% instead." : "That is still above your " + inr(r.floor) + " floor, so it is safe to join."));
-    li.push("<b>Returns climb above " + pct(Math.min(0.6, t.expectedReturnRate * 1.5)) + ".</b> Your floor goes up. Read the return reasons first: if buyers say size or quality, a lower price won't fix it.");
+    var t = r.triggers, R = r.rating, mk = r.market, li = [];
+    li.push("<b>You reach " + R.good.toFixed(1) + "★ with 30 or more reviews.</b> In the synthetic data, listings at that rating hold their orders about " + pct(t.raisePct) + " higher. Try " + inr(t.raiseTo) + " and keep it only if orders hold up for 2 weeks.");
+    li.push("<b>You're offered a sale campaign.</b> A 20% discount takes " + inr(r.start) + " to " + inr(t.saleFloorCheck.priceAfter) + ". " +
+      (t.saleFloorCheck.breaksFloor ? "That is below your " + inr(r.floor) + " break-even, so each average order would lose money: skip it or offer 10%." : "That stays above your " + inr(r.floor) + " break-even, but check the extra orders are worth the smaller margin."));
+    li.push("<b>Returns climb above " + pct(Math.min(0.6, t.expectedReturnRate * 1.5)) + ".</b> Your break-even goes up. Read the return reasons first: if buyers say size or quality, a lower price won't fix it.");
     li.push("<b>Views come in but orders don't.</b> Fix photos and title first. If orders stay slow for 2 weeks, move toward " + inr(mk.median) + ", never below " + inr(r.floor) + ".");
     return '<ul class="triggers">' + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
   }
 
   function howHTML(r) {
-    var C = M.categories[r.category], st = C.stats, cn = catName(r.category, true);
-    var within = E.priceEffect(C, 0.1);
-    var naive = Math.exp(st.naive_price_coef * Math.log(1.1)) - 1;
-    var rev = Math.exp(C.impr.logrev * Math.log(2)) - 1;
-    var bt = st.backtest, meta = M.meta;
-    return '<div class="how-body">' + "<h3>The data</h3><p>" + meta.listings + " synthetic listings (150 soap, 150 t-shirt), followed week by week from launch (" + meta.first_launch + ") to " + meta.data_to +
-      ": " + meta.listing_weeks.toLocaleString("en-IN") + " listing-weeks and " + meta.reviews.toLocaleString("en-IN") + " reviews. Each week records price, impressions, views, wishlist and cart adds, orders, RTO, returns with reasons, reviews and rating. The data is generated from assumed buyer behaviour, so it demonstrates the method; it is not a forecast.</p>" +
-      '<div class="kv"><div><b>' + pct(within) + "</b>orders per impression when " + cn + " cost 10% more, learnt from price changes on the same listing</div>" +
-      "<div><b>" + (naive >= 0 ? "+" : "") + pct(naive) + "</b>what comparing different listings suggests instead. Better products charge more and still sell more, which hides how much price matters</div>" +
-      "<div><b>+" + pct(rev) + "</b>more impressions each time a listing's review count doubles</div>" +
-      "<div><b>" + pct(bt.model_median_abs_pct_error) + "</b>typical error predicting 8-week orders on " + bt.n_listings + " held-out listings (a simple average is off by " + pct(bt.naive_median_abs_pct_error) + ")</div></div>" +
-      "<h3>The models</h3><ul>" +
-      "<li><b>Conversion:</b> orders <i>per impression</i>, so impressions are the exposure and more views are never mistaken for better conversion. Inputs: price relative to the market, rating, review count, festival weeks. Fitted within each listing, so the price effect isn't confused with product quality.</li>" +
-      "<li><b>Visibility:</b> impressions per week from launch phase, recent sales, reviews, rating and category demand, also fitted within each listing. This is how early orders turn into later traffic.</li>" +
-      "<li><b>What you keep:</b> RTO rate, return rate by price and listing quality, how many returns can be resold, and how many buyers leave a review.</li>" +
-      "<li><b>Good, typical and weak products:</b> a good product (top quarter) gets a better rating <i>and</i> converts better and is returned less; a weak one the opposite.</li></ul>" +
-      "<h3>Checked against the simulator</h3><p>We also ran Seller 6's soap through the simulator that generated the data, 300 times per plan. It agrees that launching below the floor loses money for good, typical and weak products. Our models are more cautious than the simulator about discounts that stay above the floor: sellers in the data cut prices when sales are slow, which blurs the price effect. Only a randomised price test removes that, so the pilot includes one.</p>" +
-      "<h3>Your answer, step by step</h3><ol>" +
-      "<li>Work out what one paid order costs you, spreading RTO and returns over the orders that do get paid. That gives the floor.</li>" +
-      "<li>Take today's market for " + cn + ", weighting the last few weeks most.</li>" +
-      "<li>Simulate 12 weeks at every price from well below the market up to its top end: impressions, orders, reviews, and how reviews feed back into impressions.</li>" +
-      "<li>Pick the price with the best 12-week profit above your floor. If a lower price earns within 5% of it, pick that one for faster reviews.</li>" +
-      "<li>If no price buyers accept covers your costs, show how long your loss budget would last and what rating it would take to close the gap.</li>" +
-      "<li>Let you try launching lower for a few weeks: we follow 26 weeks for good and weak products, count what each extra review costs, compare it with staying just above your floor, and check it against your loss budget.</li>" +
-      "<li>Check what similar listings actually did, recalculated with your costs.</li></ol>" +
-      "<p style=\"margin-top:10px\">In a real rollout these models would train on Meesho's own order, return and review history, and every change would be tested against a control group before it reached sellers.</p>" +
-      "</div>";
+    var C = M.categories[r.category], meta = M.meta, A = M.assumptions.economics, cn = catName(r.category, true);
+    var within = E.priceEffect(M, { category: r.category, subcategory: r.subcategory, tier: r.tier, attribute: r.attribute }, 0.1);
+    var naive = Math.exp(C.stats.naive_price_coef * 0.1) - 1;
+    var rev = Math.exp(C.impr.coef.logrev * Math.log(2)) - 1;
+    var h = ['<div class="how-body"><h3>The data is synthetic</h3><p>' + meta.listings + " synthetic listings in " + Object.keys(M.categories).length + " categories, followed week by week from " + meta.first_launch + " to " + meta.data_to + ": " +
+      meta.listing_weeks.toLocaleString("en-IN") + " listing-weeks and " + meta.reviews.toLocaleString("en-IN") + " reviews (generator " + esc(meta.generator_version) + ", seed " + meta.seed + "). We do not have Meesho's listing data. " +
+      "The generator gives each product its own way of reacting to price (some buyers chase the lowest price, some barely notice, some distrust prices that look too cheap), so the method is tested on a world where one price curve does not fit everyone.</p>"];
+    h.push('<div class="kv"><div><b>' + pct(within) + "</b>orders per impression for a typical " + esc(C.label.toLowerCase()) + " listing like yours priced 10% higher, from price changes on the same listing</div>" +
+      "<div><b>" + (naive >= 0 ? "+" : "") + pct(naive) + "</b>what comparing different listings suggests instead: better products charge more and still sell more</div>" +
+      "<div><b>+" + pct(rev) + "</b>impressions each time a listing's review count doubles</div>" +
+      "<div><b>±" + C.price_slope.sd.toFixed(1) + "</b>how much listings' own price sensitivity varies around that average (log-orders per 100% price change)</div></div>");
+    h.push("<p>The price effects are <b>associations learnt within listings</b>: they remove fixed differences between products but not sellers who cut prices because sales were slow. They are not proven causal effects. Only a randomised price test can establish those, which is why the Test first setting exists.</p>");
+    if (EV) h.push("<h3>How accurate is it (on synthetic data)</h3><p>On listings the models never saw, launched after the training cutoff: one-week-ahead orders are off by " + pct(EV.a_wape) + " (WAPE; last week's orders as a guess: " + pct(EV.a_persist) + "), and 12-week orders simulated from launch by " + pct(EV.c_wape) + " (category average: " + pct(EV.c_cat) + "). " +
+      "Judged by the generator itself, the Balanced price is within 10% of the best achievable profit for " + pct(EV.within10) + " of the holdout listings it priced (the simpler v1 rule: " + pct(EV.within10_v1) + "); risk limits buy fewer bad surprises, not more profit. These numbers show the method recovers the generator's assumptions; they say nothing about accuracy on real sellers.</p>");
+    h.push("<h3>The models</h3><ul>" +
+      "<li><b>Conversion:</b> orders per impression, by price relative to last week's market, positioning, campaign discount, delivery promise, rating and review count. Fitted within each listing, then each listing's level is explained by launch-time facts (listing quality, positioning, type, " + esc(C.attr_name.replace(/_/g, " ")) + ").</li>" +
+      "<li><b>Visibility:</b> impressions per week from launch phase, past reviews, rating, recent conversion and last week's demand.</li>" +
+      "<li><b>After the order:</b> cancellation, RTO, return and resale rates, reviews and stars.</li>" +
+      "<li><b>Only information available at the start of a week is used.</b> A schema marks every column; hidden, future and seller-private columns are refused by tests.</li></ul>");
+    h.push("<h3>Your answer, step by step</h3><ol>" +
+      "<li>Work out the break-even price: what an average placed order costs once cancellations, RTO and returns are spread over the sales that are kept.</li>" +
+      "<li>Simulate " + M.assumptions.policy.n_simulations + " possible 12-week futures at every price from well below the market to above it, each with different model coefficients, a different listing level and price sensitivity, and different weekly luck. Every price sees the same futures.</li>" +
+      "<li>Drop prices below break-even, above the market band's top, outside prices seen in the data, or with too high a chance of loss or of passing your budget. If nothing is left, say so and show what would change it.</li>" +
+      "<li>Pick by your risk setting: highest expected profit, best bad case, or a price test when the best price is too uncertain.</li></ol>");
+    h.push("<h3>Assumptions you should know</h3><p>GST " + pct(A.gst_rate_included_in_price) + " included in the price; platform commission " + pct(A.platform_commission_rate) + "; payment fee " + pct(A.payment_fee_rate) + "; delivery " + inr(A.forward_shipping_inr[r.category]) + " per " + esc(C.label.toLowerCase()) + " parcel; return pickup " + A.return_pickup_fee_multiplier + "× delivery; RTO units restockable: " + (A.rto_units_restockable ? "yes" : "no") +
+      ". These are our assumptions for the demo, not Meesho's published fees or policies.</p></div>");
+    return h.join("");
   }
 
+  // ---------------------------------------------------------------- charts
   function drawCharts(r) {
-    if (r.status !== "ok") { drawBleedChart(r); return; }
+    var fan = $("#chart-fan");
+    if (fan && fan.offsetParent !== null && r.startFan) {
+      var w = r.startFan.weekly;
+      lineChart(fan, {
+        label: "Running profit over 12 weeks at the suggested price", height: 260,
+        areas: [{ lo: [[0, 0]].concat(w.map(function (x) { return [x.w, x.cumP10]; })), hi: [[0, 0]].concat(w.map(function (x) { return [x.w, x.cumP90]; })), color: "var(--pink)" }],
+        series: [{ pts: [[0, 0]].concat(w.map(function (x) { return [x.w, x.cumP50]; })), color: "var(--pink)", width: 3 }],
+        hlines: r.budget ? [{ y: -r.budget, label: "Your loss budget " + inr(r.budget), color: "var(--floor)" }].filter(function (h) { return h.y > Math.min.apply(null, w.map(function (x) { return x.cumP10; })) * 3; }) : [],
+        xMin: 0, xMax: w.length, xTicks: [0, 2, 4, 6, 8, 10, 12], xFmt: function (v) { return "wk " + v; }, xLabel: "Weeks since launch"
+      });
+    }
     var hostP = $("#chart-price");
     if (hostP && hostP.offsetParent !== null) {
-      var xStart = Math.max(r.curve[0].p, Math.floor(r.floor * 0.85));
-      var pts = r.curve.filter(function (c) { return c.p >= xStart; }).map(function (c) { return [c.p, c.total]; });
-      var ys = pts.map(function (p) { return p[1]; });
-      var best = Math.max.apply(null, ys);
+      var xStart = Math.max(r.curve[0].p, Math.floor((r.floor || r.curve[0].p) * 0.85));
+      var cs = r.curve.filter(function (c) { return c.p >= xStart && c.inSupport; });
       lineChart(hostP, {
-        label: "Twelve-week profit by launch price", height: 290,
-        series: [{ pts: pts, color: "var(--pink)", width: 3 }],
+        label: "Expected 12-week profit by launch price", height: 290,
+        areas: [{ lo: cs.map(function (c) { return [c.p, c.p10]; }), hi: cs.map(function (c) { return [c.p, c.p90]; }), color: "var(--pink)", opacity: 0.14 }],
+        series: [{ pts: cs.map(function (c) { return [c.p, c.mean]; }), color: "var(--pink)", width: 3 }],
         band: [r.market.p25, r.market.p75],
-        vlines: [{ x: r.floor, label: "Floor " + inr(r.floor), color: "var(--floor)" }],
-        dots: [{ x: r.start, y: r.startSim.total, color: "var(--pink)", label: "Start " + inr(r.start) }],
+        vlines: [{ x: r.floor, label: "Break-even " + inr(r.floor), color: "var(--floor)" }, { x: r.grid.cap, label: "Cap", color: "var(--ink2)", dash: true, row: 1 }],
+        dots: [{ x: r.start, y: r.pick.mean, color: "var(--pink)", label: "Start " + inr(r.start) }],
         xFmt: function (v) { return "₹" + v; }, xLabel: "Launch price"
+      });
+    }
+    var hb = $("#chart-bleed");
+    if (hb && hb.offsetParent !== null && r.bleed && r.bleed.sim) {
+      var bw = r.bleed.sim.weekly;
+      lineChart(hb, {
+        label: "Running profit if listed anyway", height: 260,
+        areas: [{ lo: [[0, 0]].concat(bw.map(function (x) { return [x.w, x.cumP10]; })), hi: [[0, 0]].concat(bw.map(function (x) { return [x.w, x.cumP90]; })), color: "var(--floor)" }],
+        series: [{ pts: [[0, 0]].concat(bw.map(function (x) { return [x.w, x.cumP50]; })), color: "var(--floor)", width: 3 }],
+        hlines: r.budget ? [{ y: -r.budget, label: "Your loss budget " + inr(r.budget), color: "var(--floor)" }] : [],
+        xMin: 0, xMax: bw.length, xFmt: function (v) { return "wk " + v; }, xLabel: "Weeks since launch"
       });
     }
     drawLaunchChart(state.launch || r.launch, r);
   }
-
-  function budgetLine(budget, sims) {
-    var worst = Math.min.apply(null, sims.map(function (s) { return s.minCum; }).concat([0]));
-    return budget > 0 && budget <= 3 * Math.max(-worst, 500) ? [{ y: -budget, label: "Your loss budget " + inr(budget), color: "var(--floor)" }] : [];
-  }
-
   function drawLaunchChart(l, r) {
-    var hostI = $("#chart-invest");
-    if (!hostI || !l || hostI.offsetParent === null) return;
-    var toPts = function (sim) { return [[0, 0]].concat(sim.weeks.map(function (w) { return [w.w, w.cum]; })); };
-    lineChart(hostI, {
-      label: "Running profit over " + l.horizon + " weeks for each launch plan", height: 300,
-      series: [
-        { pts: toPts(l.flatGood), color: "var(--pink)" },
-        { pts: toPts(l.flatWeak), color: "var(--pink)", dash: true },
-        { pts: toPts(l.good), color: "var(--plum)" },
-        { pts: toPts(l.weak), color: "var(--plum)", dash: true }
-      ],
-      hlines: budgetLine(l.budget, [l.good, l.weak]),
+    var host = $("#chart-invest");
+    if (!host || !l || host.offsetParent === null) return;
+    var pts = function (b, k) { return [[0, 0]].concat(b.map(function (x) { return [x.w, x[k]]; })); };
+    lineChart(host, {
+      label: "Average running profit for each launch plan", height: 300,
+      areas: [{ lo: pts(l.bandLaunch, "p10"), hi: pts(l.bandLaunch, "p90"), color: "var(--plum)", opacity: 0.12 }],
+      series: [{ pts: pts(l.bandFlat, "mean"), color: "var(--pink)" }, { pts: pts(l.bandLaunch, "mean"), color: "var(--plum)" }],
+      hlines: l.budget ? [{ y: -l.budget, label: "Your loss budget " + inr(l.budget), color: "var(--floor)" }] : [],
       vlines: [{ x: l.weeks, label: "Move to " + inr(r.start), color: "var(--ink2)", dash: true }],
       xMin: 0, xMax: l.horizon, xTicks: [0, 4, 8, 12, 16, 20, 26], xFmt: function (v) { return "wk " + v; }, xLabel: "Weeks since launch"
     });
   }
-
-  function drawBleedChart(r) {
-    var host = $("#chart-bleed");
-    if (!host || !r.bleed || host.offsetParent === null) return;
-    var b = r.bleed, toPts = function (sim) { return [[0, 0]].concat(sim.weeks.map(function (w) { return [w.w, w.cum]; })); };
-    lineChart(host, {
-      label: "Running loss if listed at the top of the market price", height: 260,
-      series: [{ pts: toPts(b.top.sim), color: "var(--floor)", width: 3 }, { pts: toPts(b.topGood.sim), color: "var(--floor)", dash: true }],
-      hlines: budgetLine(b.budget, [b.top.sim, b.topGood.sim]),
-      xMin: 0, xMax: b.horizon, xTicks: [0, 4, 8, 12, 16, 20, 26], xFmt: function (v) { return "wk " + v; }, xLabel: "Weeks since launch"
-    });
-  }
-
   function bindLaunch() {
     var lp = $("#lp"), lw = $("#lw");
     if (!lp || !lw) return;
@@ -947,9 +1060,9 @@ window.PC_MODEL = /*__MODEL__*/null;
       var l = E.launchOption(M, state.last.inp, r, L, k);
       state.launch = l;
       var o = $("#lp-out");
-      o.textContent = inr(L) + (L < r.floor ? ", below floor" : "");
-      o.classList.toggle("loss", L < r.floor);
-      $("#lw-out").textContent = k + (k === 1 ? " week" : " weeks");
+      o.textContent = inr(L) + (r.floor && L < r.floor ? ", below break-even" : "");
+      o.classList.toggle("loss", r.floor && L < r.floor);
+      $("#lw-out").textContent = weeksTxt(k);
       $("#launch-body").innerHTML = launchBodyHTML(r, l);
       var tz = $("#teaser-launch"); if (tz) tz.innerHTML = launchTeaser(r, l);
       drawLaunchChart(l, r);
@@ -958,73 +1071,51 @@ window.PC_MODEL = /*__MODEL__*/null;
     lw.addEventListener("input", upd);
     upd();
   }
-
+  function launchTeaser(r, l) {
+    var v = l.worthIt ? '<span class="good">Worth trying</span>' : '<span class="bad">Not worth it for your costs</span>';
+    return v + ": " + inr(l.launch) + " for " + weeksTxt(l.weeks) + " changes " + l.horizon + "-week profit by " + signed(l.gainMean) + " on average";
+  }
   function acc(key, title, teaser, body) {
     if (!body) return "";
     return '<details class="acc" data-k="' + key + '"' + (state.open[key] ? " open" : "") + '><summary><span class="acc-title">' + title +
-      '</span><span class="acc-teaser" id="teaser-' + key + '">' + teaser + '</span><span class="acc-chev" aria-hidden="true">' + CHEV +
-      '</span></summary><div class="acc-body">' + body + "</div></details>";
-  }
-
-  function fixHTML(r) {
-    var lev = [];
-    if (r.maxProductCostAtMedian !== null) lev.push("<b>Bring your making cost down to about " + inr(r.maxProductCostAtMedian) + ".</b> Then the typical price of " + inr(r.market.median) + " starts to work.");
-    lev.push("<b>Sell a pack of 2 or 3</b>, so one " + inr(r.ship) + " delivery charge covers more pieces.");
-    lev.push("<b>Cut packaging or the free gift.</b> Both are paid on every parcel, even the ones that come back.");
-    lev.push("<b>Is it a premium " + catName(r.category) + "?</b> Organic, gift box or luxury products compete with premium listings that sell for more. This demo has one " + catName(r.category) + " market; the full tool would compare you with close matches found from your photo and title.");
-    return '<ul class="reasons">' + lev.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
-  }
-
-  function launchTeaser(r, l) {
-    var v = l.worthIt ? '<span class="good">Worth trying</span>' : '<span class="bad">Not worth it for your costs</span>';
-    return v + ": " + inr(l.launch) + " for " + l.weeks + (l.weeks === 1 ? " week" : " weeks") + " changes 26-week profit by " + signed(l.gainIfGood) + " even with good ratings";
+      '</span><span class="acc-teaser" id="teaser-' + key + '">' + teaser + '</span><span class="acc-chev" aria-hidden="true">' + CHEV + '</span></summary><div class="acc-body">' + body + "</div></details>";
   }
 
   function render(inp, r, flash) {
     state.launch = null;
-    var u = r.floorEcon, k = u ? u.kept : 1, per = function (x) { return Math.round(x / k); };
-    var billTotal = u ? per(u.parts.product) + per(u.parts.packaging) + per(u.parts.forward) + per(u.parts.reverse) + (u.parts.gift > 0 ? per(u.parts.gift) : 0) : 0;
-    var billTeaser = "Costs " + inr(billTotal) + " + GST " + inr(r.floor - billTotal) + " = your floor <b>" + inr(r.floor) + "</b>";
     var parts = [heroHTML(inp, r), '<p class="acc-hint">Tap a section for the details.</p><div class="accs">'];
-    if (r.status === "ok") {
-      var cs = r.cohorts, g = function (pos, good) { return cs.filter(function (x) { return x.pos === pos && x.good === good; })[0]; };
-      var bg = g("below", true), bw = g("below", false);
-      parts.push(acc("why", "Why " + inr(r.start) + "?", "About <b>" + Math.round(r.startSim.orders) + " orders placed</b> (" + Math.round(r.startSim.orders * r.startEcon.kept) + " paid) and <b>" + inr(r.startSim.total) + " profit</b> in 12 weeks. Most " + catName(r.category, true) + " sell for " + inr(r.market.p25) + " to " + inr(r.market.p75) + ".", whyHTML(r)));
-      parts.push(acc("bill", "What one paid order really costs you", billTeaser, receiptHTML(r)));
-      parts.push(acc("launch", "Should I launch at a loss to get reviews?", launchTeaser(r, r.launch), launchHTML(r)));
-      parts.push(acc("similar", "What similar listings did", "Launched below the typical price: rated well " + inr(bg ? bg.profit : 0) + ", rated poorly " + inr(bw ? bw.profit : 0) + " in 12 weeks, with your costs", cohortHTML(r)));
-      parts.push(acc("later", "When to change the price later", "At " + r.rating.good.toFixed(1) + "★ with 30+ reviews, try <b>" + inr(r.triggers.raiseTo) + "</b>. Check every sale against your " + inr(r.floor) + " floor.", triggersHTML(r)));
-    } else {
+    if (r.status === "no_feasible_candidate") {
       if (state.open.fix === undefined) state.open.fix = true;
-      var top = r.bleed.top;
-      r.bleed.noBudget = inp.budget === null;
-      parts.push(acc("fix", "How to make this product work", r.maxProductCostAtMedian !== null ? "Cut making cost to about <b>" + inr(r.maxProductCostAtMedian) + "</b>, sell a pack, or cut packaging" : "Sell a pack, or cut packaging and gifts", fixHTML(r)));
-      parts.push(acc("bleed", "What if I sell anyway?", "At " + inr(top.price) + " you lose <b>" + inr(top.lossPerPaid) + "</b> on every paid order" + (r.bleed.budget > 0 && top.weeksBudget ? "; your " + inr(r.bleed.budget) + " lasts about " + top.weeksBudget + (top.weeksBudget === 1 ? " week" : " weeks") : ""), bleedHTML(r)));
-      parts.push(acc("bill", "What one paid order really costs you", billTeaser, receiptHTML(r)));
+      parts.push(acc("fix", "What blocks every price, and what would change it", r.reasons.length + (r.reasons.length === 1 ? " limit binds" : " limits bind") + "; " + (r.tradeoffs.length + 1) + " ways out", infeasibleHTML(r)));
+      if (r.floorEcon) parts.push(acc("bill", "What one kept sale really costs you", "At your break-even of <b>" + inr(r.floor) + "</b>", receiptHTML(r, r.floorEcon, r.floor)));
+    } else {
+      parts.push(acc("sure", "How sure are we?", "Chance of a loss <b>" + pct(r.pick.probLoss) + "</b>; best price " + (r.confident ? "well determined" : "<span class=\"bad\">uncertain</span>") + " (" + inr(r.decision.p10) + " to " + inr(r.decision.p90) + ")", sureHTML(r)));
+      if (r.status === "ok") parts.push(acc("why", "Why " + inr(r.start) + "?", "About <b>" + Math.round(r.startSim.orders) + " orders</b> and <b>" + inr(r.pick.mean) + " expected profit</b> in 12 weeks. Comparable " + catName(r.category, true) + " sell for " + inr(r.market.p25) + " to " + inr(r.market.p75) + ".", whyHTML(r)));
+      parts.push(acc("bill", "What one kept sale really costs you", "Break-even <b>" + inr(r.floor) + "</b>, covering cancellations, RTO and returns", receiptHTML(r, r.floorEcon, r.floor)));
+      if (r.status === "ok") parts.push(acc("launch", "Should I launch at a loss to get reviews?", launchTeaser(r, r.launch), launchHTML(r)));
+      if (r.strategies) parts.push(acc("plans", "Compare plans side by side", "Same simulated futures for every plan, over " + r.strategies.horizon + " weeks", strategiesHTML(r)));
+      parts.push(acc("similar", "What similar listings did", "Descriptive only: synthetic listings grouped by launch price and rating, with your costs", cohortHTML(r)));
+      if (r.status === "ok") parts.push(acc("later", "When to change the price later", "At " + r.rating.good.toFixed(1) + "★ with 30+ reviews, try <b>" + inr(r.triggers.raiseTo) + "</b>. Check every sale against your " + inr(r.floor) + " break-even.", triggersHTML(r)));
     }
-    parts.push(acc("how", "How this works", "The data, the three models, and how accurate they are", howHTML(r)));
+    parts.push(acc("how", "How this works", "Synthetic data, the models, their accuracy on synthetic holdout listings, and our assumptions", howHTML(r)));
     parts.push("</div>");
     $("#results").innerHTML = parts.join("");
     $$("details.acc").forEach(function (d) {
-      d.addEventListener("toggle", function () {
-        state.open[d.dataset.k] = d.open;
-        if (d.open) drawCharts(state.last.r);
-      });
+      d.addEventListener("toggle", function () { state.open[d.dataset.k] = d.open; if (d.open) drawCharts(state.last.r); });
     });
     bindLaunch();
     drawCharts(r);
     if (flash) { var t = $("#tag"); if (t) { t.classList.remove("flash"); void t.offsetWidth; t.classList.add("flash"); } }
   }
 
-
   var rt;
-  window.addEventListener("resize", function () {
-    clearTimeout(rt);
-    rt = setTimeout(function () { if (state.last) drawCharts(state.last.r); }, 150);
-  });
+  window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { if (state.last) drawCharts(state.last.r); }, 150); });
 
-  fill(EXAMPLES.soap);
-  $$("[data-example]")[0].setAttribute("aria-pressed", "true");
+  $("#foot").textContent = "Built on " + M.meta.listings + " synthetic listings in " + CATS.length + " categories, generated to demonstrate the method (" + M.meta.provenance.split(".")[0] + "). " +
+    "The numbers show how the tool reasons under stated assumptions; they are not Meesho data and not a forecast for real sellers.";
+  setPolicy("balanced");
+  fill(EXAMPLES.soap, "soap");
+  $$("[data-example]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.example === "soap")); });
   run(false);
 })();
 </script>

@@ -1,0 +1,404 @@
+{
+ "checks": [
+  {
+   "check": "schema:products",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "undeclared=[] missing=[]"
+  },
+  {
+   "check": "schema:weekly_panel",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "undeclared=[] missing=[]"
+  },
+  {
+   "check": "schema:market_weekly",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "undeclared=[] missing=[]"
+  },
+  {
+   "check": "schema:reviews",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "undeclared=[] missing=[]"
+  },
+  {
+   "check": "missing_values:products",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "unexpected missing: none; expected-missing columns: {'delist_week': 415, 'final_rating': 34}"
+  },
+  {
+   "check": "missing_values:weekly_panel",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "unexpected missing: none; expected-missing columns: {'new_reviews_avg_stars': 5099, 'cumulative_rating': 625}"
+  },
+  {
+   "check": "missing_values:market_weekly",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "unexpected missing: none; expected-missing columns: {}"
+  },
+  {
+   "check": "missing_values:reviews",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "unexpected missing: none; expected-missing columns: {}"
+  },
+  {
+   "check": "missing_values:explained",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "missing stars/rating only where there are no reviews"
+  },
+  {
+   "check": "duplicates:products",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 duplicate product_id"
+  },
+  {
+   "check": "duplicates:weekly",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 duplicate (product, week)"
+  },
+  {
+   "check": "duplicates:market",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "unique (category, subcategory, week)"
+  },
+  {
+   "check": "duplicates:reviews",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "unique review_id"
+  },
+  {
+   "check": "prices:valid",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 rows with a non-positive price, price above list price or invalid discount"
+  },
+  {
+   "check": "costs:valid",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 listings with a negative cost or non-positive unit cost"
+  },
+  {
+   "check": "counts:non_negative_integers",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "negative=none non-integer=none"
+  },
+  {
+   "check": "funnel:clicks<=impressions",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 violating rows"
+  },
+  {
+   "check": "funnel:carts<=clicks",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 violating rows"
+  },
+  {
+   "check": "funnel:orders<=carts",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 violating rows"
+  },
+  {
+   "check": "funnel:dispatched=orders-cancelled",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 violating rows"
+  },
+  {
+   "check": "funnel:cod<=dispatched",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 violating rows"
+  },
+  {
+   "check": "funnel:rto<=dispatched",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 violating rows"
+  },
+  {
+   "check": "funnel:delivered=dispatched-rto",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 violating rows"
+  },
+  {
+   "check": "funnel:returns<=delivered",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 violating rows"
+  },
+  {
+   "check": "funnel:resold<=returns",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 violating rows"
+  },
+  {
+   "check": "funnel:kept=delivered-returns",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 violating rows"
+  },
+  {
+   "check": "funnel:reasons sum to returns",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 violating rows"
+  },
+  {
+   "check": "funnel:review sentiment sums",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 violating rows"
+  },
+  {
+   "check": "funnel:negative themes sum",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 violating rows"
+  },
+  {
+   "check": "funnel:reviews<=kept+returns",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 violating rows"
+  },
+  {
+   "check": "funnel:cumulative_reviews=running sum",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 rows"
+  },
+  {
+   "check": "reviews table matches panel",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "reviews.csv rows = new_reviews per week"
+  },
+  {
+   "check": "rates:in_range",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 out-of-range stock shares, ratings or stars"
+  },
+  {
+   "check": "time:regular_weeks",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "0 gaps, 0 series not starting at week 1, launch_week mismatches=0"
+  },
+  {
+   "check": "time:market_complete",
+   "status": "PASS",
+   "level": "HARD",
+   "detail": "weeks per subcategory: [69]"
+  },
+  {
+   "check": "coverage:listings_per_category",
+   "status": "PASS",
+   "level": "WARN",
+   "detail": {
+    "bedsheet": 150,
+    "earrings": 150,
+    "soap": 150,
+    "tshirt": 150
+   }
+  },
+  {
+   "check": "coverage:category x subcategory x tier",
+   "status": "WARN",
+   "level": "WARN",
+   "detail": "36 cells, smallest 2"
+  },
+  {
+   "check": "coverage:price segments",
+   "status": "PASS",
+   "level": "WARN",
+   "detail": {
+    "bedsheet": {
+     "<0.85": 769,
+     "0.85-0.95": 633,
+     "0.95-1.05": 968,
+     "1.05-1.15": 413,
+     ">1.15": 548
+    },
+    "earrings": {
+     "<0.85": 1022,
+     "0.85-0.95": 947,
+     "0.95-1.05": 1068,
+     "1.05-1.15": 394,
+     ">1.15": 611
+    },
+    "soap": {
+     "<0.85": 815,
+     "0.85-0.95": 769,
+     "0.95-1.05": 1296,
+     "1.05-1.15": 530,
+     ">1.15": 729
+    },
+    "tshirt": {
+     "<0.85": 518,
+     "0.85-0.95": 730,
+     "0.95-1.05": 1127,
+     "1.05-1.15": 415,
+     ">1.15": 948
+    }
+   }
+  },
+  {
+   "check": "concentration:top10pct_order_share",
+   "status": "PASS",
+   "level": "WARN",
+   "detail": "top-10% listings' share of orders {'bedsheet': 0.576, 'earrings': 0.51, 'soap': 0.462, 'tshirt': 0.499}; HHI {'bedsheet': 0.0315, 'earrings': 0.0266, 'soap': 0.0206, 'tshirt': 0.0267}"
+  },
+  {
+   "check": "price_variation:informative",
+   "status": "PASS",
+   "level": "WARN",
+   "detail": "79% of listings have >1 selling price; median within-listing SD of log price 0.046; price changes: 88% exogenous (experiments, campaigns, scheduled market follow), 12% reacting to own sales"
+  }
+ ],
+ "summary": {
+  "rows": {
+   "products": 600,
+   "weekly_panel": 15250,
+   "market_weekly": 828,
+   "reviews": 44545
+  },
+  "products": 600,
+  "categories": [
+   "bedsheet",
+   "earrings",
+   "soap",
+   "tshirt"
+  ],
+  "weeks": 56,
+  "first_week": "2025-09-01",
+  "last_week": "2026-09-21",
+  "missing_cells": {
+   "products": 449,
+   "weekly_panel": 5724,
+   "market_weekly": 0,
+   "reviews": 0
+  },
+  "price_variation": {
+   "share_multi_price": 0.788,
+   "median_within_sd_logprice": 0.046,
+   "share_exogenous_changes": 0.877,
+   "share_endogenous_changes": 0.123,
+   "change_reasons": {
+    "campaign_discount": 685,
+    "campaign_ended": 474,
+    "market_follow": 399,
+    "experiment": 297,
+    "reactive_cut": 137,
+    "raise_after_reviews": 68,
+    "reactive_raise": 56
+   }
+  },
+  "distributions": {
+   "bedsheet": {
+    "orders_per_week": {
+     "p10": 1.0,
+     "p50": 7.0,
+     "p90": 34.0
+    },
+    "orders_per_1000_impressions": 1.957,
+    "cancel_rate": 0.049,
+    "rto_rate": 0.101,
+    "return_rate": 0.074,
+    "variance_to_mean_orders": 32.4
+   },
+   "earrings": {
+    "orders_per_week": {
+     "p10": 3.0,
+     "p50": 17.0,
+     "p90": 103.90000000000009
+    },
+    "orders_per_1000_impressions": 3.81,
+    "cancel_rate": 0.051,
+    "rto_rate": 0.121,
+    "return_rate": 0.069,
+    "variance_to_mean_orders": 98.7
+   },
+   "soap": {
+    "orders_per_week": {
+     "p10": 2.0,
+     "p50": 10.0,
+     "p90": 55.0
+    },
+    "orders_per_1000_impressions": 2.279,
+    "cancel_rate": 0.049,
+    "rto_rate": 0.102,
+    "return_rate": 0.056,
+    "variance_to_mean_orders": 32.8
+   },
+   "tshirt": {
+    "orders_per_week": {
+     "p10": 2.0,
+     "p50": 10.0,
+     "p90": 48.30000000000018
+    },
+    "orders_per_1000_impressions": 2.088,
+    "cancel_rate": 0.05,
+    "rto_rate": 0.122,
+    "return_rate": 0.175,
+    "variance_to_mean_orders": 51.0
+   }
+  },
+  "price_segments": {
+   "bedsheet": {
+    "<0.85": 769,
+    "0.85-0.95": 633,
+    "0.95-1.05": 968,
+    "1.05-1.15": 413,
+    ">1.15": 548
+   },
+   "earrings": {
+    "<0.85": 1022,
+    "0.85-0.95": 947,
+    "0.95-1.05": 1068,
+    "1.05-1.15": 394,
+    ">1.15": 611
+   },
+   "soap": {
+    "<0.85": 815,
+    "0.85-0.95": 769,
+    "0.95-1.05": 1296,
+    "1.05-1.15": 530,
+    ">1.15": 729
+   },
+   "tshirt": {
+    "<0.85": 518,
+    "0.85-0.95": 730,
+    "0.95-1.05": 1127,
+    "1.05-1.15": 415,
+    ">1.15": 948
+   }
+  }
+ },
+ "thresholds": {
+  "min_share_products_multi_price": 0.3,
+  "min_median_within_sd_logprice": 0.02,
+  "min_share_exogenous_changes": 0.2,
+  "min_listings_per_category": 50
+ },
+ "provenance": "SYNTHETIC. Generated by generate_dataset.py from assumed buyer behaviour (synth_market.py). Not Meesho data and not public marketplace observations."
+}

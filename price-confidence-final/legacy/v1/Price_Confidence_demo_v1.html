@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Price Confidence: launch price for new Meesho sellers (demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Hind:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #FFFFFF;
+  --wash: #F7F1F8;
+  --ink: #2A0B2F;
+  --ink2: #67516B;
+  --line: #E6DAE9;
+  --pink: #B5145D;
+  --pink-soft: #FBE4EF;
+  --floor: #B42318;
+  --floor-soft: #FDECEA;
+  --gain: #1B7A49;
+  --band: #EBD6EE;
+  --tag: #FFF4F9;
+  --plum: #5B2A86;
+  --focus: #1A5FD6;
+  --display: "Baloo 2", "Hind", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --body: "Hind", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #170D1B; --wash: #22152A; --ink: #F6EDF8; --ink2: #BEAAC3; --line: #3B2944;
+    --pink: #FF7DB6; --pink-soft: #3A1830; --floor: #FF8B7D; --floor-soft: #3B1C1A; --gain: #6CD69D;
+    --band: #3D2344; --tag: #2A1527; --plum: #C9A2F2; --focus: #8AB4FF;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #170D1B; --wash: #22152A; --ink: #F6EDF8; --ink2: #BEAAC3; --line: #3B2944;
+  --pink: #FF7DB6; --pink-soft: #3A1830; --floor: #FF8B7D; --floor-soft: #3B1C1A; --gain: #6CD69D;
+  --band: #3D2344; --tag: #2A1527; --plum: #C9A2F2; --focus: #8AB4FF;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 400 16px/1.55 var(--body); font-feature-settings: "tnum" 1;
+}
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; margin: 0; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--pink); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- top bar ---------- */
+.top {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  max-width: 1240px; margin: 0 auto; padding: 18px 24px 8px;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand svg { flex: none; }
+.brand-name { font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: -0.01em; }
+.top-note { margin-left: auto; font-size: 14px; color: var(--ink2); }
+.top-note b { color: var(--ink); font-weight: 600; }
+
+/* ---------- layout ---------- */
+.wrap {
+  max-width: 1240px; margin: 0 auto; padding: 8px 24px 64px;
+  display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); gap: 40px; align-items: start;
+}
+@media (max-width: 920px) { .wrap { grid-template-columns: 1fr; gap: 28px; } }
+
+/* ---------- form ---------- */
+.form {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px);
+  background: var(--wash); border-radius: 20px; padding: 22px 22px 20px;
+}
+@media (max-width: 920px) { .form { position: static; } }
+.form h1 { font-size: 26px; margin-bottom: 4px; }
+.form .lede { color: var(--ink2); font-size: 15px; margin-bottom: 16px; }
+.examples { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.chip {
+  font: 500 14px/1 var(--body); padding: 8px 12px; border-radius: 999px; cursor: pointer;
+  background: var(--paper); color: var(--ink); border: 1px solid var(--line);
+}
+.chip:hover { border-color: var(--pink); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+fieldset { border: 0; margin: 0 0 18px; padding: 0; min-width: 0; }
+legend { font-family: var(--display); font-weight: 700; font-size: 17px; padding: 0; margin-bottom: 8px; }
+.field { margin-bottom: 12px; }
+.field label, .field .label { display: block; font-weight: 500; font-size: 15px; margin-bottom: 4px; }
+.hint { font-size: 13px; color: var(--ink2); margin-top: 3px; }
+.money { position: relative; }
+.money span {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ink2); pointer-events: none;
+}
+input[type="text"], input[type="number"] {
+  width: 100%; font: 400 16px/1.2 var(--body); color: var(--ink); background: var(--paper);
+  border: 1.5px solid var(--line); border-radius: 10px; padding: 11px 12px;
+}
+.money input { padding-left: 28px; }
+input:hover { border-color: var(--ink2); }
+input[aria-invalid="true"] { border-color: var(--floor); }
+.err { color: var(--floor); font-size: 13px; margin-top: 3px; display: none; }
+.err.on { display: block; }
+.cat-row { display: flex; gap: 8px; margin-top: 8px; }
+.ship-line { font-size: 14px; color: var(--ink2); background: var(--paper); border-radius: 10px; padding: 9px 12px; }
+.ship-line b { color: var(--ink); }
+.checks label { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; margin-bottom: 7px; cursor: pointer; }
+.checks input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--pink); flex: none; }
+.photo { display: flex; align-items: center; gap: 12px; }
+.photo-thumb {
+  width: 64px; height: 64px; border-radius: 12px; background: var(--paper); border: 1.5px dashed var(--line);
+  display: grid; place-items: center; overflow: hidden; flex: none; color: var(--ink2); font-size: 12px; text-align: center;
+}
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.file-btn {
+  font: 500 15px/1 var(--body); padding: 10px 14px; border-radius: 10px; background: var(--paper);
+  border: 1.5px solid var(--line); color: var(--ink); cursor: pointer;
+}
+.file-btn:hover { border-color: var(--ink2); }
+.go {
+  width: 100%; font: 700 18px/1 var(--display); padding: 15px 18px; border: 0; border-radius: 12px; cursor: pointer;
+  background: var(--pink); color: #fff;
+}
+.go:hover { filter: brightness(1.06); }
+:root[data-theme="dark"] .go { color: #1b0714; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .go { color: #1b0714; } }
+
+/* ---------- results ---------- */
+.results { min-width: 0; }
+.results section { margin-bottom: 44px; }
+.results h2 { font-size: 26px; margin-bottom: 10px; }
+.results .sub { color: var(--ink2); margin-bottom: 16px; max-width: 70ch; }
+
+/* price tag: the one bold object on the page */
+.hero { display: grid; grid-template-columns: 1fr; gap: 18px; }
+.tag {
+  position: relative; background: var(--tag); border: 2px solid var(--pink);
+  border-radius: 22px 22px 22px 22px; padding: 26px 28px 22px 76px; max-width: 640px;
+}
+.tag::before {
+  content: ""; position: absolute; left: 28px; top: 40px; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--paper); border: 2px solid var(--pink);
+}
+.tag::after {
+  content: ""; position: absolute; left: 37px; top: 0; width: 2px; height: 42px; background: var(--pink); opacity: .5;
+}
+.tag-top { display: flex; align-items: center; gap: 14px; }
+.tag-img { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; border: 1.5px solid var(--line); }
+.tag-kicker { font: 600 18px/1.2 var(--body); color: var(--ink2); }
+.tag-title { font-weight: 600; font-size: 16px; }
+.tag-price {
+  font: 800 clamp(64px, 11vw, 112px)/0.95 var(--display); letter-spacing: -0.02em; color: var(--ink);
+  margin: 6px 0 4px;
+}
+.tag-price .rs { font-size: .55em; vertical-align: .45em; margin-right: .04em; font-weight: 700; color: var(--pink); }
+.tag-range { font-size: 18px; }
+.tag-range b { font-weight: 600; }
+.tag-floor {
+  margin-top: 16px; padding-top: 14px; border-top: 1.5px dashed var(--line); color: var(--floor); font-size: 16px;
+}
+.tag-floor b { font-weight: 600; }
+.tag.warn { border-color: var(--floor); background: var(--floor-soft); }
+.tag.warn::before { border-color: var(--floor); }
+.tag.warn::after { background: var(--floor); }
+.tag.warn .tag-price { font-size: clamp(40px, 7vw, 64px); color: var(--floor); }
+.notes { display: grid; gap: 8px; max-width: 640px; }
+.note { font-size: 15px; padding: 10px 14px; border-radius: 12px; background: var(--wash); }
+.note.bad { background: var(--floor-soft); color: var(--ink); }
+.note.bad b { color: var(--floor); }
+
+/* price ruler */
+.ruler { position: relative; height: 96px; margin: 4px 6px 0; max-width: 640px; }
+.r-track { position: absolute; left: 0; right: 0; top: 48px; height: 8px; border-radius: 4px; background: var(--line); }
+.r-band { position: absolute; top: 44px; height: 16px; border-radius: 8px; background: var(--band); }
+.r-range { position: absolute; top: 46px; height: 12px; border-radius: 6px; background: var(--pink); opacity: .85; }
+.r-med { position: absolute; top: 38px; width: 2px; height: 28px; background: var(--ink2); }
+.r-floor { position: absolute; top: 30px; width: 3px; height: 44px; background: var(--floor); border-radius: 2px; }
+.r-start { position: absolute; top: 40px; width: 20px; height: 24px; margin-left: -10px; }
+.r-lab { position: absolute; font-size: 13px; white-space: nowrap; transform: translateX(-50%); line-height: 1.2; }
+.r-lab.top { top: 6px; }
+.r-lab.bot { top: 74px; }
+.r-lab b { font-weight: 600; }
+.r-lab.floor { color: var(--floor); }
+.r-lab.start { color: var(--pink); }
+.r-lab.muted { color: var(--ink2); }
+.r-cap { font-size: 13px; color: var(--ink2); margin: -4px 6px 0; max-width: 640px; }
+.r-cap .sw { display: inline-block; width: 18px; height: 10px; border-radius: 5px; background: var(--band); margin-right: 6px; vertical-align: -1px; }
+.r-cap .tick { display: inline-block; width: 2px; height: 12px; background: var(--ink2); margin: 0 6px 0 4px; vertical-align: -2px; }
+.r-off { position: absolute; top: 40px; width: 2px; height: 24px; background: var(--ink2); opacity: .7; }
+
+/* receipt */
+.receipt {
+  background: var(--wash); border-radius: 16px; padding: 18px 20px; max-width: 560px;
+}
+.receipt .intro { font-size: 15px; margin-bottom: 12px; }
+.rline { display: flex; align-items: baseline; gap: 8px; padding: 4px 0; font-size: 16px; }
+.rline .l { flex: none; max-width: 70%; }
+.rline .dots { flex: 1; border-bottom: 2px dotted var(--line); transform: translateY(-4px); min-width: 16px; }
+.rline .v { flex: none; font-variant-numeric: tabular-nums; }
+.rline.total { font-weight: 600; border-top: 1.5px solid var(--line); margin-top: 6px; padding-top: 8px; }
+.rline.floor { color: var(--floor); font-weight: 600; font-size: 18px; }
+.rline .l small { color: var(--ink2); font-size: 13px; display: block; font-weight: 400; }
+
+/* reasons */
+.reasons { list-style: none; padding: 0; margin: 0 0 20px; display: grid; gap: 10px; max-width: 72ch; }
+.reasons li { position: relative; padding-left: 22px; }
+.reasons li::before {
+  content: ""; position: absolute; left: 2px; top: .62em; width: 9px; height: 9px; border-radius: 50%; background: var(--pink);
+}
+.reasons li b { font-weight: 600; }
+
+/* charts */
+figure { margin: 0; }
+.chart { width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font-family: var(--body); font-size: 12px; fill: var(--ink2); }
+.chart .axis-line { stroke: var(--line); }
+.chart .grid { stroke: var(--line); stroke-dasharray: 2 4; }
+.chart .zero { stroke: var(--ink2); stroke-width: 1; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 6px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; margin: 4px 0 8px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 22px; height: 0; border-top: 3px solid; }
+.legend i.dash { border-top-style: dashed; }
+
+/* verdict */
+.verdict { font-size: 17px; max-width: 72ch; margin-bottom: 16px; }
+.verdict b { font-weight: 600; }
+.pill {
+  display: inline-block; font: 700 14px/1 var(--display); padding: 6px 10px 5px; border-radius: 999px; margin-right: 6px;
+  vertical-align: 2px;
+}
+.pill.no { background: var(--floor-soft); color: var(--floor); }
+.pill.yes { background: var(--pink-soft); color: var(--pink); }
+
+/* accordions */
+.acc-hint { font-size: 14px; color: var(--ink2); margin: 26px 0 6px; }
+.accs { max-width: 760px; }
+details.acc { border-top: 1px solid var(--line); }
+details.acc:last-child { border-bottom: 1px solid var(--line); }
+details.acc > summary {
+  list-style: none; cursor: pointer; display: grid; grid-template-columns: 1fr auto; column-gap: 16px;
+  align-items: center; padding: 16px 4px;
+}
+details.acc > summary::-webkit-details-marker { display: none; }
+details.acc > summary:hover .acc-title { color: var(--pink); }
+.acc-title { font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.2; }
+.acc-teaser { grid-column: 1; font-size: 15px; color: var(--ink2); margin-top: 2px; }
+.acc-teaser b { color: var(--ink); font-weight: 600; }
+.acc-teaser .bad { color: var(--floor); font-weight: 600; }
+.acc-teaser .good { color: var(--pink); font-weight: 600; }
+.acc-chev {
+  grid-column: 2; grid-row: 1 / span 2; width: 34px; height: 34px; border-radius: 50%; background: var(--wash);
+  display: grid; place-items: center; color: var(--ink);
+}
+details.acc[open] .acc-chev svg { transform: rotate(180deg); }
+.acc-body { padding: 2px 4px 26px; }
+@media (prefers-reduced-motion: no-preference) { .acc-chev svg { transition: transform .2s ease; } }
+details.more { background: var(--paper); border-radius: 12px; margin: 4px 0 18px; }
+details.more > summary { list-style: none; cursor: pointer; padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; column-gap: 10px; align-items: center; }
+details.more > summary::-webkit-details-marker { display: none; }
+details.more .more-title { font-family: var(--display); font-weight: 700; font-size: 17px; }
+details.more .more-teaser { grid-column: 1; font-size: 13px; color: var(--ink2); }
+details.more .acc-chev { width: 30px; height: 30px; }
+details.more[open] .acc-chev svg { transform: rotate(180deg); }
+details.more .more-body { padding: 4px 14px 14px; }
+details.more .sub-legend { font-weight: 600; font-size: 15px; margin: 6px 0 6px; }
+
+/* launch controls */
+.controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 28px; background: var(--wash);
+  border-radius: 16px; padding: 16px 18px; margin-bottom: 16px; max-width: 720px; }
+@media (max-width: 560px) { .controls { grid-template-columns: 1fr; } }
+.ctl label { display: flex; justify-content: space-between; gap: 8px; font-weight: 500; font-size: 15px; margin-bottom: 4px; }
+.ctl output { font-family: var(--display); font-weight: 700; font-size: 18px; color: var(--pink); }
+.ctl output.loss { color: var(--floor); }
+.ctl input[type="range"] { width: 100%; accent-color: var(--pink); }
+.ctl-scale { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink2); }
+.facts { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 8px; max-width: 72ch; }
+.facts li { padding-left: 22px; position: relative; }
+.facts li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 9px; height: 9px; border-radius: 2px; background: var(--plum); }
+.facts li.bad::before { background: var(--floor); }
+.facts b { font-weight: 600; }
+.bleed { max-width: 720px; margin-top: 8px; }
+.bleed h3 { font-size: 20px; margin: 10px 0 8px; }
+.bleed p { margin-bottom: 10px; max-width: 72ch; }
+.bleed b { font-weight: 600; }
+
+/* evidence table */
+.tbl-wrap { overflow-x: auto; max-width: 100%; }
+table { border-collapse: collapse; font-size: 15px; min-width: 560px; }
+th, td { text-align: right; padding: 8px 12px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; }
+thead th { font-weight: 600; font-size: 14px; color: var(--ink2); vertical-align: bottom; }
+thead tr.grp th { color: var(--ink); font-size: 15px; border-bottom: 0; text-align: center; }
+td.neg { color: var(--floor); }
+td.mine { background: var(--pink-soft); }
+.small { font-size: 14px; color: var(--ink2); max-width: 72ch; }
+
+/* triggers */
+.triggers { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; max-width: 72ch; }
+.triggers li { padding: 12px 16px; border-left: 4px solid var(--band); background: var(--paper); }
+.triggers li b { font-weight: 600; }
+
+/* how it works */
+details.how { background: var(--wash); border-radius: 16px; padding: 16px 20px; }
+details.how summary { cursor: pointer; font-family: var(--display); font-weight: 700; font-size: 20px; }
+details.how h3, .how-body h3 { font-size: 17px; margin: 18px 0 6px; }
+.how-body h3:first-child { margin-top: 4px; }
+.how-body p, .how-body li { font-size: 15px; max-width: 76ch; }
+.how-body ol, .how-body ul { padding-left: 20px; margin: 6px 0; }
+.how-body .kv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 10px 0; max-width: 680px; }
+@media (max-width: 560px) { .how-body .kv { grid-template-columns: 1fr; } }
+.how-body .kv div { background: var(--wash); border-radius: 12px; padding: 10px 12px; }
+.how-body .kv b { display: block; font-family: var(--display); font-size: 22px; }
+details.how p, details.how li { font-size: 15px; max-width: 76ch; }
+details.how ol, details.how ul { padding-left: 20px; margin: 6px 0; }
+details.how .kv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 10px 0; max-width: 680px; }
+@media (max-width: 560px) { details.how .kv { grid-template-columns: 1fr; } }
+details.how .kv div { background: var(--paper); border-radius: 12px; padding: 10px 12px; }
+details.how .kv b { display: block; font-family: var(--display); font-size: 22px; }
+
+.foot { max-width: 1240px; margin: 0 auto; padding: 0 24px 40px; color: var(--ink2); font-size: 14px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .tag.flash { animation: flash .5s ease-out; }
+  @keyframes flash { from { transform: scale(.985); box-shadow: 0 0 0 8px var(--pink-soft); } to { transform: none; box-shadow: none; } }
+}
+@media (max-width: 560px) {
+  .top, .wrap, .foot { padding-left: 16px; padding-right: 16px; }
+  .tag { padding: 22px 18px 18px 58px; }
+  .tag::before { left: 20px; }
+  .tag::after { left: 29px; }
+  .results h2 { font-size: 23px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+      <path d="M4 16.5 16.5 4H29a1 1 0 0 1 1 1v12.5L17.5 30a1.4 1.4 0 0 1-2 0L4 18.5a1.4 1.4 0 0 1 0-2Z" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--pink)"/>
+      <circle cx="23.5" cy="10.5" r="2.6" fill="currentColor" style="color:var(--pink)"/>
+    </svg>
+    <span class="brand-name">Price Confidence</span>
+  </div>
+  <p class="top-note">Demo for Meesho DICE S3 by <b>Team Edge Case</b>, IIT Roorkee. All data is synthetic.</p>
+</header>
+
+<main class="wrap">
+  <form class="form" id="form" novalidate>
+    <h1>What should I charge?</h1>
+    <p class="lede">Tell us about one product. We work out your lowest safe price, check it against the market, and suggest where to start.</p>
+    <div class="examples" role="group" aria-label="Load an example">
+      <button type="button" class="chip" data-example="soap">Try the soap example</button>
+      <button type="button" class="chip" data-example="tshirt">Try the t-shirt example</button>
+    </div>
+
+    <fieldset>
+      <legend>Your product</legend>
+      <div class="field">
+        <label for="title">Product title</label>
+        <input type="text" id="title" autocomplete="off" placeholder="e.g. Handmade neem soap">
+        <div class="cat-row" role="group" aria-label="Category">
+          <button type="button" class="chip" data-cat="soap" aria-pressed="false">Soap</button>
+          <button type="button" class="chip" data-cat="tshirt" aria-pressed="false">T-shirt</button>
+        </div>
+        <p class="err" id="err-cat">Pick soap or t-shirt. This demo covers only these two.</p>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Your costs for one piece</legend>
+      <div class="field">
+        <label for="product">Making or buying cost</label>
+        <div class="money"><span>₹</span><input type="number" id="product" min="0" step="1" inputmode="decimal"></div>
+        <p class="err" id="err-product">Enter what one piece costs you to make or buy.</p>
+      </div>
+      <div class="field">
+        <label for="packaging">Packaging per parcel</label>
+        <div class="money"><span>₹</span><input type="number" id="packaging" min="0" step="1" inputmode="decimal"></div>
+      </div>
+      <p class="ship-line" id="ship-line">Meesho delivery: <b>₹30</b> per soap parcel, <b>₹70</b> per t-shirt parcel.</p>
+    </fieldset>
+
+    <details class="more" id="more">
+      <summary><span class="more-title">More details (optional)</span><span class="more-teaser" id="more-teaser"></span><span class="acc-chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 6 8 10.5 12.5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+      <div class="more-body">
+        <div class="field">
+          <span class="label">Photo</span>
+          <div class="photo">
+            <div class="photo-thumb" id="thumb">No photo</div>
+            <label class="file-btn" for="photo">Add photo</label>
+            <input type="file" id="photo" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0">
+          </div>
+        </div>
+        <div class="field">
+          <label for="gift">Free gift in each parcel</label>
+          <div class="money"><span>₹</span><input type="number" id="gift" min="0" step="1" inputmode="decimal"></div>
+          <p class="hint">A sample or extra piece you add to win reviews.</p>
+        </div>
+        <p class="sub-legend">Your listing has</p>
+        <div class="checks" id="checks">
+          <label><input type="checkbox" value="1"> 4 or more clear photos</label>
+          <label><input type="checkbox" value="1"> Plain, well-lit background</label>
+          <label><input type="checkbox" value="1"> Full description: material, size, weight</label>
+          <label><input type="checkbox" value="1"> Size chart or ingredient list</label>
+        </div>
+        <div class="field" style="margin-top:10px">
+          <label for="budget">How much can you afford to lose while building reviews?</label>
+          <div class="money"><span>₹</span><input type="number" id="budget" min="0" step="100" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="offline">Price you sell at offline</label>
+          <div class="money"><span>₹</span><input type="number" id="offline" min="0" step="1" inputmode="decimal"></div>
+        </div>
+      </div>
+    </details>
+    <button type="submit" class="go">Show my price</button>
+  </form>
+
+  <div class="results" id="results" aria-live="polite"></div>
+</main>
+
+<footer class="foot">
+  Built on 300 synthetic listings (150 soap, 150 t-shirt) generated to demonstrate the method. The numbers show how the
+  tool reasons; they are not a forecast for real Meesho sellers.
+</footer>
+
+<script>
+window.PC_MODEL = {"meta":{"synthetic":true,"seed_note":"generate_dataset.py seed 20260930","listings":300,"listing_weeks":7627,"reviews":28639,"first_launch":"2025-09-01","data_to":"2026-09-21","gst":0.05,"shrink_m":20,"horizon_weeks":12},"categories":{"soap":{"ship":30,"conv":{"rel":-2.4030567584309512,"rel2":1.3577790786486137,"rating_c":0.48541794061069693,"logrev":0.014119106789195188,"festival_week":0.05255408951669188,"a":-6.851790298756336,"b_lq":0.6765102180766253,"fe_sd":0.4399414447539945},"impr":{"ph12":0.5932786241558403,"ph34":0.3165161605311059,"logrev":0.09624026087864651,"rating_c":0.22340541857060037,"convratio":0.29780234348609674,"log_di":1.0663523266789572,"campaign_week":0.25174402285549774,"intercept":8.566830112815898,"lq":0.09390460298226871,"fe_sd":0.19730961339346825},"conv_ref":0.002714115036470349,"keep":{"rto":0.10106682880990547,"ret_intercept":-2.7049689486982045,"ret_lp_pos":0.39959929944166417,"ret_lq":-0.2020059274766448,"resale":0.0,"review_rate":0.14028507126781695,"ret_fe_sd":0.4375717684383344},"rating":{"prior":3.87,"weak":3.5,"expected":3.87,"good":4.13},"lq":{"mean":62.266666666666666,"sd":13.267848136885092},"market":{"median":186,"p25":149,"p75":228,"median_prev4":186,"median_last4":186,"demand_prev4":1.058,"demand_last4":1.08,"as_of":"2026-09-21"},"price_form":"rel","stats":{"naive_price_coef":-0.7062270780178223,"backtest":{"n_listings":22,"model_median_abs_pct_error":0.3083626634376454,"naive_median_abs_pct_error":1.5330926862817398},"listings":150,"weeks":3909},"complaints":[{"bucket":"more than 5% below median","price_share":0.221,"n":172},{"bucket":"within 5% of median","price_share":0.266,"n":241},{"bucket":"5-15% above median","price_share":0.441,"n":34},{"bucket":"more than 15% above median","price_share":0.583,"n":12}],"cohorts":[{"id":"SP001","pos":"above","lvm":1.064,"eligible":true,"survived12":true,"rating":3.5,"reviews":4,"kxp":3024,"orders":23,"returns":3,"kept":16,"resold":0},{"id":"SP002","pos":"below","lvm":0.756,"eligible":false,"survived12":false,"rating":3.29,"reviews":14,"kxp":13066,"orders":126,"returns":17,"kept":94,"resold":0},{"id":"SP003","pos":"at","lvm":1.006,"eligible":true,"survived12":true,"rating":4.55,"reviews":473,"kxp":163977,"orders":1063,"returns":28,"kept":939,"resold":0},{"id":"SP004","pos":"above","lvm":1.192,"eligible":true,"survived12":true,"rating":4.38,"reviews":287,"kxp":82367,"orders":475,"returns":12,"kept":415,"resold":0},{"id":"SP005","pos":"below","lvm":0.926,"eligible":true,"survived12":true,"rating":3.65,"reviews":17,"kxp":10072,"orders":73,"returns":8,"kept":58,"resold":0},{"id":"SP006","pos":"below","lvm":0.88,"eligible":true,"survived12":false,"rating":2.67,"reviews":3,"kxp":1431,"orders":13,"returns":2,"kept":9,"resold":0},{"id":"SP007","pos":"below","lvm":0.871,"eligible":true,"survived12":true,"rating":3.93,"reviews":30,"kxp":21990,"orders":149,"returns":5,"kept":130,"resold":0},{"id":"SP008","pos":"above","lvm":1.108,"eligible":true,"survived12":true,"rating":2.95,"reviews":19,"kxp":5391,"orders":33,"returns":2,"kept":29,"resold":0},{"id":"SP009","pos":"below","lvm":0.872,"eligible":true,"survived12":false,"rating":2.0,"reviews":2,"kxp":1272,"orders":11,"returns":3,"kept":8,"resold":0},{"id":"SP010","pos":"at","lvm":0.974,"eligible":false,"survived12":false,"rating":2.0,"reviews":1,"kxp":1969,"orders":12,"returns":0,"kept":11,"resold":0},{"id":"SP011","pos":"below","lvm":0.764,"eligible":true,"survived12":true,"rating":3.08,"reviews":13,"kxp":3336,"orders":36,"returns":6,"kept":24,"resold":0},{"id":"SP012","pos":"at","lvm":0.987,"eligible":true,"survived12":true,"rating":4.04,"reviews":122,"kxp":80908,"orders":533,"returns":23,"kept":452,"resold":0},{"id":"SP013","pos":"below","lvm":0.882,"eligible":true,"survived12":true,"rating":2.5,"reviews":2,"kxp":3657,"orders":32,"returns":5,"kept":23,"resold":0},{"id":"SP014","pos":"below","lvm":0.904,"eligible":true,"survived12":true,"rating":4.29,"reviews":229,"kxp":93048,"orders":592,"returns":25,"kept":522,"resold":0},{"id":"SP015","pos":"above","lvm":1.541,"eligible":true,"survived12":false,"rating":5.0,"reviews":1,"kxp":1674,"orders":6,"returns":0,"kept":6,"resold":0},{"id":"SP016","pos":"at","lvm":0.945,"eligible":true,"survived12":true,"rating":3.94,"reviews":16,"kxp":7401,"orders":60,"returns":6,"kept":44,"resold":0},{"id":"SP017","pos":"at","lvm":1.007,"eligible":true,"survived12":true,"rating":3.24,"reviews":17,"kxp":8180,"orders":53,"returns":4,"kept":46,"resold":0},{"id":"SP018","pos":"at","lvm":0.942,"eligible":true,"survived12":true,"rating":4.17,"reviews":222,"kxp":97577,"orders":681,"returns":27,"kept":584,"resold":0},{"id":"SP019","pos":"below","lvm":0.932,"eligible":true,"survived12":true,"rating":3.0,"reviews":10,"kxp":6083,"orders":45,"returns":7,"kept":37,"resold":0},{"id":"SP020","pos":"above","lvm":1.062,"eligible":true,"survived12":true,"rating":3.43,"reviews":7,"kxp":4669,"orders":32,"returns":1,"kept":25,"resold":0},{"id":"SP021","pos":"below","lvm":0.894,"eligible":true,"survived12":true,"rating":4.27,"reviews":226,"kxp":78444,"orders":535,"returns":23,"kept":446,"resold":0},{"id":"SP022","pos":"at","lvm":0.946,"eligible":true,"survived12":false,"rating":2.75,"reviews":4,"kxp":3380,"orders":24,"returns":3,"kept":20,"resold":0},{"id":"SP023","pos":"at","lvm":0.994,"eligible":true,"survived12":true,"rating":4.59,"reviews":593,"kxp":283868,"orders":1820,"returns":37,"kept":1594,"resold":0},{"id":"SP024","pos":"at","lvm":1.052,"eligible":true,"survived12":false,"rating":null,"reviews":0,"kxp":1285,"orders":9,"returns":2,"kept":7,"resold":0},{"id":"SP025","pos":"above","lvm":1.088,"eligible":true,"survived12":true,"rating":3.47,"reviews":15,"kxp":12736,"orders":74,"returns":4,"kept":64,"resold":0},{"id":"SP026","pos":"at","lvm":0.993,"eligible":true,"survived12":true,"rating":3.79,"reviews":33,"kxp":11635,"orders":77,"returns":5,"kept":65,"resold":0},{"id":"SP027","pos":"at","lvm":0.984,"eligible":true,"survived12":true,"rating":4.21,"reviews":242,"kxp":193745,"orders":1285,"returns":50,"kept":1105,"resold":0},{"id":"SP028","pos":"at","lvm":1.018,"eligible":true,"survived12":true,"rating":4.59,"reviews":244,"kxp":247636,"orders":1753,"returns":45,"kept":1520,"resold":0},{"id":"SP029","pos":"below","lvm":0.774,"eligible":true,"survived12":true,"rating":3.17,"reviews":12,"kxp":6116,"orders":63,"returns":15,"kept":44,"resold":0},{"id":"SP030","pos":"at","lvm":0.992,"eligible":true,"survived12":true,"rating":3.88,"reviews":17,"kxp":5549,"orders":36,"returns":2,"kept":31,"resold":0},{"id":"SP031","pos":"at","lvm":0.945,"eligible":true,"survived12":true,"rating":3.68,"reviews":41,"kxp":15827,"orders":126,"returns":18,"kept":93,"resold":0},{"id":"SP032","pos":"below","lvm":0.908,"eligible":true,"survived12":true,"rating":3.77,"reviews":52,"kxp":22989,"orders":170,"returns":11,"kept":145,"resold":0},{"id":"SP033","pos":"at","lvm":0.961,"eligible":true,"survived12":false,"rating":2.5,"reviews":2,"kxp":2967,"orders":23,"returns":2,"kept":18,"resold":0},{"id":"SP034","pos":"below","lvm":0.894,"eligible":true,"survived12":true,"rating":3.72,"reviews":57,"kxp":24551,"orders":175,"returns":13,"kept":149,"resold":0},{"id":"SP035","pos":"above","lvm":1.135,"eligible":true,"survived12":true,"rating":4.15,"reviews":102,"kxp":24869,"orders":155,"returns":11,"kept":131,"resold":0},{"id":"SP036","pos":"at","lvm":0.952,"eligible":true,"survived12":true,"rating":3.68,"reviews":87,"kxp":24795,"orders":177,"returns":15,"kept":145,"resold":0},{"id":"SP037","pos":"above","lvm":1.234,"eligible":true,"survived12":true,"rating":4.57,"reviews":429,"kxp":155490,"orders":824,"returns":24,"kept":710,"resold":0},{"id":"SP038","pos":"above","lvm":1.19,"eligible":false,"survived12":false,"rating":4.31,"reviews":13,"kxp":19053,"orders":96,"returns":0,"kept":87,"resold":0},{"id":"SP039","pos":"above","lvm":1.202,"eligible":true,"survived12":true,"rating":4.07,"reviews":29,"kxp":23191,"orders":129,"returns":3,"kept":107,"resold":0},{"id":"SP040","pos":"at","lvm":1.007,"eligible":true,"survived12":false,"rating":2.0,"reviews":1,"kxp":1611,"orders":11,"returns":2,"kept":9,"resold":0},{"id":"SP041","pos":"at","lvm":0.997,"eligible":true,"survived12":false,"rating":null,"reviews":0,"kxp":358,"orders":3,"returns":1,"kept":2,"resold":0},{"id":"SP042","pos":"below","lvm":0.848,"eligible":true,"survived12":true,"rating":3.9,"reviews":50,"kxp":24221,"orders":190,"returns":12,"kept":154,"resold":0},{"id":"SP043","pos":"below","lvm":0.838,"eligible":true,"survived12":true,"rating":4.25,"reviews":346,"kxp":120627,"orders":829,"returns":24,"kept":711,"resold":0},{"id":"SP044","pos":"below","lvm":0.822,"eligible":true,"survived12":true,"rating":3.57,"reviews":53,"kxp":19966,"orders":166,"returns":18,"kept":134,"resold":0},{"id":"SP045","pos":"below","lvm":0.875,"eligible":true,"survived12":true,"rating":2.86,"reviews":7,"kxp":3307,"orders":31,"returns":7,"kept":21,"resold":0},{"id":"SP046","pos":"below","lvm":0.823,"eligible":true,"survived12":true,"rating":4.01,"reviews":68,"kxp":38632,"orders":259,"returns":18,"kept":218,"resold":0},{"id":"SP047","pos":"below","lvm":0.872,"eligible":true,"survived12":true,"rating":3.99,"reviews":84,"kxp":76647,"orders":520,"returns":33,"kept":433,"resold":0},{"id":"SP048","pos":"below","lvm":0.928,"eligible":true,"survived12":true,"rating":3.25,"reviews":20,"kxp":12506,"orders":88,"returns":6,"kept":74,"resold":0},{"id":"SP049","pos":"below","lvm":0.879,"eligible":true,"survived12":true,"rating":3.43,"reviews":28,"kxp":8156,"orders":64,"returns":8,"kept":52,"resold":0},{"id":"SP050","pos":"below","lvm":0.892,"eligible":true,"survived12":true,"rating":3.5,"reviews":10,"kxp":10460,"orders":82,"returns":11,"kept":68,"resold":0},{"id":"SP051","pos":"above","lvm":1.221,"eligible":true,"survived12":true,"rating":3.25,"reviews":24,"kxp":6593,"orders":43,"returns":3,"kept":37,"resold":0},{"id":"SP052","pos":"at","lvm":0.951,"eligible":true,"survived12":true,"rating":3.92,"reviews":49,"kxp":12427,"orders":80,"returns":5,"kept":73,"resold":0},{"id":"SP053","pos":"at","lvm":0.999,"eligible":true,"survived12":true,"rating":3.93,"reviews":43,"kxp":24124,"orders":161,"returns":8,"kept":140,"resold":0},{"id":"SP054","pos":"at","lvm":1.027,"eligible":false,"survived12":false,"rating":3.0,"reviews":3,"kxp":2797,"orders":19,"returns":2,"kept":15,"resold":0},{"id":"SP055","pos":"at","lvm":0.992,"eligible":true,"survived12":true,"rating":3.92,"reviews":24,"kxp":5370,"orders":34,"returns":2,"kept":30,"resold":0},{"id":"SP056","pos":"above","lvm":1.208,"eligible":true,"survived12":true,"rating":3.0,"reviews":5,"kxp":3802,"orders":22,"returns":2,"kept":20,"resold":0},{"id":"SP057","pos":"above","lvm":1.202,"eligible":true,"survived12":true,"rating":4.2,"reviews":25,"kxp":17028,"orders":99,"returns":4,"kept":88,"resold":0},{"id":"SP058","pos":"at","lvm":1.058,"eligible":true,"survived12":true,"rating":3.78,"reviews":37,"kxp":11529,"orders":72,"returns":5,"kept":61,"resold":0},{"id":"SP059","pos":"at","lvm":0.993,"eligible":true,"survived12":true,"rating":3.38,"reviews":8,"kxp":4833,"orders":36,"returns":3,"kept":27,"resold":0},{"id":"SP060","pos":"above","lvm":1.142,"eligible":true,"survived12":true,"rating":3.5,"reviews":2,"kxp":3462,"orders":20,"returns":2,"kept":18,"resold":0},{"id":"SP061","pos":"at","lvm":0.963,"eligible":true,"survived12":true,"rating":4.22,"reviews":629,"kxp":208467,"orders":1474,"returns":64,"kept":1268,"resold":0},{"id":"SP062","pos":"below","lvm":0.824,"eligible":true,"survived12":true,"rating":3.48,"reviews":29,"kxp":6958,"orders":66,"returns":9,"kept":47,"resold":0},{"id":"SP063","pos":"above","lvm":1.158,"eligible":true,"survived12":false,"rating":3.25,"reviews":4,"kxp":6479,"orders":36,"returns":3,"kept":31,"resold":0},{"id":"SP064","pos":"at","lvm":1.039,"eligible":true,"survived12":true,"rating":3.87,"reviews":38,"kxp":29539,"orders":191,"returns":12,"kept":158,"resold":0},{"id":"SP065","pos":"below","lvm":0.875,"eligible":true,"survived12":true,"rating":3.5,"reviews":14,"kxp":5406,"orders":56,"returns":11,"kept":34,"resold":0},{"id":"SP066","pos":"at","lvm":0.948,"eligible":true,"survived12":true,"rating":3.66,"reviews":32,"kxp":12168,"orders":89,"returns":9,"kept":72,"resold":0},{"id":"SP067","pos":"above","lvm":1.211,"eligible":true,"survived12":false,"rating":null,"reviews":0,"kxp":617,"orders":4,"returns":0,"kept":3,"resold":0},{"id":"SP068","pos":"at","lvm":1.051,"eligible":true,"survived12":true,"rating":3.85,"reviews":34,"kxp":13132,"orders":91,"returns":10,"kept":72,"resold":0},{"id":"SP069","pos":"below","lvm":0.839,"eligible":true,"survived12":true,"rating":3.94,"reviews":164,"kxp":48800,"orders":345,"returns":21,"kept":298,"resold":0},{"id":"SP070","pos":"at","lvm":0.999,"eligible":true,"survived12":true,"rating":3.0,"reviews":1,"kxp":3167,"orders":29,"returns":6,"kept":19,"resold":0},{"id":"SP071","pos":"below","lvm":0.92,"eligible":false,"survived12":false,"rating":3.89,"reviews":44,"kxp":42627,"orders":309,"returns":27,"kept":251,"resold":0},{"id":"SP072","pos":"at","lvm":0.976,"eligible":true,"survived12":true,"rating":4.0,"reviews":3,"kxp":5012,"orders":38,"returns":6,"kept":28,"resold":0},{"id":"SP073","pos":"below","lvm":0.908,"eligible":true,"survived12":true,"rating":4.08,"reviews":51,"kxp":18687,"orders":134,"returns":10,"kept":117,"resold":0},{"id":"SP074","pos":"below","lvm":0.887,"eligible":true,"survived12":true,"rating":4.27,"reviews":116,"kxp":37799,"orders":272,"returns":14,"kept":221,"resold":0},{"id":"SP075","pos":"at","lvm":0.997,"eligible":true,"survived12":false,"rating":null,"reviews":0,"kxp":2791,"orders":19,"returns":0,"kept":17,"resold":0},{"id":"SP076","pos":"below","lvm":0.837,"eligible":true,"survived12":false,"rating":4.61,"reviews":179,"kxp":190349,"orders":1312,"returns":31,"kept":1141,"resold":0},{"id":"SP077","pos":"at","lvm":1.035,"eligible":true,"survived12":true,"rating":4.03,"reviews":35,"kxp":31769,"orders":209,"returns":15,"kept":170,"resold":0},{"id":"SP078","pos":"below","lvm":0.866,"eligible":false,"survived12":false,"rating":3.0,"reviews":4,"kxp":7632,"orders":65,"returns":13,"kept":48,"resold":0},{"id":"SP079","pos":"below","lvm":0.834,"eligible":true,"survived12":true,"rating":4.04,"reviews":89,"kxp":38077,"orders":286,"returns":19,"kept":235,"resold":0},{"id":"SP080","pos":"below","lvm":0.826,"eligible":true,"survived12":true,"rating":3.29,"reviews":17,"kxp":7152,"orders":55,"returns":5,"kept":48,"resold":0},{"id":"SP081","pos":"below","lvm":0.83,"eligible":true,"survived12":true,"rating":4.52,"reviews":485,"kxp":249526,"orders":1565,"returns":37,"kept":1334,"resold":0},{"id":"SP082","pos":"below","lvm":0.762,"eligible":true,"survived12":true,"rating":3.13,"reviews":15,"kxp":5838,"orders":52,"returns":5,"kept":42,"resold":0},{"id":"SP083","pos":"at","lvm":0.989,"eligible":true,"survived12":true,"rating":null,"reviews":0,"kxp":1253,"orders":11,"returns":3,"kept":7,"resold":0},{"id":"SP084","pos":"above","lvm":1.062,"eligible":true,"survived12":true,"rating":3.41,"reviews":17,"kxp":5292,"orders":36,"returns":4,"kept":28,"resold":0},{"id":"SP085","pos":"at","lvm":0.963,"eligible":true,"survived12":true,"rating":3.95,"reviews":118,"kxp":33065,"orders":245,"returns":15,"kept":204,"resold":0},{"id":"SP086","pos":"at","lvm":1.018,"eligible":true,"survived12":false,"rating":2.0,"reviews":1,"kxp":895,"orders":10,"returns":3,"kept":5,"resold":0},{"id":"SP087","pos":"at","lvm":0.951,"eligible":true,"survived12":true,"rating":4.29,"reviews":103,"kxp":30676,"orders":223,"returns":6,"kept":184,"resold":0},{"id":"SP088","pos":"above","lvm":1.206,"eligible":true,"survived12":true,"rating":3.0,"reviews":5,"kxp":3878,"orders":25,"returns":0,"kept":21,"resold":0},{"id":"SP089","pos":"at","lvm":1.041,"eligible":true,"survived12":true,"rating":3.36,"reviews":11,"kxp":6425,"orders":43,"returns":4,"kept":35,"resold":0},{"id":"SP090","pos":"at","lvm":0.997,"eligible":true,"survived12":true,"rating":3.4,"reviews":5,"kxp":4117,"orders":28,"returns":3,"kept":23,"resold":0},{"id":"SP091","pos":"below","lvm":0.837,"eligible":true,"survived12":true,"rating":3.47,"reviews":32,"kxp":10877,"orders":88,"returns":8,"kept":73,"resold":0},{"id":"SP092","pos":"at","lvm":1.035,"eligible":true,"survived12":true,"rating":4.07,"reviews":27,"kxp":29624,"orders":193,"returns":8,"kept":160,"resold":0},{"id":"SP093","pos":"below","lvm":0.874,"eligible":true,"survived12":true,"rating":3.75,"reviews":36,"kxp":24006,"orders":179,"returns":10,"kept":144,"resold":0},{"id":"SP094","pos":"above","lvm":1.1,"eligible":true,"survived12":true,"rating":3.91,"reviews":57,"kxp":26467,"orders":166,"returns":13,"kept":133,"resold":0},{"id":"SP095","pos":"below","lvm":0.887,"eligible":true,"survived12":true,"rating":3.86,"reviews":58,"kxp":28261,"orders":206,"returns":12,"kept":175,"resold":0},{"id":"SP096","pos":"above","lvm":1.234,"eligible":true,"survived12":true,"rating":3.65,"reviews":52,"kxp":9969,"orders":65,"returns":7,"kept":51,"resold":0},{"id":"SP097","pos":"below","lvm":0.889,"eligible":true,"survived12":true,"rating":3.08,"reviews":13,"kxp":5040,"orders":43,"returns":9,"kept":32,"resold":0},{"id":"SP098","pos":"above","lvm":1.168,"eligible":true,"survived12":true,"rating":4.25,"reviews":79,"kxp":27500,"orders":156,"returns":6,"kept":136,"resold":0},{"id":"SP099","pos":"below","lvm":0.892,"eligible":true,"survived12":false,"rating":2.5,"reviews":2,"kxp":1431,"orders":12,"returns":1,"kept":9,"resold":0},{"id":"SP100","pos":"below","lvm":0.873,"eligible":true,"survived12":true,"rating":3.5,"reviews":8,"kxp":5723,"orders":47,"returns":6,"kept":37,"resold":0},{"id":"SP101","pos":"above","lvm":1.166,"eligible":true,"survived12":false,"rating":null,"reviews":0,"kxp":988,"orders":5,"returns":0,"kept":5,"resold":0},{"id":"SP102","pos":"at","lvm":1.007,"eligible":true,"survived12":true,"rating":3.5,"reviews":8,"kxp":5370,"orders":35,"returns":1,"kept":30,"resold":0},{"id":"SP103","pos":"at","lvm":1.004,"eligible":true,"survived12":true,"rating":3.92,"reviews":105,"kxp":42265,"orders":274,"returns":11,"kept":242,"resold":0},{"id":"SP104","pos":"above","lvm":1.2,"eligible":true,"survived12":false,"rating":3.0,"reviews":2,"kxp":1752,"orders":8,"returns":0,"kept":8,"resold":0},{"id":"SP105","pos":"at","lvm":0.984,"eligible":true,"survived12":true,"rating":3.09,"reviews":11,"kxp":9772,"orders":63,"returns":4,"kept":56,"resold":0},{"id":"SP106","pos":"at","lvm":1.041,"eligible":true,"survived12":true,"rating":3.87,"reviews":55,"kxp":44226,"orders":285,"returns":20,"kept":234,"resold":0},{"id":"SP107","pos":"above","lvm":1.233,"eligible":true,"survived12":true,"rating":3.59,"reviews":34,"kxp":9618,"orders":78,"returns":15,"kept":53,"resold":0},{"id":"SP108","pos":"below","lvm":0.776,"eligible":true,"survived12":true,"rating":3.61,"reviews":28,"kxp":6533,"orders":58,"returns":6,"kept":47,"resold":0},{"id":"SP109","pos":"below","lvm":0.866,"eligible":false,"survived12":false,"rating":3.75,"reviews":8,"kxp":9661,"orders":75,"returns":6,"kept":59,"resold":0},{"id":"SP110","pos":"below","lvm":0.877,"eligible":true,"survived12":true,"rating":4.5,"reviews":612,"kxp":373014,"orders":2705,"returns":64,"kept":2346,"resold":0},{"id":"SP111","pos":"at","lvm":1.008,"eligible":true,"survived12":true,"rating":3.63,"reviews":150,"kxp":39445,"orders":281,"returns":26,"kept":227,"resold":0},{"id":"SP112","pos":"above","lvm":1.12,"eligible":true,"survived12":false,"rating":null,"reviews":0,"kxp":1104,"orders":7,"returns":0,"kept":6,"resold":0},{"id":"SP113","pos":"below","lvm":0.837,"eligible":true,"survived12":true,"rating":3.88,"reviews":258,"kxp":64815,"orders":521,"returns":39,"kept":435,"resold":0},{"id":"SP114","pos":"at","lvm":0.951,"eligible":true,"survived12":true,"rating":4.08,"reviews":177,"kxp":50869,"orders":359,"returns":19,"kept":301,"resold":0},{"id":"SP115","pos":"above","lvm":1.231,"eligible":true,"survived12":false,"rating":3.0,"reviews":1,"kxp":1533,"orders":11,"returns":4,"kept":7,"resold":0},{"id":"SP116","pos":"below","lvm":0.936,"eligible":true,"survived12":true,"rating":3.62,"reviews":16,"kxp":4563,"orders":36,"returns":5,"kept":27,"resold":0},{"id":"SP117","pos":"below","lvm":0.839,"eligible":true,"survived12":true,"rating":3.85,"reviews":273,"kxp":116161,"orders":817,"returns":59,"kept":669,"resold":0},{"id":"SP118","pos":"below","lvm":0.877,"eligible":true,"survived12":true,"rating":4.25,"reviews":160,"kxp":75049,"orders":506,"returns":26,"kept":431,"resold":0},{"id":"SP119","pos":"above","lvm":1.162,"eligible":true,"survived12":true,"rating":3.48,"reviews":23,"kxp":8979,"orders":62,"returns":3,"kept":48,"resold":0},{"id":"SP120","pos":"at","lvm":1.007,"eligible":true,"survived12":true,"rating":3.82,"reviews":65,"kxp":16826,"orders":117,"returns":11,"kept":94,"resold":0},{"id":"SP121","pos":"above","lvm":1.112,"eligible":true,"survived12":true,"rating":4.53,"reviews":126,"kxp":48556,"orders":274,"returns":6,"kept":244,"resold":0},{"id":"SP122","pos":"at","lvm":1.017,"eligible":true,"survived12":true,"rating":4.2,"reviews":440,"kxp":141289,"orders":986,"returns":38,"kept":839,"resold":0},{"id":"SP123","pos":"below","lvm":0.903,"eligible":true,"survived12":false,"rating":2.5,"reviews":4,"kxp":2862,"orders":29,"returns":7,"kept":18,"resold":0},{"id":"SP124","pos":"above","lvm":1.132,"eligible":true,"survived12":true,"rating":3.77,"reviews":31,"kxp":9002,"orders":58,"returns":2,"kept":48,"resold":0},{"id":"SP125","pos":"at","lvm":1.006,"eligible":true,"survived12":true,"rating":3.95,"reviews":74,"kxp":9666,"orders":64,"returns":6,"kept":54,"resold":0},{"id":"SP126","pos":"at","lvm":0.995,"eligible":true,"survived12":true,"rating":4.1,"reviews":204,"kxp":70347,"orders":470,"returns":24,"kept":393,"resold":0},{"id":"SP127","pos":"at","lvm":1.044,"eligible":true,"survived12":true,"rating":3.47,"reviews":17,"kxp":9336,"orders":60,"returns":7,"kept":50,"resold":0},{"id":"SP128","pos":"at","lvm":0.952,"eligible":true,"survived12":true,"rating":4.27,"reviews":186,"kxp":47055,"orders":316,"returns":10,"kept":275,"resold":0},{"id":"SP129","pos":"below","lvm":0.884,"eligible":true,"survived12":false,"rating":2.0,"reviews":3,"kxp":3910,"orders":39,"returns":9,"kept":26,"resold":0},{"id":"SP130","pos":"above","lvm":1.101,"eligible":true,"survived12":false,"rating":1.75,"reviews":4,"kxp":1791,"orders":11,"returns":1,"kept":9,"resold":0},{"id":"SP131","pos":"above","lvm":1.219,"eligible":true,"survived12":false,"rating":null,"reviews":0,"kxp":971,"orders":7,"returns":1,"kept":5,"resold":0},{"id":"SP132","pos":"above","lvm":1.158,"eligible":true,"survived12":true,"rating":4.15,"reviews":33,"kxp":14421,"orders":83,"returns":7,"kept":69,"resold":0},{"id":"SP133","pos":"above","lvm":1.169,"eligible":true,"survived12":true,"rating":3.33,"reviews":3,"kxp":2399,"orders":23,"returns":6,"kept":14,"resold":0},{"id":"SP134","pos":"at","lvm":0.948,"eligible":true,"survived12":false,"rating":2.67,"reviews":3,"kxp":2197,"orders":16,"returns":1,"kept":13,"resold":0},{"id":"SP135","pos":"below","lvm":0.817,"eligible":true,"survived12":true,"rating":3.89,"reviews":47,"kxp":22797,"orders":182,"returns":11,"kept":153,"resold":0},{"id":"SP136","pos":"below","lvm":0.903,"eligible":true,"survived12":false,"rating":4.13,"reviews":124,"kxp":139498,"orders":1052,"returns":53,"kept":886,"resold":0},{"id":"SP137","pos":"above","lvm":1.132,"eligible":true,"survived12":true,"rating":3.17,"reviews":6,"kxp":5131,"orders":33,"returns":1,"kept":29,"resold":0},{"id":"SP138","pos":"at","lvm":0.976,"eligible":true,"survived12":true,"rating":4.19,"reviews":113,"kxp":132935,"orders":909,"returns":48,"kept":769,"resold":0},{"id":"SP139","pos":"at","lvm":0.98,"eligible":true,"survived12":true,"rating":3.0,"reviews":2,"kxp":1969,"orders":15,"returns":3,"kept":11,"resold":0},{"id":"SP140","pos":"above","lvm":1.173,"eligible":true,"survived12":true,"rating":4.57,"reviews":83,"kxp":22989,"orders":128,"returns":3,"kept":111,"resold":0},{"id":"SP141","pos":"above","lvm":1.23,"eligible":true,"survived12":false,"rating":4.0,"reviews":2,"kxp":1752,"orders":9,"returns":0,"kept":8,"resold":0},{"id":"SP142","pos":"at","lvm":1.019,"eligible":true,"survived12":true,"rating":3.7,"reviews":40,"kxp":13529,"orders":93,"returns":6,"kept":79,"resold":0},{"id":"SP143","pos":"at","lvm":0.95,"eligible":true,"survived12":true,"rating":4.24,"reviews":419,"kxp":152478,"orders":1031,"returns":36,"kept":892,"resold":0},{"id":"SP144","pos":"below","lvm":0.869,"eligible":true,"survived12":true,"rating":3.74,"reviews":54,"kxp":48003,"orders":329,"returns":27,"kept":267,"resold":0},{"id":"SP145","pos":"below","lvm":0.92,"eligible":false,"survived12":false,"rating":3.33,"reviews":3,"kxp":4056,"orders":33,"returns":4,"kept":24,"resold":0},{"id":"SP146","pos":"below","lvm":0.893,"eligible":true,"survived12":true,"rating":4.12,"reviews":183,"kxp":60966,"orders":410,"returns":21,"kept":352,"resold":0},{"id":"SP147","pos":"at","lvm":0.999,"eligible":true,"survived12":false,"rating":3.0,"reviews":1,"kxp":1253,"orders":11,"returns":2,"kept":7,"resold":0},{"id":"SP148","pos":"above","lvm":1.216,"eligible":true,"survived12":true,"rating":3.86,"reviews":14,"kxp":11759,"orders":66,"returns":2,"kept":55,"resold":0},{"id":"SP149","pos":"at","lvm":0.949,"eligible":true,"survived12":true,"rating":2.75,"reviews":4,"kxp":4052,"orders":39,"returns":9,"kept":24,"resold":0},{"id":"SP150","pos":"at","lvm":0.989,"eligible":true,"survived12":true,"rating":3.35,"reviews":17,"kxp":8099,"orders":58,"returns":8,"kept":46,"resold":0}]},"tshirt":{"ship":70,"conv":{"rel":-3.1991382720347947,"rel2":1.3900947389582778,"rating_c":0.6472941243969303,"logrev":-0.0020604047473284596,"festival_week":0.06027853627020197,"a":-6.652836703441231,"b_lq":0.7114734887662532,"fe_sd":0.4293119533399342},"impr":{"ph12":0.6067244280814456,"ph34":0.3390020512857075,"logrev":0.06627400441141933,"rating_c":0.5371591266356944,"convratio":0.2899834592798262,"log_di":0.9661614534496695,"campaign_week":0.26512414762459,"intercept":9.05449811074529,"lq":0.09084156605333994,"fe_sd":0.19783466825767396},"conv_ref":0.0030611694161952986,"keep":{"rto":0.12509837157212905,"ret_intercept":-1.3444673839082002,"ret_lp_pos":0.32227170760449186,"ret_lq":-0.1392510501369827,"resale":0.6964052896256286,"review_rate":0.14903995848469123,"ret_fe_sd":0.3840939277400071},"rating":{"prior":3.655,"weak":3.24,"expected":3.66,"good":3.92},"lq":{"mean":63.28666666666667,"sd":13.313129547349828},"market":{"median":307,"p25":246,"p75":375,"median_prev4":309,"median_last4":307,"demand_prev4":0.97,"demand_last4":0.909,"as_of":"2026-09-21"},"price_form":"rel","stats":{"naive_price_coef":-1.1098742307261895,"backtest":{"n_listings":24,"model_median_abs_pct_error":0.4145819723866012,"naive_median_abs_pct_error":0.8710916532474504},"listings":150,"weeks":3718},"complaints":[{"bucket":"more than 5% below median","price_share":0.188,"n":548},{"bucket":"within 5% of median","price_share":0.246,"n":680},{"bucket":"5-15% above median","price_share":0.206,"n":160},{"bucket":"more than 15% above median","price_share":0.395,"n":38}],"cohorts":[{"id":"TS001","pos":"below","lvm":0.848,"eligible":true,"survived12":true,"rating":4.41,"reviews":300,"kxp":334743,"orders":1369,"returns":154,"kept":1037,"resold":105},{"id":"TS002","pos":"below","lvm":0.849,"eligible":true,"survived12":true,"rating":3.67,"reviews":57,"kxp":39446,"orders":206,"returns":51,"kept":134,"resold":40},{"id":"TS003","pos":"at","lvm":1.035,"eligible":true,"survived12":true,"rating":4.09,"reviews":231,"kxp":143444,"orders":606,"returns":88,"kept":436,"resold":62},{"id":"TS004","pos":"at","lvm":1.023,"eligible":true,"survived12":true,"rating":4.07,"reviews":293,"kxp":117439,"orders":504,"returns":75,"kept":371,"resold":49},{"id":"TS005","pos":"above","lvm":1.101,"eligible":true,"survived12":true,"rating":3.44,"reviews":18,"kxp":14801,"orders":77,"returns":21,"kept":49,"resold":14},{"id":"TS006","pos":"below","lvm":0.897,"eligible":true,"survived12":false,"rating":2.75,"reviews":8,"kxp":2601,"orders":22,"returns":11,"kept":9,"resold":10},{"id":"TS007","pos":"below","lvm":0.849,"eligible":true,"survived12":true,"rating":3.6,"reviews":20,"kxp":15395,"orders":69,"returns":9,"kept":55,"resold":4},{"id":"TS008","pos":"below","lvm":0.805,"eligible":true,"survived12":true,"rating":3.11,"reviews":38,"kxp":9583,"orders":66,"returns":25,"kept":37,"resold":16},{"id":"TS009","pos":"at","lvm":1.027,"eligible":false,"survived12":false,"rating":null,"reviews":0,"kxp":4147,"orders":20,"returns":5,"kept":13,"resold":4},{"id":"TS010","pos":"above","lvm":1.139,"eligible":true,"survived12":true,"rating":2.86,"reviews":7,"kxp":6419,"orders":38,"returns":16,"kept":19,"resold":13},{"id":"TS011","pos":"at","lvm":0.975,"eligible":true,"survived12":true,"rating":3.0,"reviews":11,"kxp":6798,"orders":49,"returns":18,"kept":22,"resold":13},{"id":"TS012","pos":"at","lvm":0.975,"eligible":true,"survived12":true,"rating":3.29,"reviews":35,"kxp":19776,"orders":113,"returns":37,"kept":64,"resold":29},{"id":"TS013","pos":"below","lvm":0.822,"eligible":true,"survived12":false,"rating":2.67,"reviews":6,"kxp":6993,"orders":67,"returns":32,"kept":27,"resold":20},{"id":"TS014","pos":"at","lvm":1.018,"eligible":true,"survived12":false,"rating":2.67,"reviews":6,"kxp":1546,"orders":18,"returns":11,"kept":5,"resold":8},{"id":"TS015","pos":"at","lvm":0.987,"eligible":true,"survived12":true,"rating":4.01,"reviews":144,"kxp":35725,"orders":169,"returns":30,"kept":115,"resold":20},{"id":"TS016","pos":"below","lvm":0.925,"eligible":true,"survived12":true,"rating":3.92,"reviews":223,"kxp":113861,"orders":527,"returns":86,"kept":373,"resold":53},{"id":"TS017","pos":"below","lvm":0.873,"eligible":true,"survived12":true,"rating":3.71,"reviews":366,"kxp":174801,"orders":786,"returns":143,"kept":555,"resold":98},{"id":"TS018","pos":"above","lvm":1.139,"eligible":true,"survived12":true,"rating":3.23,"reviews":22,"kxp":9243,"orders":53,"returns":15,"kept":27,"resold":12},{"id":"TS019","pos":"below","lvm":0.928,"eligible":true,"survived12":true,"rating":2.33,"reviews":3,"kxp":4754,"orders":33,"returns":12,"kept":16,"resold":6},{"id":"TS020","pos":"at","lvm":0.976,"eligible":true,"survived12":true,"rating":2.6,"reviews":10,"kxp":11174,"orders":55,"returns":16,"kept":36,"resold":11},{"id":"TS021","pos":"below","lvm":0.671,"eligible":false,"survived12":false,"rating":2.0,"reviews":2,"kxp":2090,"orders":35,"returns":22,"kept":10,"resold":15},{"id":"TS022","pos":"at","lvm":1.003,"eligible":true,"survived12":true,"rating":3.63,"reviews":19,"kxp":13717,"orders":70,"returns":16,"kept":43,"resold":11},{"id":"TS023","pos":"at","lvm":0.972,"eligible":true,"survived12":true,"rating":3.64,"reviews":59,"kxp":43569,"orders":202,"returns":33,"kept":141,"resold":24},{"id":"TS024","pos":"at","lvm":0.942,"eligible":true,"survived12":true,"rating":3.45,"reviews":20,"kxp":16269,"orders":106,"returns":35,"kept":56,"resold":24},{"id":"TS025","pos":"at","lvm":0.99,"eligible":true,"survived12":true,"rating":4.39,"reviews":426,"kxp":731390,"orders":3161,"returns":336,"kept":2396,"resold":230},{"id":"TS026","pos":"below","lvm":0.861,"eligible":true,"survived12":true,"rating":3.68,"reviews":60,"kxp":30516,"orders":144,"returns":31,"kept":104,"resold":22},{"id":"TS027","pos":"below","lvm":0.815,"eligible":true,"survived12":true,"rating":3.28,"reviews":148,"kxp":124838,"orders":769,"returns":199,"kept":482,"resold":135},{"id":"TS028","pos":"below","lvm":0.782,"eligible":true,"survived12":true,"rating":2.92,"reviews":24,"kxp":10956,"orders":82,"returns":27,"kept":44,"resold":20},{"id":"TS029","pos":"above","lvm":1.226,"eligible":true,"survived12":true,"rating":4.33,"reviews":166,"kxp":178940,"orders":616,"returns":77,"kept":460,"resold":42},{"id":"TS030","pos":"at","lvm":0.972,"eligible":true,"survived12":true,"rating":3.58,"reviews":31,"kxp":23604,"orders":121,"returns":25,"kept":76,"resold":17},{"id":"TS031","pos":"below","lvm":0.723,"eligible":true,"survived12":true,"rating":3.16,"reviews":44,"kxp":29312,"orders":249,"returns":85,"kept":128,"resold":60},{"id":"TS032","pos":"below","lvm":0.909,"eligible":true,"survived12":true,"rating":3.84,"reviews":82,"kxp":69649,"orders":333,"returns":57,"kept":241,"resold":43},{"id":"TS033","pos":"at","lvm":1.008,"eligible":true,"survived12":false,"rating":4.0,"reviews":1,"kxp":2998,"orders":16,"returns":3,"kept":10,"resold":1},{"id":"TS034","pos":"below","lvm":0.926,"eligible":false,"survived12":false,"rating":3.6,"reviews":5,"kxp":5233,"orders":26,"returns":7,"kept":18,"resold":6},{"id":"TS035","pos":"below","lvm":0.861,"eligible":true,"survived12":true,"rating":4.29,"reviews":951,"kxp":476958,"orders":1987,"returns":250,"kept":1502,"resold":183},{"id":"TS036","pos":"above","lvm":1.255,"eligible":true,"survived12":true,"rating":4.47,"reviews":105,"kxp":77805,"orders":260,"returns":30,"kept":195,"resold":18},{"id":"TS037","pos":"at","lvm":1.036,"eligible":true,"survived12":true,"rating":3.75,"reviews":4,"kxp":4540,"orders":24,"returns":7,"kept":14,"resold":5},{"id":"TS038","pos":"below","lvm":0.752,"eligible":true,"survived12":true,"rating":3.08,"reviews":53,"kxp":23900,"orders":155,"returns":41,"kept":100,"resold":34},{"id":"TS039","pos":"at","lvm":0.982,"eligible":true,"survived12":true,"rating":3.37,"reviews":19,"kxp":20268,"orders":110,"returns":28,"kept":68,"resold":19},{"id":"TS040","pos":"at","lvm":0.94,"eligible":true,"survived12":false,"rating":3.0,"reviews":5,"kxp":4784,"orders":28,"returns":8,"kept":16,"resold":8},{"id":"TS041","pos":"at","lvm":1.035,"eligible":true,"survived12":true,"rating":3.6,"reviews":60,"kxp":59220,"orders":259,"returns":47,"kept":180,"resold":27},{"id":"TS042","pos":"below","lvm":0.864,"eligible":true,"survived12":false,"rating":1.67,"reviews":3,"kxp":4114,"orders":36,"returns":18,"kept":16,"resold":14},{"id":"TS043","pos":"at","lvm":1.007,"eligible":true,"survived12":true,"rating":3.17,"reviews":6,"kxp":4147,"orders":26,"returns":10,"kept":13,"resold":10},{"id":"TS044","pos":"below","lvm":0.866,"eligible":true,"survived12":true,"rating":4.26,"reviews":298,"kxp":127924,"orders":546,"returns":65,"kept":406,"resold":50},{"id":"TS045","pos":"at","lvm":0.959,"eligible":true,"survived12":true,"rating":3.85,"reviews":80,"kxp":36064,"orders":162,"returns":24,"kept":116,"resold":17},{"id":"TS046","pos":"below","lvm":0.879,"eligible":true,"survived12":true,"rating":3.45,"reviews":33,"kxp":14787,"orders":103,"returns":39,"kept":53,"resold":30},{"id":"TS047","pos":"at","lvm":1.036,"eligible":true,"survived12":true,"rating":2.86,"reviews":14,"kxp":5593,"orders":38,"returns":15,"kept":17,"resold":11},{"id":"TS048","pos":"below","lvm":0.848,"eligible":true,"survived12":true,"rating":4.25,"reviews":255,"kxp":319399,"orders":1338,"returns":185,"kept":971,"resold":127},{"id":"TS049","pos":"above","lvm":1.116,"eligible":true,"survived12":true,"rating":3.68,"reviews":65,"kxp":19386,"orders":77,"returns":14,"kept":54,"resold":10},{"id":"TS050","pos":"at","lvm":1.018,"eligible":true,"survived12":false,"rating":null,"reviews":0,"kxp":658,"orders":7,"returns":2,"kept":2,"resold":1},{"id":"TS051","pos":"below","lvm":0.911,"eligible":true,"survived12":false,"rating":3.98,"reviews":63,"kxp":120480,"orders":566,"returns":107,"kept":394,"resold":81},{"id":"TS052","pos":"below","lvm":0.645,"eligible":true,"survived12":false,"rating":3.81,"reviews":166,"kxp":171798,"orders":1159,"returns":201,"kept":822,"resold":137},{"id":"TS053","pos":"at","lvm":0.954,"eligible":true,"survived12":true,"rating":3.92,"reviews":279,"kxp":115708,"orders":520,"returns":89,"kept":372,"resold":61},{"id":"TS054","pos":"above","lvm":1.166,"eligible":true,"survived12":false,"rating":3.0,"reviews":1,"kxp":987,"orders":7,"returns":2,"kept":3,"resold":1},{"id":"TS055","pos":"at","lvm":1.036,"eligible":true,"survived12":false,"rating":null,"reviews":0,"kxp":2533,"orders":13,"returns":4,"kept":8,"resold":2},{"id":"TS056","pos":"at","lvm":0.992,"eligible":false,"survived12":false,"rating":3.63,"reviews":30,"kxp":46778,"orders":221,"returns":41,"kept":156,"resold":35},{"id":"TS057","pos":"below","lvm":0.737,"eligible":false,"survived12":false,"rating":4.19,"reviews":353,"kxp":461435,"orders":2696,"returns":393,"kept":2015,"resold":287},{"id":"TS058","pos":"at","lvm":1.037,"eligible":true,"survived12":true,"rating":3.84,"reviews":31,"kxp":25974,"orders":130,"returns":31,"kept":82,"resold":19},{"id":"TS059","pos":"below","lvm":0.846,"eligible":true,"survived12":true,"rating":3.33,"reviews":39,"kxp":48689,"orders":306,"returns":85,"kept":181,"resold":58},{"id":"TS060","pos":"at","lvm":1.004,"eligible":true,"survived12":false,"rating":2.5,"reviews":2,"kxp":1276,"orders":16,"returns":10,"kept":4,"resold":5},{"id":"TS061","pos":"below","lvm":0.939,"eligible":true,"survived12":false,"rating":2.2,"reviews":5,"kxp":2272,"orders":17,"returns":8,"kept":8,"resold":7},{"id":"TS062","pos":"at","lvm":1.037,"eligible":true,"survived12":true,"rating":4.12,"reviews":270,"kxp":232932,"orders":949,"returns":140,"kept":708,"resold":102},{"id":"TS063","pos":"below","lvm":0.876,"eligible":true,"survived12":true,"rating":3.94,"reviews":581,"kxp":283461,"orders":1302,"returns":210,"kept":939,"resold":152},{"id":"TS064","pos":"at","lvm":1.036,"eligible":true,"survived12":true,"rating":3.57,"reviews":54,"kxp":45122,"orders":194,"returns":41,"kept":138,"resold":32},{"id":"TS065","pos":"above","lvm":1.188,"eligible":false,"survived12":false,"rating":2.67,"reviews":3,"kxp":6082,"orders":25,"returns":6,"kept":18,"resold":4},{"id":"TS066","pos":"at","lvm":0.987,"eligible":true,"survived12":false,"rating":2.0,"reviews":2,"kxp":6061,"orders":32,"returns":8,"kept":19,"resold":5},{"id":"TS067","pos":"above","lvm":1.204,"eligible":true,"survived12":false,"rating":null,"reviews":0,"kxp":698,"orders":3,"returns":1,"kept":2,"resold":1},{"id":"TS068","pos":"above","lvm":1.12,"eligible":false,"survived12":false,"rating":3.43,"reviews":14,"kxp":14658,"orders":65,"returns":15,"kept":42,"resold":11},{"id":"TS069","pos":"below","lvm":0.911,"eligible":true,"survived12":true,"rating":3.89,"reviews":28,"kxp":32368,"orders":171,"returns":36,"kept":112,"resold":24},{"id":"TS070","pos":"at","lvm":1.018,"eligible":true,"survived12":true,"rating":4.22,"reviews":1473,"kxp":672273,"orders":2841,"returns":364,"kept":2125,"resold":237},{"id":"TS071","pos":"below","lvm":0.928,"eligible":false,"survived12":false,"rating":null,"reviews":0,"kxp":1997,"orders":16,"returns":9,"kept":7,"resold":8},{"id":"TS072","pos":"at","lvm":1.046,"eligible":true,"survived12":true,"rating":3.48,"reviews":67,"kxp":30441,"orders":157,"returns":37,"kept":97,"resold":31},{"id":"TS073","pos":"below","lvm":0.846,"eligible":true,"survived12":true,"rating":3.75,"reviews":192,"kxp":111413,"orders":625,"returns":121,"kept":421,"resold":85},{"id":"TS074","pos":"at","lvm":0.992,"eligible":false,"survived12":false,"rating":3.83,"reviews":12,"kxp":23654,"orders":121,"returns":25,"kept":81,"resold":16},{"id":"TS075","pos":"above","lvm":1.195,"eligible":true,"survived12":true,"rating":2.5,"reviews":2,"kxp":1403,"orders":15,"returns":10,"kept":5,"resold":5},{"id":"TS076","pos":"below","lvm":0.93,"eligible":false,"survived12":false,"rating":3.23,"reviews":13,"kxp":20784,"orders":116,"returns":28,"kept":74,"resold":18},{"id":"TS077","pos":"at","lvm":1.003,"eligible":true,"survived12":false,"rating":3.33,"reviews":12,"kxp":18561,"orders":95,"returns":22,"kept":63,"resold":13},{"id":"TS078","pos":"below","lvm":0.863,"eligible":true,"survived12":true,"rating":3.74,"reviews":167,"kxp":95355,"orders":491,"returns":100,"kept":339,"resold":67},{"id":"TS079","pos":"at","lvm":1.027,"eligible":false,"survived12":false,"rating":3.8,"reviews":5,"kxp":11484,"orders":60,"returns":15,"kept":36,"resold":10},{"id":"TS080","pos":"below","lvm":0.88,"eligible":true,"survived12":true,"rating":3.12,"reviews":16,"kxp":9207,"orders":54,"returns":15,"kept":33,"resold":11},{"id":"TS081","pos":"above","lvm":1.085,"eligible":true,"survived12":true,"rating":3.8,"reviews":64,"kxp":19962,"orders":74,"returns":11,"kept":58,"resold":8},{"id":"TS082","pos":"below","lvm":0.91,"eligible":true,"survived12":true,"rating":4.16,"reviews":191,"kxp":213644,"orders":993,"returns":137,"kept":720,"resold":99},{"id":"TS083","pos":"at","lvm":0.984,"eligible":true,"survived12":true,"rating":3.73,"reviews":184,"kxp":66859,"orders":318,"returns":63,"kept":213,"resold":46},{"id":"TS084","pos":"at","lvm":1.022,"eligible":true,"survived12":false,"rating":null,"reviews":0,"kxp":2599,"orders":17,"returns":5,"kept":8,"resold":3},{"id":"TS085","pos":"above","lvm":1.232,"eligible":true,"survived12":false,"rating":1.0,"reviews":1,"kxp":1276,"orders":7,"returns":2,"kept":4,"resold":2},{"id":"TS086","pos":"at","lvm":0.992,"eligible":true,"survived12":true,"rating":3.6,"reviews":157,"kxp":44660,"orders":192,"returns":34,"kept":140,"resold":25},{"id":"TS087","pos":"at","lvm":0.974,"eligible":true,"survived12":false,"rating":1.0,"reviews":1,"kxp":1545,"orders":8,"returns":2,"kept":5,"resold":2},{"id":"TS088","pos":"below","lvm":0.863,"eligible":true,"survived12":true,"rating":3.57,"reviews":161,"kxp":113715,"orders":580,"returns":136,"kept":382,"resold":98},{"id":"TS089","pos":"at","lvm":0.942,"eligible":true,"survived12":true,"rating":3.98,"reviews":90,"kxp":75348,"orders":385,"returns":79,"kept":252,"resold":60},{"id":"TS090","pos":"at","lvm":0.982,"eligible":true,"survived12":true,"rating":3.7,"reviews":43,"kxp":53675,"orders":267,"returns":53,"kept":181,"resold":37},{"id":"TS091","pos":"at","lvm":0.943,"eligible":true,"survived12":false,"rating":2.67,"reviews":3,"kxp":1196,"orders":13,"returns":8,"kept":4,"resold":6},{"id":"TS092","pos":"at","lvm":0.955,"eligible":true,"survived12":true,"rating":3.67,"reviews":30,"kxp":15141,"orders":77,"returns":15,"kept":49,"resold":10},{"id":"TS093","pos":"at","lvm":1.025,"eligible":false,"survived12":false,"rating":1.67,"reviews":3,"kxp":2233,"orders":18,"returns":9,"kept":7,"resold":6},{"id":"TS094","pos":"at","lvm":1.038,"eligible":true,"survived12":true,"rating":3.91,"reviews":110,"kxp":85538,"orders":380,"returns":57,"kept":262,"resold":38},{"id":"TS095","pos":"at","lvm":0.943,"eligible":true,"survived12":true,"rating":4.31,"reviews":541,"kxp":321126,"orders":1400,"returns":158,"kept":1074,"resold":107},{"id":"TS096","pos":"at","lvm":1.049,"eligible":true,"survived12":true,"rating":3.84,"reviews":86,"kxp":35013,"orders":150,"returns":29,"kept":107,"resold":17},{"id":"TS097","pos":"above","lvm":1.118,"eligible":true,"survived12":true,"rating":3.49,"reviews":49,"kxp":14436,"orders":59,"returns":9,"kept":44,"resold":5},{"id":"TS098","pos":"below","lvm":0.721,"eligible":true,"survived12":true,"rating":2.7,"reviews":23,"kxp":14885,"orders":115,"returns":28,"kept":65,"resold":17},{"id":"TS099","pos":"at","lvm":0.963,"eligible":false,"survived12":false,"rating":3.33,"reviews":9,"kxp":13275,"orders":63,"returns":10,"kept":45,"resold":7},{"id":"TS100","pos":"above","lvm":1.285,"eligible":false,"survived12":false,"rating":3.0,"reviews":1,"kxp":2793,"orders":21,"returns":10,"kept":7,"resold":6},{"id":"TS101","pos":"at","lvm":1.035,"eligible":true,"survived12":true,"rating":2.92,"reviews":13,"kxp":9487,"orders":57,"returns":23,"kept":30,"resold":17},{"id":"TS102","pos":"at","lvm":1.056,"eligible":false,"survived12":false,"rating":4.0,"reviews":22,"kxp":32122,"orders":144,"returns":28,"kept":98,"resold":19},{"id":"TS103","pos":"above","lvm":1.223,"eligible":true,"survived12":true,"rating":2.0,"reviews":1,"kxp":1286,"orders":19,"returns":15,"kept":4,"resold":8},{"id":"TS104","pos":"above","lvm":1.162,"eligible":true,"survived12":true,"rating":3.14,"reviews":21,"kxp":18339,"orders":90,"returns":27,"kept":50,"resold":22},{"id":"TS105","pos":"below","lvm":0.879,"eligible":true,"survived12":true,"rating":3.28,"reviews":54,"kxp":49941,"orders":306,"returns":88,"kept":179,"resold":65},{"id":"TS106","pos":"at","lvm":0.986,"eligible":true,"survived12":true,"rating":3.94,"reviews":266,"kxp":141636,"orders":627,"returns":98,"kept":444,"resold":67},{"id":"TS107","pos":"at","lvm":0.944,"eligible":true,"survived12":true,"rating":4.26,"reviews":699,"kxp":571840,"orders":2512,"returns":344,"kept":1900,"resold":241},{"id":"TS108","pos":"below","lvm":0.869,"eligible":true,"survived12":true,"rating":3.69,"reviews":16,"kxp":12774,"orders":70,"returns":19,"kept":44,"resold":17},{"id":"TS109","pos":"below","lvm":0.862,"eligible":true,"survived12":true,"rating":3.88,"reviews":250,"kxp":97929,"orders":493,"returns":72,"kept":351,"resold":49},{"id":"TS110","pos":"below","lvm":0.782,"eligible":true,"survived12":true,"rating":4.25,"reviews":867,"kxp":358560,"orders":2027,"returns":264,"kept":1440,"resold":192},{"id":"TS111","pos":"at","lvm":1.018,"eligible":true,"survived12":true,"rating":3.94,"reviews":308,"kxp":129855,"orders":591,"returns":88,"kept":429,"resold":62},{"id":"TS112","pos":"above","lvm":1.201,"eligible":true,"survived12":true,"rating":2.2,"reviews":5,"kxp":7747,"orders":40,"returns":11,"kept":25,"resold":7},{"id":"TS113","pos":"below","lvm":0.863,"eligible":false,"survived12":false,"rating":2.6,"reviews":5,"kxp":8608,"orders":57,"returns":18,"kept":32,"resold":13},{"id":"TS114","pos":"at","lvm":0.974,"eligible":true,"survived12":true,"rating":3.94,"reviews":110,"kxp":92700,"orders":434,"returns":69,"kept":300,"resold":50},{"id":"TS115","pos":"below","lvm":0.91,"eligible":true,"survived12":true,"rating":3.35,"reviews":40,"kxp":38553,"orders":201,"returns":50,"kept":127,"resold":38},{"id":"TS116","pos":"below","lvm":0.877,"eligible":true,"survived12":true,"rating":3.75,"reviews":44,"kxp":41070,"orders":228,"returns":63,"kept":130,"resold":40},{"id":"TS117","pos":"at","lvm":1.003,"eligible":true,"survived12":false,"rating":2.0,"reviews":3,"kxp":2806,"orders":21,"returns":9,"kept":10,"resold":6},{"id":"TS118","pos":"at","lvm":1.005,"eligible":true,"survived12":true,"rating":3.35,"reviews":17,"kxp":8548,"orders":48,"returns":14,"kept":28,"resold":9},{"id":"TS119","pos":"at","lvm":0.976,"eligible":true,"survived12":true,"rating":3.12,"reviews":8,"kxp":8034,"orders":45,"returns":10,"kept":26,"resold":5},{"id":"TS120","pos":"at","lvm":1.032,"eligible":true,"survived12":false,"rating":null,"reviews":0,"kxp":2632,"orders":17,"returns":5,"kept":8,"resold":4},{"id":"TS121","pos":"below","lvm":0.867,"eligible":true,"survived12":true,"rating":3.0,"reviews":10,"kxp":14604,"orders":89,"returns":21,"kept":54,"resold":17},{"id":"TS122","pos":"above","lvm":1.322,"eligible":true,"survived12":true,"rating":3.92,"reviews":121,"kxp":128633,"orders":437,"returns":73,"kept":307,"resold":50},{"id":"TS123","pos":"at","lvm":0.999,"eligible":true,"survived12":true,"rating":4.35,"reviews":412,"kxp":174131,"orders":740,"returns":90,"kept":557,"resold":58},{"id":"TS124","pos":"at","lvm":0.987,"eligible":true,"survived12":true,"rating":3.88,"reviews":800,"kxp":298640,"orders":1338,"returns":211,"kept":944,"resold":147},{"id":"TS125","pos":"above","lvm":1.141,"eligible":true,"survived12":true,"rating":3.74,"reviews":126,"kxp":77028,"orders":347,"returns":70,"kept":228,"resold":44},{"id":"TS126","pos":"at","lvm":1.045,"eligible":true,"survived12":true,"rating":3.9,"reviews":52,"kxp":79487,"orders":341,"returns":63,"kept":243,"resold":50},{"id":"TS127","pos":"below","lvm":0.849,"eligible":true,"survived12":false,"rating":3.04,"reviews":27,"kxp":30666,"orders":201,"returns":58,"kept":114,"resold":37},{"id":"TS128","pos":"below","lvm":0.93,"eligible":true,"survived12":true,"rating":3.43,"reviews":42,"kxp":7475,"orders":44,"returns":11,"kept":25,"resold":10},{"id":"TS129","pos":"below","lvm":0.752,"eligible":true,"survived12":false,"rating":3.56,"reviews":75,"kxp":89864,"orders":584,"returns":127,"kept":376,"resold":92},{"id":"TS130","pos":"above","lvm":1.193,"eligible":true,"survived12":false,"rating":1.0,"reviews":1,"kxp":3670,"orders":17,"returns":2,"kept":10,"resold":2},{"id":"TS131","pos":"at","lvm":0.984,"eligible":true,"survived12":true,"rating":3.41,"reviews":22,"kxp":35366,"orders":167,"returns":30,"kept":114,"resold":20},{"id":"TS132","pos":"at","lvm":1.016,"eligible":true,"survived12":true,"rating":3.03,"reviews":35,"kxp":9541,"orders":67,"returns":25,"kept":29,"resold":17},{"id":"TS133","pos":"below","lvm":0.844,"eligible":true,"survived12":true,"rating":3.41,"reviews":164,"kxp":50303,"orders":298,"returns":71,"kept":187,"resold":50},{"id":"TS134","pos":"above","lvm":1.2,"eligible":true,"survived12":true,"rating":3.33,"reviews":3,"kxp":11367,"orders":46,"returns":6,"kept":33,"resold":3},{"id":"TS135","pos":"at","lvm":0.951,"eligible":true,"survived12":true,"rating":3.97,"reviews":89,"kxp":119002,"orders":554,"returns":90,"kept":398,"resold":71},{"id":"TS136","pos":"at","lvm":0.963,"eligible":false,"survived12":false,"rating":3.33,"reviews":9,"kxp":15128,"orders":79,"returns":20,"kept":52,"resold":13},{"id":"TS137","pos":"at","lvm":1.006,"eligible":true,"survived12":true,"rating":2.67,"reviews":6,"kxp":3764,"orders":30,"returns":14,"kept":12,"resold":9},{"id":"TS138","pos":"above","lvm":1.111,"eligible":true,"survived12":true,"rating":4.17,"reviews":120,"kxp":214806,"orders":850,"returns":97,"kept":619,"resold":61},{"id":"TS139","pos":"at","lvm":0.984,"eligible":true,"survived12":false,"rating":1.8,"reviews":5,"kxp":3667,"orders":29,"returns":11,"kept":13,"resold":8},{"id":"TS140","pos":"below","lvm":0.911,"eligible":true,"survived12":true,"rating":3.73,"reviews":33,"kxp":33468,"orders":160,"returns":29,"kept":110,"resold":23},{"id":"TS141","pos":"below","lvm":0.844,"eligible":true,"survived12":true,"rating":2.78,"reviews":32,"kxp":17754,"orders":118,"returns":38,"kept":66,"resold":22},{"id":"TS142","pos":"at","lvm":1.04,"eligible":true,"survived12":true,"rating":4.23,"reviews":329,"kxp":418420,"orders":1791,"returns":222,"kept":1299,"resold":151},{"id":"TS143","pos":"at","lvm":1.027,"eligible":false,"survived12":false,"rating":2.0,"reviews":2,"kxp":2727,"orders":18,"returns":5,"kept":9,"resold":5},{"id":"TS144","pos":"at","lvm":1.006,"eligible":true,"survived12":true,"rating":4.15,"reviews":61,"kxp":55167,"orders":249,"returns":43,"kept":177,"resold":31},{"id":"TS145","pos":"below","lvm":0.864,"eligible":true,"survived12":true,"rating":2.62,"reviews":26,"kxp":10629,"orders":88,"returns":37,"kept":39,"resold":26},{"id":"TS146","pos":"above","lvm":1.112,"eligible":true,"survived12":false,"rating":null,"reviews":0,"kxp":1665,"orders":11,"returns":1,"kept":5,"resold":1},{"id":"TS147","pos":"at","lvm":1.016,"eligible":true,"survived12":true,"rating":3.87,"reviews":175,"kxp":79127,"orders":358,"returns":63,"kept":245,"resold":49},{"id":"TS148","pos":"below","lvm":0.892,"eligible":true,"survived12":true,"rating":4.3,"reviews":1119,"kxp":606741,"orders":2411,"returns":296,"kept":1859,"resold":203},{"id":"TS149","pos":"at","lvm":1.018,"eligible":true,"survived12":true,"rating":3.81,"reviews":119,"kxp":19929,"orders":102,"returns":23,"kept":61,"resold":18},{"id":"TS150","pos":"below","lvm":0.879,"eligible":true,"survived12":true,"rating":2.2,"reviews":5,"kxp":3822,"orders":35,"returns":15,"kept":14,"resold":11}]}}};
+</script>
+<script>
+/*
+ * Price Confidence - pricing engine (Team Edge Case, Meesho DICE S3)
+ *
+ * Pure functions over model.json (written by train_models.py). Used by the web app,
+ * and by test_engine.js under node. No network, no storage.
+ *
+ * Steps for one seller:
+ *   1. unitEconomics  - what one dispatched order costs, and what comes back, at a price
+ *   2. floorPrice     - lowest listing price where a paid order covers every dispatched order
+ *   3. simulate       - 12 weeks of impressions -> orders -> reviews -> visibility, at a price plan
+ *   4. recommend      - best flat launch price inside the market band, a good range,
+ *                       the "launch lower first" check, similar-listing evidence, and triggers
+ */
+(function (root) {
+  "use strict";
+
+  var ends9 = function (x) { return Math.max(49, Math.round(x / 10) * 10 - 1); };
+  var sig = function (x) { return 1 / (1 + Math.exp(-x)); };
+  var clamp = function (x, a, b) { return Math.min(b, Math.max(a, x)); };
+  var median = function (a) {
+    if (!a.length) return null;
+    var s = a.slice().sort(function (x, y) { return x - y; });
+    var m = Math.floor(s.length / 2);
+    return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+  };
+
+  function detectCategory(title) {
+    var t = (title || "").toLowerCase();
+    if (/t[\s-]?shirt|\btees?\b|tshirt/.test(t)) return "tshirt";
+    if (/soap|sabun|साबुन|bath bar/.test(t)) return "soap";
+    return null;
+  }
+
+  // Listing checklist (0-4 boxes) -> listing quality score used by the models
+  function listingScore(checks) { return 50 + 7.5 * clamp(checks, 0, 4); }   // 50..80, inside the data range
+
+  // A product scenario: the rating buyers give it, and how far its own baseline sits from a typical listing
+  // (shift in SD units: +0.674 = 75th percentile "good", -0.674 = 25th percentile "weak")
+  var QSHIFT = 0.674;
+  function scen(R, which) {
+    if (which === "good") return { rating: R.good, shift: QSHIFT };
+    if (which === "weak") return { rating: R.weak, shift: -QSHIFT };
+    return { rating: R.expected, shift: 0 };
+  }
+  function asScen(s) { return typeof s === "number" ? { rating: s, shift: 0 } : s; }
+
+  // log-conversion change from price p, relative to the market median
+  function priceTerm(C, p) {
+    if (C.price_form === "rel") { var r = p / C.market.median - 1; return C.conv.rel * r + C.conv.rel2 * r * r; }
+    var lp = Math.log(p / C.market.median); return C.conv.lp * lp + C.conv.lp2 * lp * lp;
+  }
+  // effect on orders per impression of a +x price change at the typical price
+  function priceEffect(C, x) { return Math.exp(priceTerm(C, C.market.median * (1 + x)) - priceTerm(C, C.market.median)) - 1; }
+
+  function lqz(M, cat, score) {
+    var C = M.categories[cat];
+    return (score - C.lq.mean) / C.lq.sd;
+  }
+
+  // 1. What one dispatched order costs and returns at listing price `price`
+  function unitEconomics(M, cat, price, costs, z, shift) {
+    var C = M.categories[cat], k = C.keep, gst = M.meta.gst;
+    var lp = Math.log(price / C.market.median);
+    var ret = sig(k.ret_intercept + k.ret_lp_pos * Math.max(0, lp) + k.ret_lq * z - (shift || 0) * (k.ret_fe_sd || 0));
+    var rto = k.rto;
+    var delivered = 1 - rto;
+    var returns = delivered * ret;
+    var kept = delivered - returns;
+    var lostUnits = kept + returns * (1 - k.resale);     // RTO parcels come back intact
+    var parts = {
+      product: costs.product * lostUnits,
+      packaging: costs.packaging,                         // every parcel
+      forward: C.ship,                                    // every parcel, incl. RTO and returns
+      reverse: returns * C.ship,                          // return pickup
+      gift: costs.gift
+    };
+    var cost = parts.product + parts.packaging + parts.forward + parts.reverse + parts.gift;
+    var revenue = kept * price / (1 + gst);
+    return {
+      price: price, rto: rto, ret: ret, delivered: delivered, returns: returns, kept: kept,
+      parts: parts, costPerDispatch: cost, revenue: revenue, profit: revenue - cost,
+      costPerPaid: cost / kept, gstPerPaid: price - price / (1 + gst)
+    };
+  }
+
+  // 2. Floor: lowest whole-rupee listing price with profit >= 0 per dispatched order
+  function floorPrice(M, cat, costs, z) {
+    var cap = M.categories[cat].market.median * 8;
+    for (var p = 1; p <= cap; p++) {
+      if (unitEconomics(M, cat, p, costs, z).profit >= 0) return p;
+    }
+    return null;
+  }
+
+  // 3. Week-by-week simulation of a price plan (array of weekly prices)
+  function simulate(M, cat, plan, costs, z, scenario) {
+    var sc = asScen(scenario), rating = sc.rating, sh = sc.shift || 0;
+    var C = M.categories[cat], I = C.impr, V = C.conv;
+    var prior = C.rating.prior, m = M.meta.shrink_m, logdi = Math.log(C.market.demand_last4);
+    var cumRev = 0, ema = null, cum = 0, minCum = 0, orders = 0, weeks = [];
+    for (var w = 1; w <= plan.length; w++) {
+      var p = plan[w - 1], lp = Math.log(p / C.market.median);
+      var rShown = (rating * cumRev + prior * m) / (cumRev + m);
+      var rc = rShown - 4, lr = Math.log1p(cumRev);
+      var convratio = ema === null ? 0 : clamp(ema / C.conv_ref - 1, -1, 3);
+      var impr = Math.exp(I.intercept + I.lq * z + sh * (I.fe_sd || 0) + I.ph12 * (w <= 2 ? 1 : 0) + I.ph34 * (w >= 3 && w <= 4 ? 1 : 0)
+        + I.logrev * lr + I.rating_c * rc + I.convratio * convratio + I.log_di * logdi);
+      var conv = Math.exp(V.a + V.b_lq * z + sh * (V.fe_sd || 0) + priceTerm(C, p) + V.rating_c * rc + V.logrev * lr);
+      var o = impr * conv;
+      var u = unitEconomics(M, cat, p, costs, z, sh);
+      var profit = o * u.profit;
+      cumRev += C.keep.review_rate * o * (u.kept + u.returns);
+      ema = ema === null ? conv : 0.6 * ema + 0.4 * conv;
+      cum += profit;
+      minCum = Math.min(minCum, cum);
+      orders += o;
+      weeks.push({ w: w, price: p, impressions: impr, orders: o, profit: profit, cum: cum, reviews: cumRev });
+    }
+    return { weeks: weeks, total: cum, minCum: minCum, orders: orders, reviews: cumRev };
+  }
+
+  function flat(price, n) { var a = []; for (var i = 0; i < n; i++) a.push(price); return a; }
+
+  var LONG = 26;   // horizon for launch-at-a-loss decisions: payback often takes about 13 weeks
+
+  // extra price the same sales can bear when the rating rises by dr stars (conversion + visibility effects)
+  function trustRoom(C, dr) {
+    var gain = (C.conv.rating_c + C.impr.rating_c) * dr;          // log-orders gained from the better rating
+    // find the price rise (as a share of the typical price) that loses the same log-orders
+    var lo = 0, hi = 3;
+    for (var i = 0; i < 40; i++) { var mid = (lo + hi) / 2; if (-(Math.log(1 + priceEffect(C, mid))) < gain) lo = mid; else hi = mid; }
+    return lo;
+  }
+
+  // Launch at price L for k weeks, then the start price; followed for 26 weeks under good, typical and weak ratings
+  function launchOption(M, input, rec, L, k) {
+    var cat = rec.category, C = M.categories[cat], R = C.rating, H = LONG, T = rec.start, floor = rec.floor;
+    var costs = rec.costs, z = lqz(M, cat, rec.listingScore);
+    var budgetGiven = input.budget !== null && input.budget !== undefined && input.budget !== "";
+    var budget = budgetGiven ? (+input.budget || 0) : null;
+    var planL = flat(L, k).concat(flat(T, H - k)), planT = flat(T, H);
+    var sim = function (plan, r) { return simulate(M, cat, plan, costs, z, r); };
+    var SG = scen(R, "good"), SW = scen(R, "weak"), SX = scen(R, "expected");
+    var gL = sim(planL, SG), wL = sim(planL, SW), xL = sim(planL, SX);
+    var gT = sim(planT, SG), wT = sim(planT, SW), xT = sim(planT, SX);
+    var eL = unitEconomics(M, cat, L, costs, z);
+    // launch-window figures use the good-rating runs, the same lines the chart shows
+    var ordersLaunch = 0;
+    for (var i = 0; i < k; i++) ordersLaunch += gL.weeks[i].orders;
+    var extraReviews = gL.weeks[k - 1].reviews - gT.weeks[k - 1].reviews;
+    var launchCost = gT.weeks[k - 1].cum - gL.weeks[k - 1].cum;
+    var backToZero = function (s) {
+      var dipped = false;
+      for (var j = 0; j < s.weeks.length; j++) { if (s.weeks[j].cum < 0) dipped = true; else if (dipped) return s.weeks[j].w; }
+      return dipped ? null : 0;
+    };
+    var catchUp = function (a, b) {
+      for (var j = k; j < H; j++) if (a.weeks[j].cum >= b.weeks[j].cum) return j + 1;
+      return null;
+    };
+    var maxWeeks = budgetGiven ? 0 : null;
+    for (var kk = 1; budgetGiven && kk <= 12; kk++) {
+      var s = sim(flat(L, kk).concat(flat(T, H - kk)), SW);
+      if (-s.minCum <= budget) maxWeeks = kk; else break;
+    }
+    var worstDip = -Math.min(gL.minCum, wL.minCum, 0);
+    var gain = gL.total - gT.total;
+    return {
+      launch: L, weeks: k, horizon: H, start: T, floor: floor, belowFloor: L < floor,
+      perPaid: eL.profit / eL.kept, ordersLaunch: ordersLaunch,
+      reviewsLaunch: gL.weeks[k - 1].reviews, reviewsFlat: gT.weeks[k - 1].reviews, extraReviews: extraReviews,
+      cumAtK: { launch: gL.weeks[k - 1].cum, flat: gT.weeks[k - 1].cum },
+      launchCost: launchCost, costPerReview: extraReviews > 0.5 && launchCost > 0 ? launchCost / extraReviews : null,
+      good: gL, weak: wL, flatGood: gT, flatWeak: wT, gainIfGood: gain, changeIfWeak: wL.total - wT.total,
+      worstDip: worstDip, budget: budget, withinBudget: budgetGiven ? worstDip <= budget : null, maxWeeks: maxWeeks,
+      backToZeroGood: backToZero(gL), backToZeroWeak: backToZero(wL),
+      catchUpGood: catchUp(gL, gT), catchUpWeak: catchUp(wL, wT),
+      // "worth it" is about the money; whether the seller can afford the dip is reported separately
+      worthIt: gain >= Math.max(500, 0.05 * Math.abs(gT.total))
+    };
+  }
+
+  // Similar listings, re-costed with THIS seller's costs (competitor costs are unknown)
+  function cohortEvidence(M, cat, costs, split) {
+    var C = M.categories[cat], gst = M.meta.gst;
+    var rows = C.cohorts.filter(function (r) { return r.eligible && r.rating !== null; }).map(function (r) {
+      var profit = r.kxp / (1 + gst) - r.orders * (C.ship + costs.packaging + costs.gift)
+        - r.returns * C.ship - (r.kept + r.returns - r.resold) * costs.product;
+      return { pos: r.pos, good: r.rating >= split, survived: r.survived12, orders: r.orders, profit: profit };
+    });
+    var groups = [];
+    ["below", "at", "above"].forEach(function (pos) {
+      [true, false].forEach(function (good) {
+        var g = rows.filter(function (r) { return r.pos === pos && r.good === good; });
+        groups.push({
+          pos: pos, good: good, n: g.length,
+          survival: g.length ? g.filter(function (r) { return r.survived; }).length / g.length : null,
+          orders: median(g.map(function (r) { return r.orders; })),
+          profit: median(g.map(function (r) { return r.profit; })),
+          lossShare: g.length ? g.filter(function (r) { return r.profit < 0; }).length / g.length : null
+        });
+      });
+    });
+    return groups;
+  }
+
+  function positionOf(price, med) {
+    var r = price / med;
+    return r < 0.94 ? "below" : r > 1.06 ? "above" : "at";
+  }
+
+  // 4. Everything the seller sees
+  function recommend(M, input) {
+    var cat = input.category, C = M.categories[cat], mk = C.market, H = M.meta.horizon_weeks;
+    var costs = { product: +input.product || 0, packaging: +input.packaging || 0, gift: +input.gift || 0 };
+    var score = listingScore(input.checks || 0), z = lqz(M, cat, score);
+    var floor = floorPrice(M, cat, costs, z);
+    var R = C.rating;
+
+    // candidate launch prices: ending in 9, from well below the band up to the band's top
+    var lo = ends9(mk.p25 * 0.6), hi = ends9(mk.p75);
+    var cands = [];
+    for (var p = lo; p <= hi; p += 10) cands.push(p);
+    var evals = cands.map(function (p) {
+      return { p: p, sim: simulate(M, cat, flat(p, H), costs, z, scen(R, "expected")), u: unitEconomics(M, cat, p, costs, z) };
+    });
+    var viable = evals.filter(function (e) { return floor !== null && e.p >= floor; });
+    var best = null;
+    viable.forEach(function (e) { if (!best || e.sim.total > best.sim.total) best = e; });
+
+    var out = {
+      category: cat, costs: costs, listingScore: score, floor: floor, market: mk, ship: C.ship,
+      rating: R, curve: evals.map(function (e) { return { p: e.p, total: e.sim.total, orders: e.sim.orders, perOrder: e.u.profit }; }),
+      floorEcon: floor ? unitEconomics(M, cat, floor, costs, z) : null
+    };
+
+    if (!best || best.sim.total <= 0) {
+      // no price buyers accept covers the costs: find the product cost that would make the median work
+      var maxCost = null;
+      for (var c = Math.floor(costs.product); c >= 0; c--) {
+        var cc = { product: c, packaging: costs.packaging, gift: costs.gift };
+        if (floorPrice(M, cat, cc, z) <= mk.median) { maxCost = c; break; }
+      }
+      out.status = "no_viable_price";
+      out.maxProductCostAtMedian = maxCost;
+      out.medianEcon = unitEconomics(M, cat, mk.median, costs, z);
+      var bleedAt = function (p, rating) {
+        var sim = simulate(M, cat, flat(p, LONG), costs, z, rating), e = unitEconomics(M, cat, p, costs, z), wk = null;
+        var budget = +input.budget || 0;
+        if (budget <= 0) wk = 0; else for (var i = 0; i < sim.weeks.length; i++) if (sim.weeks[i].cum <= -budget) { wk = sim.weeks[i].w; break; }
+        return { price: p, lossPerPaid: -e.profit / e.kept, weeksBudget: wk, sim: sim };
+      };
+      var top = hi;
+      out.bleed = { top: bleedAt(top, scen(R, "expected")), topGood: bleedAt(top, scen(R, "good")), median: bleedAt(ends9(mk.median), scen(R, "expected")),
+                    budget: +input.budget || 0, horizon: LONG };
+      var th = C.conv.rating_c + C.impr.rating_c, needLog = -Math.log(1 + priceEffect(C, floor / mk.median - 1)) + Math.log(1 + priceEffect(C, top / mk.median - 1));
+      out.trust = { top: top, needPct: floor / top - 1, needRating: R.expected + needLog / th,
+                    good: R.good, room: [R.good, 4.5].map(function (r) { return { rating: r, pct: trustRoom(C, r - R.expected) }; }) };
+      return out;
+    }
+
+    // good range: neighbours within 90% of the best 12-week profit
+    var idx = viable.indexOf(best), a = idx, b = idx;
+    // start price: when a lower price earns almost the same (within 5%), take it - more orders, faster reviews
+    var start = best;
+    for (var s = idx - 1; s >= 0 && viable[s].sim.total >= 0.95 * best.sim.total; s--) start = viable[s];
+    while (a - 1 >= 0 && viable[a - 1].sim.total >= 0.9 * best.sim.total) a--;
+    while (b + 1 < viable.length && viable[b + 1].sim.total >= 0.9 * best.sim.total) b++;
+    out.status = "ok";
+    out.start = start.p;
+    out.modelBest = best.p;
+    out.range = [viable[a].p, viable[b].p];
+    out.cappedAtBand = best.p === hi;
+    out.startEcon = start.u;
+    out.startSim = start.sim;
+    out.position = positionOf(start.p, mk.median);
+    out.thinMargin = start.u.profit < 0.08 * start.p;
+    var lower = null;                                  // a cheaper price to compare against in the reasons
+    viable.forEach(function (e) { if (e.p <= start.p - 30 && (!lower || e.p > lower.p)) lower = e; });
+    out.compareLower = lower ? { p: lower.p, orders: lower.sim.orders, total: lower.sim.total } : null;
+
+    var T = start.p;
+    // launch at a loss (or just lower) to build reviews: default = 10% under the floor for 4 weeks
+    var Ld = ends9(floor * 0.9);
+    if (Ld >= start.p - 10) Ld = start.p - 20;
+    var bMin = Math.max(49, ends9(floor * 0.7)), bMax = start.p - 10;
+    out.launchBounds = { min: Math.min(bMin, Ld), max: bMax, step: 10 };
+    out.launch = launchOption(M, input, out, Ld, 4);
+    // the gentler alternative: a discount that stays a little above the floor, same 4 weeks
+    var La = ends9(Math.max(floor * 1.1, start.p * 0.75));
+    if (La < start.p - 10) out.launchAlt = launchOption(M, input, out, La, 4);
+
+    // evidence from similar listings, re-costed with this seller's costs
+    out.cohorts = cohortEvidence(M, cat, costs, R.expected);
+
+    // what buyers complain about at the start price
+    var rel = T / mk.median;
+    var bucket = rel < 0.95 ? 0 : rel <= 1.05 ? 1 : rel <= 1.15 ? 2 : 3;
+    out.complaintBucket = bucket;
+    out.complaint = { at: C.complaints[bucket], above: C.complaints[3], base: C.complaints[1] };
+
+    // triggers after launch
+    var upPct = trustRoom(C, R.good - R.expected);
+    out.triggers = {
+      raiseAtRating: R.good, raisePct: upPct, raiseTo: ends9(T * (1 + upPct)),
+      saleFloorCheck: { discount: 0.2, priceAfter: Math.round(T * 0.8), breaksFloor: T * 0.8 < floor },
+      expectedReturnRate: start.u.ret, expectedRto: start.u.rto
+    };
+
+    if (input.offline) {
+      out.offline = { price: +input.offline, econ: unitEconomics(M, cat, +input.offline, costs, z) };
+    }
+    return out;
+  }
+
+  var api = { ends9: ends9, detectCategory: detectCategory, listingScore: listingScore, unitEconomics: unitEconomics,
+              scen: scen, priceEffect: priceEffect,
+              floorPrice: floorPrice, simulate: simulate, recommend: recommend, cohortEvidence: cohortEvidence,
+              launchOption: launchOption, trustRoom: trustRoom, LONG: 26 };
+  if (typeof module !== "undefined" && module.exports) module.exports = api; else root.PriceEngine = api;
+})(typeof window !== "undefined" ? window : (typeof globalThis !== "undefined" ? globalThis : this));
+
+</script>
+<script>
+(function () {
+  "use strict";
+  var M = window.PC_MODEL, E = window.PriceEngine;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  if (!M || !E) {
+    document.getElementById("form").addEventListener("submit", function (e) { e.preventDefault(); });
+    document.getElementById("results").innerHTML =
+      '<p class="note bad" style="font-size:17px;max-width:560px"><b>This is the unbuilt template, not the demo.</b> ' +
+      'Open <b>OPEN_THIS_Price_Confidence_demo.html</b> instead. To rebuild it yourself, run <code>python build_app.py</code>.</p>';
+    return;
+  }
+  if (!M || !E) {
+    document.getElementById("form").addEventListener("submit", function (e) { e.preventDefault(); });
+    document.getElementById("results").innerHTML =
+      '<p class="note bad" style="max-width:640px"><b>This file is the unbuilt template, so it has no data.</b> ' +
+      'Close it and open <b>OPEN_THIS_Price_Confidence_demo.html</b> from the same folder (or run <code>python build_app.py</code>).</p>';
+    return;
+  }
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var state = { cat: null, img: null, last: null, open: {} };
+  var CHEV = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 6 8 10.5 12.5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  var inr = function (x) {
+    var v = Math.round(x), s = Math.abs(v).toLocaleString("en-IN");
+    return (v < 0 ? "−\u2060₹\u2060" : "₹\u2060") + s;
+  };
+  var signed = function (x) { var v = Math.round(x); return (v > 0 ? "+\u2060" : v < 0 ? "−\u2060" : "") + "₹\u2060" + Math.abs(v).toLocaleString("en-IN"); };
+  var pct = function (x, d) { var s = (Math.abs(x) * 100).toFixed(d || 0) + "%"; return (x < 0 && s !== "0%" ? "−" : "") + s; };
+  var catName = function (c, plural) { return c === "soap" ? (plural ? "soaps" : "soap") : (plural ? "t-shirts" : "t-shirt"); };
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+
+  var EXAMPLES = {
+    soap: { title: "Handmade herbal soap, 200 g", product: 64, packaging: 12, gift: 15, checks: 2, budget: 3000, offline: 134 },
+    tshirt: { title: "Cotton round-neck t-shirt", product: 120, packaging: 10, gift: 0, checks: 2, budget: 5000, offline: 250 }
+  };
+
+  // ---------------------------------------------------------------- form
+  function setCat(c) {
+    state.cat = c;
+    $$("[data-cat]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.cat === c)); });
+    var line = $("#ship-line");
+    if (c) line.innerHTML = "Meesho delivery: <b>" + inr(M.categories[c].ship) + "</b> per " + catName(c) + " parcel, paid on every parcel you send.";
+    $("#err-cat").classList.remove("on");
+  }
+  function fill(ex) {
+    $("#title").value = ex.title;
+    ["product", "packaging", "gift", "budget", "offline"].forEach(function (k) { $("#" + k).value = (k === "offline" && !ex[k]) ? "" : ex[k]; });
+    $$("#checks input").forEach(function (c, i) { c.checked = i < ex.checks; });
+    setCat(E.detectCategory(ex.title));
+    moreTeaser();
+  }
+  function moreTeaser() {
+    var bits = [], g = parseFloat($("#gift").value), b = $("#budget").value.trim(), o = parseFloat($("#offline").value);
+    var n = $$("#checks input").filter(function (c) { return c.checked; }).length;
+    if (state.img) bits.push("photo added");
+    if (g > 0) bits.push("free gift " + inr(g));
+    bits.push(n + " of 4 listing boxes ticked");
+    if (b !== "") bits.push("loss budget " + inr(parseFloat(b) || 0));
+    if (o > 0) bits.push("offline " + inr(o));
+    var s = bits.join(", ");
+    $("#more-teaser").textContent = s.charAt(0).toUpperCase() + s.slice(1);
+  }
+  function read() {
+    return {
+      category: state.cat,
+      title: $("#title").value.trim(),
+      product: parseFloat($("#product").value),
+      packaging: parseFloat($("#packaging").value) || 0,
+      gift: parseFloat($("#gift").value) || 0,
+      checks: $$("#checks input").filter(function (c) { return c.checked; }).length,
+      budget: $("#budget").value.trim() === "" ? null : (parseFloat($("#budget").value) || 0),
+      offline: parseFloat($("#offline").value) || 0
+    };
+  }
+  function validate(inp) {
+    var ok = true;
+    if (!inp.category) { $("#err-cat").classList.add("on"); ok = false; }
+    var bad = !(inp.product > 0);
+    $("#err-product").classList.toggle("on", bad);
+    $("#product").setAttribute("aria-invalid", String(bad));
+    if (bad) ok = false;
+    return ok;
+  }
+
+  $("#title").addEventListener("input", function () {
+    var c = E.detectCategory(this.value);
+    if (c) setCat(c);
+  });
+  $$("[data-cat]").forEach(function (b) { b.addEventListener("click", function () { setCat(b.dataset.cat); }); });
+  $$("[data-example]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      $$("[data-example]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      fill(EXAMPLES[b.dataset.example]);
+      state.img = null; $("#thumb").textContent = "No photo";
+      run(true);
+    });
+  });
+  ["#gift", "#budget", "#offline"].forEach(function (id) { $(id).addEventListener("input", moreTeaser); });
+  $$("#checks input").forEach(function (c) { c.addEventListener("change", moreTeaser); });
+  $("#photo").addEventListener("change", function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      state.img = rd.result;
+      $("#thumb").innerHTML = '<img alt="Your product photo" src="' + rd.result + '">';
+      moreTeaser();
+      if (state.last) render(state.last.inp, state.last.r, false);
+    };
+    rd.readAsDataURL(f);
+  });
+  $("#form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!state.cat) { var c = E.detectCategory($("#title").value); if (c) setCat(c); }
+    run(true, true);
+  });
+
+  function run(flash, scroll) {
+    var inp = read();
+    if (!validate(inp)) return;
+    var r;
+    try { r = E.recommend(M, inp); }
+    catch (err) {
+      $("#results").innerHTML = '<p class="note bad" style="max-width:640px"><b>Could not calculate a price.</b> ' + esc(err.message) +
+        '. Check that every cost is a number and try again.</p>';
+      return;
+    }
+    state.last = { inp: inp, r: r };
+    render(inp, r, flash);
+    if (scroll && window.matchMedia("(max-width: 920px)").matches) {
+      $("#results").scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    }
+  }
+
+  // ---------------------------------------------------------------- charts (hand-built SVG)
+  function niceTicks(min, max, n) {
+    var span = max - min || 1, step = Math.pow(10, Math.floor(Math.log10(span / n)));
+    var err = span / n / step;
+    step *= err >= 7.5 ? 10 : err >= 3.5 ? 5 : err >= 1.5 ? 2 : 1;
+    var t = [], s = Math.ceil(min / step) * step;
+    for (var v = s; v <= max + 1e-9; v += step) t.push(Math.round(v * 1e6) / 1e6);
+    return t;
+  }
+  function kfmt(v) {
+    var a = Math.abs(v), s = a >= 100000 ? (a / 100000).toFixed(a >= 1000000 ? 0 : 1) + "L" : a >= 1000 ? (a / 1000).toFixed(a >= 10000 ? 0 : 1) + "k" : String(Math.round(a));
+    return (v < 0 ? "−₹" : "₹") + s;
+  }
+  function lineChart(host, o) {
+    var W = Math.max(300, host.clientWidth || 600), H = o.height || 280;
+    var P = { l: 58, r: 18, t: 26, b: 42 };
+    var xs = [], ys = [];
+    o.series.forEach(function (s) { s.pts.forEach(function (p) { xs.push(p[0]); ys.push(p[1]); }); });
+    (o.hlines || []).forEach(function (hl) { ys.push(hl.y); });
+    var x0 = o.xMin !== undefined ? o.xMin : Math.min.apply(null, xs), x1 = o.xMax !== undefined ? o.xMax : Math.max.apply(null, xs);
+    var y0 = Math.min(0, Math.min.apply(null, ys)), y1 = Math.max(0, Math.max.apply(null, ys));
+    if (o.yFloor !== undefined) y0 = Math.max(y0, o.yFloor);
+    var pad = (y1 - y0) * 0.08; y1 += pad; if (y0 < 0) y0 -= pad;
+    var X = function (v) { return P.l + (v - x0) / (x1 - x0 || 1) * (W - P.l - P.r); };
+    var Y = function (v) { return P.t + (1 - (Math.max(v, y0) - y0) / (y1 - y0 || 1)) * (H - P.t - P.b); };
+    var g = [];
+    g.push('<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(o.label) + '">');
+    if (o.band) g.push('<rect x="' + X(o.band[0]) + '" y="' + P.t + '" width="' + (X(o.band[1]) - X(o.band[0])) + '" height="' + (H - P.t - P.b) + '" style="fill:var(--band);opacity:.55"/>');
+    niceTicks(y0, y1, 5).forEach(function (t) {
+      g.push('<line x1="' + P.l + '" x2="' + (W - P.r) + '" y1="' + Y(t) + '" y2="' + Y(t) + '" class="' + (t === 0 ? "zero" : "grid") + '"/>');
+      g.push('<text x="' + (P.l - 8) + '" y="' + (Y(t) + 4) + '" text-anchor="end">' + kfmt(t) + "</text>");
+    });
+    (o.xTicks || niceTicks(x0, x1, 6)).forEach(function (t) {
+      g.push('<text x="' + X(t) + '" y="' + (H - P.b + 18) + '" text-anchor="middle">' + (o.xFmt ? o.xFmt(t) : t) + "</text>");
+    });
+    if (o.xLabel) g.push('<text x="' + ((P.l + W - P.r) / 2) + '" y="' + (H - 4) + '" text-anchor="middle">' + esc(o.xLabel) + "</text>");
+    (o.hlines || []).forEach(function (hl) {
+      if (hl.y < y0 || hl.y > y1) return;
+      g.push('<line x1="' + P.l + '" x2="' + (W - P.r) + '" y1="' + Y(hl.y) + '" y2="' + Y(hl.y) + '" style="stroke:' + hl.color + ';stroke-width:2;stroke-dasharray:6 4"/>');
+      g.push('<text x="' + (W - P.r) + '" y="' + (Y(hl.y) - 6) + '" text-anchor="end" style="fill:' + hl.color + ';font-weight:600">' + esc(hl.label) + "</text>");
+    });
+    (o.vlines || []).forEach(function (v) {
+      if (v.x < x0 || v.x > x1) return;
+      g.push('<line x1="' + X(v.x) + '" x2="' + X(v.x) + '" y1="' + (P.t - 6) + '" y2="' + (H - P.b) + '" style="stroke:' + v.color + ';stroke-width:2' + (v.dash ? ";stroke-dasharray:5 4" : "") + '"/>');
+      var anchor = X(v.x) > W - 90 ? "end" : X(v.x) < P.l + 60 ? "start" : "middle";
+      g.push('<text x="' + X(v.x) + '" y="' + (P.t - 10) + '" text-anchor="' + anchor + '" style="fill:' + v.color + ';font-weight:600">' + esc(v.label) + "</text>");
+    });
+    o.series.forEach(function (s) {
+      var d = s.pts.map(function (p, i) { return (i ? "L" : "M") + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1); }).join(" ");
+      g.push('<path d="' + d + '" fill="none" style="stroke:' + s.color + ";stroke-width:" + (s.width || 2.5) + (s.dash ? ";stroke-dasharray:7 5" : "") + ';stroke-linejoin:round;stroke-linecap:round"/>');
+    });
+    (o.dots || []).forEach(function (p) {
+      g.push('<circle cx="' + X(p.x) + '" cy="' + Y(p.y) + '" r="6" style="fill:' + p.color + ';stroke:var(--paper);stroke-width:2"/>');
+      if (p.label) g.push('<text x="' + X(p.x) + '" y="' + (Y(p.y) - 12) + '" text-anchor="middle" style="fill:' + p.color + ';font-weight:600">' + esc(p.label) + "</text>");
+    });
+    g.push("</svg>");
+    host.innerHTML = g.join("");
+  }
+
+  // ---------------------------------------------------------------- sections
+  function ruler(r, inp) {
+    var mk = r.market, pts = [mk.p25, mk.p75, r.floor || mk.p25];
+    if (r.status === "ok") pts.push(r.range[0], r.range[1], r.start);
+    if (inp.offline) pts.push(inp.offline);
+    var lo = Math.min.apply(null, pts) * 0.88, hi = Math.max.apply(null, pts) * 1.08;
+    var X = function (v) { return ((v - lo) / (hi - lo) * 100).toFixed(2) + "%"; };
+    var fx = function (v) { return (v - lo) / (hi - lo) * 100; };
+    var h = ['<div class="ruler" role="img" aria-label="Price scale: floor ' + inr(r.floor) + ", market middle half " + inr(mk.p25) + " to " + inr(mk.p75) +
+      (r.status === "ok" ? ", suggested start " + inr(r.start) : "") + '">'];
+    h.push('<div class="r-track"></div>');
+    h.push('<div class="r-band" style="left:' + X(mk.p25) + ";width:" + (fx(mk.p75) - fx(mk.p25)).toFixed(2) + '%"></div>');
+    h.push('<div class="r-med" style="left:' + X(mk.median) + '"></div>');
+    if (r.status === "ok") h.push('<div class="r-range" style="left:' + X(r.range[0]) + ";width:" + Math.max(1.2, fx(r.range[1]) - fx(r.range[0])).toFixed(2) + '%"></div>');
+    if (inp.offline) h.push('<div class="r-off" style="left:' + X(inp.offline) + '"></div>');
+    h.push('<div class="r-floor" style="left:' + X(r.floor) + '"></div>');
+    if (r.status === "ok") {
+      h.push('<svg class="r-start" style="left:' + X(r.start) + '" viewBox="0 0 20 24" aria-hidden="true"><path d="M10 24 2 12V2h16v10Z" style="fill:var(--pink)"/><circle cx="10" cy="7" r="2.4" style="fill:var(--paper)"/></svg>');
+    }
+    // labels: top row = start + offline, bottom row = floor + market
+    var top = [], bot = [];
+    if (r.status === "ok") top.push({ x: fx(r.start), html: "<b>Start " + inr(r.start) + "</b>", cls: "start" });
+    if (inp.offline) top.push({ x: fx(inp.offline), html: "Offline " + inr(inp.offline), cls: "muted" });
+    bot.push({ x: fx(r.floor), html: "<b>Floor " + inr(r.floor) + "</b>", cls: "floor" });
+    [top, bot].forEach(function (row) {
+      row.sort(function (a, b) { return a.x - b.x; });
+      for (var i = 1; i < row.length; i++) if (row[i].x - row[i - 1].x < 26) { row[i - 1].x -= 6; row[i].x = row[i - 1].x + 26; }
+    });
+    top.forEach(function (l) { h.push('<div class="r-lab top ' + l.cls + '" style="left:' + Math.min(92, Math.max(8, l.x)) + '%">' + l.html + "</div>"); });
+    bot.forEach(function (l) { h.push('<div class="r-lab bot ' + l.cls + '" style="left:' + Math.min(88, Math.max(10, l.x)) + '%">' + l.html + "</div>"); });
+    h.push("</div>");
+    h.push('<p class="r-cap"><i class="sw"></i>Where most ' + catName(r.category, true) + " sell: " + inr(mk.p25) + " to " + inr(mk.p75) + '. <i class="tick"></i>Typical price ' + inr(mk.median) + ".</p>");
+    return h.join("");
+  }
+
+  function heroHTML(inp, r) {
+    var img = state.img ? '<img class="tag-img" alt="" src="' + state.img + '">' : "";
+    var head = '<div class="tag-top">' + img + '<div><p class="tag-title">' + esc(inp.title || "Your " + catName(r.category)) + '</p></div></div>';
+    var h = ['<section class="hero" aria-labelledby="hero-h"><h2 id="hero-h" class="sr" style="position:absolute;left:-9999px">Suggested price</h2>'];
+    if (r.status === "ok") {
+      h.push('<div class="tag" id="tag">' + head +
+        '<p class="tag-kicker" style="margin-top:14px">Start at</p>' +
+        '<p class="tag-price num"><span class="rs">₹</span>' + r.start.toLocaleString("en-IN") + "</p>" +
+        '<p class="tag-range">Good range <b>' + inr(r.range[0]) + " to " + inr(r.range[1]) + "</b>. You keep about <b>" + inr(r.startEcon.profit / r.startEcon.kept) + "</b> on each paid order.</p>" +
+        '<p class="tag-floor"><b>Never list below ' + inr(r.floor) + ".</b> Below this, every order loses money.</p></div>");
+      h.push(ruler(r, inp));
+      var note = null;
+      if (r.offline && r.offline.econ.profit < 0) note = '<p class="note bad"><b>Your offline price loses money online.</b> At ' + inr(r.offline.price) + " you lose about " + inr(-r.offline.econ.profit / r.offline.econ.kept) + " on every paid order.</p>";
+      else if (r.thinMargin) note = '<p class="note bad"><b>Thin margin.</b> You keep under 8% of the price, so one bad week of returns wipes it out.</p>';
+      if (note) h.push('<div class="notes">' + note + "</div>");
+    } else {
+      h.push('<div class="tag warn" id="tag">' + head + '<p class="tag-kicker" style="margin-top:14px">No safe price yet</p>' +
+        '<p class="tag-price num">Floor ' + inr(r.floor) + "</p>" +
+        '<p class="tag-range">Most ' + catName(r.category, true) + " sell for " + inr(r.market.p25) + " to " + inr(r.market.p75) + ". At those prices your costs are not covered, so every order loses money.</p></div>");
+      h.push(ruler(r, inp));
+    }
+    h.push("</section>");
+    return h.join("");
+  }
+
+
+  function bleedHTML(r) {
+    var b = r.bleed, tr = r.trust, top = b.top, cn = catName(r.category), cns = catName(r.category, true);
+    var h = ['<div class="bleed">'];
+    var p1 = "At " + inr(top.price) + ", about the most buyers pay for a " + cn + ", you lose <b>" + inr(top.lossPerPaid) + "</b> on every paid order. ";
+    if (b.noBudget) p1 += "";
+    else if (b.budget <= 0) p1 += "You said you can't afford any loss, so this product should not go live at these costs. ";
+    else if (top.weeksBudget) p1 += "Your budget runs out in about <b>" + top.weeksBudget + (top.weeksBudget === 1 ? " week" : " weeks") + "</b>. ";
+    else p1 += "Your budget lasts beyond " + b.horizon + " weeks, but you lose money every single week. ";
+    p1 += "After " + b.horizon + " weeks you would be <b>" + inr(top.sim.total) + "</b>. Good ratings make it worse, not better: more orders, each one losing money (" + inr(b.topGood.sim.total) + " at " + r.rating.good.toFixed(1) + "★).";
+    h.push("<p>" + p1 + "</p>");
+    var room = tr.room.map(function (x) { return "about " + pct(x.pct) + " at " + x.rating.toFixed(1) + "★"; }).join(", ");
+    var need = tr.needRating > 5 ? "more than a perfect 5★, so no rating closes it" : "about a <b>" + tr.needRating.toFixed(1) + "★</b> average, and only the top quarter of " + cns + " even reach " + tr.good.toFixed(1) + "★";
+    h.push("<p>The loss does not turn around by itself. To reach your " + inr(r.floor) + " floor, buyers would have to pay <b>" + pct(tr.needPct) + " more</b> than " + inr(tr.top) +
+      ". Good ratings do buy some room (" + room + "), but closing this gap needs " + need + ". <b>A loss budget buys time, not profit.</b> Fix the cost first.</p>");
+    h.push('<figure><div class="chart" id="chart-bleed"></div><figcaption>Running profit if you list at ' + inr(top.price) + " anyway.</figcaption></figure></div>");
+    return h.join("");
+  }
+
+  function receiptHTML(r) {
+    var u = r.floorEcon; if (!u) return "";
+    var k = u.kept, per = function (x) { return Math.round(x / k); };
+    var lines = [
+      ["Making cost", "includes pieces lost when a return can't be resold", per(u.parts.product)],
+      ["Packaging", "paid on every parcel", per(u.parts.packaging)],
+      ["Meesho delivery", "paid on every parcel, including ones that come back", per(u.parts.forward)],
+      ["Return pickups", "", per(u.parts.reverse)]
+    ];
+    if (u.parts.gift > 0) lines.push(["Free gift", "in every parcel", per(u.parts.gift)]);
+    var total = lines.reduce(function (s, l) { return s + l[2]; }, 0);
+    var gst = r.floor - total;
+    var paid = Math.round(k * 100), rto = Math.round(u.rto * 100), ret = Math.round(u.ret * 100);
+    var h = ['<div class="receipt"><p class="intro">Out of every 100 parcels you send, about ' + rto + " come back undelivered (RTO) and " + ret +
+      "% of the delivered ones are returned. Only about <b>" + paid + "</b> get paid for, so their price has to cover all 100.</p>"];
+    lines.forEach(function (l) {
+      h.push('<div class="rline"><span class="l">' + l[0] + (l[1] ? "<small>" + l[1] + "</small>" : "") + '</span><span class="dots"></span><span class="v">' + inr(l[2]) + "</span></div>");
+    });
+    h.push('<div class="rline total"><span class="l">Cost of one paid order</span><span class="dots"></span><span class="v">' + inr(total) + "</span></div>");
+    h.push('<div class="rline"><span class="l">GST (5%)</span><span class="dots"></span><span class="v">' + inr(gst) + "</span></div>");
+    h.push('<div class="rline floor"><span class="l">Your floor price</span><span class="dots"></span><span class="v">' + inr(r.floor) + "</span></div></div>");
+    return h.join("");
+  }
+
+  function whyHTML(r) {
+    if (r.status !== "ok") return "";
+    var mk = r.market, s = r.startSim, cn = catName(r.category, true);
+    var li = [];
+    li.push("<b>Your floor is " + inr(r.floor) + ".</b> Packaging" + (r.costs.gift > 0 ? ", the free gift" : "") + ", delivery, returns and GST add " + inr(r.floor - r.costs.product) + " on top of your making cost of " + inr(r.costs.product) + ".");
+    var trend = mk.demand_last4 / mk.demand_prev4 - 1;
+    li.push("<b>Most " + cn + " on Meesho sell for " + inr(mk.p25) + " to " + inr(mk.p75) + "</b>, typically around " + inr(mk.median) + ". Over the last 4 weeks the typical price " +
+      (Math.abs(mk.median_last4 - mk.median_prev4) < 3 ? "held steady" : "moved from " + inr(mk.median_prev4) + " to " + inr(mk.median_last4)) +
+      " and demand " + (Math.abs(trend) < 0.01 ? "was flat" : (trend > 0 ? "rose " : "fell ") + pct(Math.abs(trend)) ) + ".");
+    var paid = Math.round(s.orders * r.startEcon.kept);
+    var t = "<b>At " + inr(r.start) + " we expect about " + Math.round(s.orders) + " orders placed in your first 12 weeks, about " + paid + " of them paid, and " + inr(s.total) + " profit</b> (" + paid + " paid orders × about " + inr(r.startEcon.profit / r.startEcon.kept) + " each).";
+    if (r.compareLower) t += " At " + inr(r.compareLower.p) + " you would get more orders (" + Math.round(r.compareLower.orders) + " placed) but " + (r.compareLower.total < 0 ? "lose " + inr(-r.compareLower.total) : "only " + inr(r.compareLower.total) + " profit") + ".";
+    li.push(t);
+    if (r.modelBest !== r.start) li.push("A slightly higher price earns a little more, but within 5% we pick the lower one: more orders means reviews arrive sooner.");
+    var c = r.complaint;
+    if (c.at && c.at.price_share !== null) {
+      li.push("At this price level, <b>" + pct(c.at.price_share) + " of negative reviews complain about price</b>, against " + pct(c.base.price_share) + " for " + cn + " priced near the typical price" +
+        (c.at.n < 40 ? " (based on only " + c.at.n + " reviews)" : "") + ".");
+    }
+    li.push("Expect about " + pct(r.triggers.expectedReturnRate) + " returns and " + pct(r.triggers.expectedRto) + " RTO for " + cn + ". Both are already inside your floor.");
+    if (r.cappedAtBand) li.push("The numbers point even higher, but a new listing has no reviews yet, so we stop at the top of what most buyers pay (" + inr(mk.p75) + ").");
+    if (r.offline && r.offline.econ.profit >= 0) li.push("At your offline price of " + inr(r.offline.price) + " you would keep about " + inr(r.offline.econ.profit / r.offline.econ.kept) + " per paid order, less than at " + inr(r.start) + ".");
+    return '<ul class="reasons">' + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>" +
+      '<figure><div class="chart" id="chart-price"></div><figcaption>Profit over your first 12 weeks if you launch at each price and keep it there. Shaded: where most ' + cn + " sell. Red line: your floor.</figcaption></figure>";
+  }
+
+  function launchHTML(r) {
+    if (r.status !== "ok") return "";
+    var b = r.launchBounds, l = r.launch;
+    return '<p class="sub">Pick a launch price and how long to hold it before moving to ' + inr(r.start) + ". We follow your next " + l.horizon +
+      " weeks for good and weak ratings. It starts 10% below your floor.</p>" +
+      '<div class="controls"><div class="ctl"><label for="lp"><span>Launch price</span><output id="lp-out"></output></label>' +
+      '<input type="range" id="lp" min="' + b.min + '" max="' + b.max + '" step="10" value="' + l.launch + '">' +
+      '<div class="ctl-scale"><span>' + inr(b.min) + "</span><span>" + inr(b.max) + "</span></div></div>" +
+      '<div class="ctl"><label for="lw"><span>Hold it for</span><output id="lw-out"></output></label>' +
+      '<input type="range" id="lw" min="1" max="8" step="1" value="' + l.weeks + '">' +
+      '<div class="ctl-scale"><span>1 week</span><span>8 weeks</span></div></div></div>' +
+      '<div id="launch-body"></div>';
+  }
+
+  function launchBodyHTML(r, l) {
+    var R = r.rating, T = inr(r.start);
+    var head = l.worthIt
+      ? '<span class="pill yes">Worth trying</span> With good ratings you end ' + l.horizon + " weeks <b>" + signed(l.gainIfGood) + "</b> compared with starting at " + T + ". With weak ratings the change is <b>" + signed(l.changeIfWeak) + "</b>, so set the stop below." +
+        (l.withinBudget === false ? " <b>But the worst-case dip is more than your budget.</b>" : "")
+      : '<span class="pill no">Not worth it for your costs</span> The reviews you would buy don\'t earn the money back within ' + l.horizon + " weeks: <b>" + signed(l.gainIfGood) + "</b> with good ratings (" + R.good.toFixed(1) + "★) and <b>" + signed(l.changeIfWeak) + "</b> with weak ones (" + R.weak.toFixed(1) + "★), compared with starting at " + T + ".";
+    var f = [];
+    f.push(l.belowFloor
+      ? ['bad', "<b>Each paid order at " + inr(l.launch) + " loses " + inr(-l.perPaid) + ".</b> Your floor is " + inr(r.floor) + "."]
+      : ['', "Each paid order at " + inr(l.launch) + " still earns " + inr(l.perPaid) + ". This is a cheaper launch, not a loss."]);
+    var rv = "With good ratings (the solid lines), in those " + l.weeks + (l.weeks === 1 ? " week" : " weeks") + ": about " + Math.round(l.ordersLaunch) + " orders placed and " + Math.round(l.reviewsLaunch) + " reviews, against " + Math.round(l.reviewsFlat) + " reviews if you started at " + T + ".";
+    if (l.costPerReview) rv += " By week " + l.weeks + " you are at " + inr(l.cumAtK.launch) + " instead of " + inr(l.cumAtK.flat) + ": the extra " + Math.round(l.extraReviews) + " reviews cost " + inr(l.launchCost) + ", <b>about " + inr(l.costPerReview) + " per review</b>.";
+    f.push(['', rv]);
+    if (l.worstDip <= 0) f.push(['', "You never go below zero at this price."]);
+    else if (l.budget === null) f.push(['', "Worst case you are <b>" + inr(l.worstDip) + " down</b> before it turns around. Add a loss budget under More details to check whether you can afford that."]);
+    else if (l.budget <= 0) f.push(['bad', "Worst case you are " + inr(l.worstDip) + " down, and you said you can't afford any loss. Keep the launch at or above " + inr(r.floor) + "."]);
+    else if (l.withinBudget) f.push(['', "Worst case you are <b>" + inr(l.worstDip) + " down</b>. Your " + inr(l.budget) + " budget covers that, and up to " + (l.maxWeeks >= 12 ? "12 or more" : l.maxWeeks) + " weeks at this price even if ratings come in weak."]);
+    else f.push(['bad', "Worst case you are <b>" + inr(l.worstDip) + " down</b>, more than your " + inr(l.budget) + " budget. At this price you can afford " + (l.maxWeeks ? "at most " + l.maxWeeks + (l.maxWeeks === 1 ? " week" : " weeks") : "no weeks at all") + "."]);
+    if (l.worstDip > 0) {
+      var back = function (w) { return w === null ? "not within " + l.horizon + " weeks" : "by week " + w; };
+      f.push(['', "You are back above zero " + back(l.backToZeroGood) + " with good ratings, " + back(l.backToZeroWeak) + " with weak ones. " +
+        (l.catchUpGood ? "With good ratings you overtake simply starting at " + T + " by week " + l.catchUpGood + "." : "Either way, you never catch up with simply starting at " + T + " within " + l.horizon + " weeks.")]);
+    }
+    var alt = r.launchAlt;
+    if (l.belowFloor && alt && alt.worstDip <= 0) {
+      f.push(['', "<b>Gentler option:</b> stay just above your floor at " + inr(alt.launch) + " for " + alt.weeks + " weeks. You get about " + Math.round(alt.reviewsLaunch) + " reviews instead of " + Math.round(alt.reviewsFlat) +
+        (alt.costPerReview ? ", at about " + inr(alt.costPerReview) + " per extra review," : "") + " and you never go below zero (26-week change " + signed(alt.gainIfGood) + " with good ratings)."]);
+    }
+    var h = ['<p class="verdict">' + head + "</p>", '<ul class="facts">' + f.map(function (x) { return '<li class="' + x[0] + '">' + x[1] + "</li>"; }).join("") + "</ul>"];
+    h.push('<div class="legend"><span><i style="border-color:var(--pink)"></i>Start at ' + T + ", good ratings</span>" +
+      '<span><i class="dash" style="border-color:var(--pink)"></i>Start at ' + T + ", weak ratings</span>" +
+      '<span><i style="border-color:var(--plum)"></i>Launch at ' + inr(l.launch) + ", good ratings</span>" +
+      '<span><i class="dash" style="border-color:var(--plum)"></i>Launch at ' + inr(l.launch) + ", weak ratings</span></div>");
+    var cap = "Running profit over " + l.horizon + " weeks.";
+    if (Math.abs(l.flatGood.total - l.flatWeak.total) > 3 * Math.abs(l.gainIfGood)) cap += " The gap between good and weak ratings is bigger than the gap between the two launch plans: how buyers rate the product matters more than the launch discount.";
+    h.push('<figure><div class="chart" id="chart-invest"></div><figcaption>' + cap + "</figcaption></figure>");
+    return h.join("");
+  }
+
+  function cohortHTML(r) {
+    var R = r.rating, l = r.launch;
+    var g = function (pos, good) { return r.cohorts.filter(function (x) { return x.pos === pos && x.good === good; })[0]; };
+    var rowName = { below: "Below the typical price", at: "Near the typical price", above: "Above the typical price" };
+    var cell = function (x, mine) {
+      if (!x || !x.n) return '<td colspan="3">No listings</td>';
+      var cls = mine ? ' class="mine"' : "";
+      return "<td" + cls + ">" + x.n + "</td><td" + cls + ">" + pct(x.survival) + "</td><td" + (x.profit < 0 ? ' class="neg' + (mine ? " mine" : "") + '"' : cls) + ">" + inr(x.profit) + "</td>";
+    };
+    var h = [];
+    h.push('<p class="small" style="margin-bottom:10px">Every listing in the data, grouped by where it launched and how buyers rated it later. Profit is recalculated with <b>your</b> costs, because other sellers\' costs are unknown. Your start price falls in the highlighted row.</p>');
+    h.push('<div class="tbl-wrap"><table><thead><tr class="grp"><th></th><th colspan="3">Rated ' + R.expected.toFixed(1) + '★ or better</th><th colspan="3">Rated below ' + R.expected.toFixed(1) + "★</th></tr>" +
+      "<tr><th>Launched</th><th>Listings</th><th>Still live at week 12</th><th>12-week profit, your costs</th><th>Listings</th><th>Still live at week 12</th><th>12-week profit, your costs</th></tr></thead><tbody>");
+    ["below", "at", "above"].forEach(function (pos) {
+      var mine = pos === r.position;
+      h.push("<tr><td" + (mine ? ' class="mine"' : "") + ">" + rowName[pos] + "</td>" + cell(g(pos, true), mine) + cell(g(pos, false), mine) + "</tr>");
+    });
+    h.push("</tbody></table></div>");
+    var bg = g("below", true), bw = g("below", false), ag = g("at", true);
+    var stop = " If you do launch low to build reviews, <b>set a stop: go back to " + inr(r.start) + " if you are under " + R.expected.toFixed(1) + "★ after 15 reviews.</b>";
+    var take;
+    if (bg && ag && bw && bg.profit > ag.profit) {
+      take = "Listings that launched below the typical price and went on to earn good ratings made the most (" + inr(bg.profit) + ", against " + inr(ag.profit) +
+        " for well-rated ones that launched near it). Poorly rated ones that launched low made " + inr(bw.profit) + ". Part of that gap is simply better products selling more; the simulation above separates out the effect of the launch price itself." + stop;
+    } else {
+      take = "In this data, launching below the typical price did not beat launching near it, even for well-rated listings (" + inr(bg ? bg.profit : 0) + " against " + inr(ag ? ag.profit : 0) + ")." + stop;
+    }
+    h.push('<p class="verdict" style="margin-top:14px">' + take + "</p>");
+    return h.join("");
+  }
+
+  function triggersHTML(r) {
+    if (r.status !== "ok") return "";
+    var t = r.triggers, R = r.rating, mk = r.market, cn = catName(r.category, true);
+    var li = [];
+    li.push("<b>You reach " + R.good.toFixed(1) + "★ with 30 or more reviews.</b> In our demo data, " + cn + " at that rating sell as well about " + pct(t.raisePct) + " higher. Try " + inr(t.raiseTo) + ", and keep it only if orders hold up.");
+    li.push("<b>Meesho offers you a sale.</b> A 20% discount takes " + inr(r.start) + " to " + inr(t.saleFloorCheck.priceAfter) + ". " +
+      (t.saleFloorCheck.breaksFloor ? "That is below your " + inr(r.floor) + " floor, so skip it or offer 10% instead." : "That is still above your " + inr(r.floor) + " floor, so it is safe to join."));
+    li.push("<b>Returns climb above " + pct(Math.min(0.6, t.expectedReturnRate * 1.5)) + ".</b> Your floor goes up. Read the return reasons first: if buyers say size or quality, a lower price won't fix it.");
+    li.push("<b>Views come in but orders don't.</b> Fix photos and title first. If orders stay slow for 2 weeks, move toward " + inr(mk.median) + ", never below " + inr(r.floor) + ".");
+    return '<ul class="triggers">' + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+  }
+
+  function howHTML(r) {
+    var C = M.categories[r.category], st = C.stats, cn = catName(r.category, true);
+    var within = E.priceEffect(C, 0.1);
+    var naive = Math.exp(st.naive_price_coef * Math.log(1.1)) - 1;
+    var rev = Math.exp(C.impr.logrev * Math.log(2)) - 1;
+    var bt = st.backtest, meta = M.meta;
+    return '<div class="how-body">' + "<h3>The data</h3><p>" + meta.listings + " synthetic listings (150 soap, 150 t-shirt), followed week by week from launch (" + meta.first_launch + ") to " + meta.data_to +
+      ": " + meta.listing_weeks.toLocaleString("en-IN") + " listing-weeks and " + meta.reviews.toLocaleString("en-IN") + " reviews. Each week records price, impressions, views, wishlist and cart adds, orders, RTO, returns with reasons, reviews and rating. The data is generated from assumed buyer behaviour, so it demonstrates the method; it is not a forecast.</p>" +
+      '<div class="kv"><div><b>' + pct(within) + "</b>orders per impression when " + cn + " cost 10% more, learnt from price changes on the same listing</div>" +
+      "<div><b>" + (naive >= 0 ? "+" : "") + pct(naive) + "</b>what comparing different listings suggests instead. Better products charge more and still sell more, which hides how much price matters</div>" +
+      "<div><b>+" + pct(rev) + "</b>more impressions each time a listing's review count doubles</div>" +
+      "<div><b>" + pct(bt.model_median_abs_pct_error) + "</b>typical error predicting 8-week orders on " + bt.n_listings + " held-out listings (a simple average is off by " + pct(bt.naive_median_abs_pct_error) + ")</div></div>" +
+      "<h3>The models</h3><ul>" +
+      "<li><b>Conversion:</b> orders <i>per impression</i>, so impressions are the exposure and more views are never mistaken for better conversion. Inputs: price relative to the market, rating, review count, festival weeks. Fitted within each listing, so the price effect isn't confused with product quality.</li>" +
+      "<li><b>Visibility:</b> impressions per week from launch phase, recent sales, reviews, rating and category demand, also fitted within each listing. This is how early orders turn into later traffic.</li>" +
+      "<li><b>What you keep:</b> RTO rate, return rate by price and listing quality, how many returns can be resold, and how many buyers leave a review.</li>" +
+      "<li><b>Good, typical and weak products:</b> a good product (top quarter) gets a better rating <i>and</i> converts better and is returned less; a weak one the opposite.</li></ul>" +
+      "<h3>Checked against the simulator</h3><p>We also ran Seller 6's soap through the simulator that generated the data, 300 times per plan. It agrees that launching below the floor loses money for good, typical and weak products. Our models are more cautious than the simulator about discounts that stay above the floor: sellers in the data cut prices when sales are slow, which blurs the price effect. Only a randomised price test removes that, so the pilot includes one.</p>" +
+      "<h3>Your answer, step by step</h3><ol>" +
+      "<li>Work out what one paid order costs you, spreading RTO and returns over the orders that do get paid. That gives the floor.</li>" +
+      "<li>Take today's market for " + cn + ", weighting the last few weeks most.</li>" +
+      "<li>Simulate 12 weeks at every price from well below the market up to its top end: impressions, orders, reviews, and how reviews feed back into impressions.</li>" +
+      "<li>Pick the price with the best 12-week profit above your floor. If a lower price earns within 5% of it, pick that one for faster reviews.</li>" +
+      "<li>If no price buyers accept covers your costs, show how long your loss budget would last and what rating it would take to close the gap.</li>" +
+      "<li>Let you try launching lower for a few weeks: we follow 26 weeks for good and weak products, count what each extra review costs, compare it with staying just above your floor, and check it against your loss budget.</li>" +
+      "<li>Check what similar listings actually did, recalculated with your costs.</li></ol>" +
+      "<p style=\"margin-top:10px\">In a real rollout these models would train on Meesho's own order, return and review history, and every change would be tested against a control group before it reached sellers.</p>" +
+      "</div>";
+  }
+
+  function drawCharts(r) {
+    if (r.status !== "ok") { drawBleedChart(r); return; }
+    var hostP = $("#chart-price");
+    if (hostP && hostP.offsetParent !== null) {
+      var xStart = Math.max(r.curve[0].p, Math.floor(r.floor * 0.85));
+      var pts = r.curve.filter(function (c) { return c.p >= xStart; }).map(function (c) { return [c.p, c.total]; });
+      var ys = pts.map(function (p) { return p[1]; });
+      var best = Math.max.apply(null, ys);
+      lineChart(hostP, {
+        label: "Twelve-week profit by launch price", height: 290,
+        series: [{ pts: pts, color: "var(--pink)", width: 3 }],
+        band: [r.market.p25, r.market.p75],
+        vlines: [{ x: r.floor, label: "Floor " + inr(r.floor), color: "var(--floor)" }],
+        dots: [{ x: r.start, y: r.startSim.total, color: "var(--pink)", label: "Start " + inr(r.start) }],
+        xFmt: function (v) { return "₹" + v; }, xLabel: "Launch price"
+      });
+    }
+    drawLaunchChart(state.launch || r.launch, r);
+  }
+
+  function budgetLine(budget, sims) {
+    var worst = Math.min.apply(null, sims.map(function (s) { return s.minCum; }).concat([0]));
+    return budget > 0 && budget <= 3 * Math.max(-worst, 500) ? [{ y: -budget, label: "Your loss budget " + inr(budget), color: "var(--floor)" }] : [];
+  }
+
+  function drawLaunchChart(l, r) {
+    var hostI = $("#chart-invest");
+    if (!hostI || !l || hostI.offsetParent === null) return;
+    var toPts = function (sim) { return [[0, 0]].concat(sim.weeks.map(function (w) { return [w.w, w.cum]; })); };
+    lineChart(hostI, {
+      label: "Running profit over " + l.horizon + " weeks for each launch plan", height: 300,
+      series: [
+        { pts: toPts(l.flatGood), color: "var(--pink)" },
+        { pts: toPts(l.flatWeak), color: "var(--pink)", dash: true },
+        { pts: toPts(l.good), color: "var(--plum)" },
+        { pts: toPts(l.weak), color: "var(--plum)", dash: true }
+      ],
+      hlines: budgetLine(l.budget, [l.good, l.weak]),
+      vlines: [{ x: l.weeks, label: "Move to " + inr(r.start), color: "var(--ink2)", dash: true }],
+      xMin: 0, xMax: l.horizon, xTicks: [0, 4, 8, 12, 16, 20, 26], xFmt: function (v) { return "wk " + v; }, xLabel: "Weeks since launch"
+    });
+  }
+
+  function drawBleedChart(r) {
+    var host = $("#chart-bleed");
+    if (!host || !r.bleed || host.offsetParent === null) return;
+    var b = r.bleed, toPts = function (sim) { return [[0, 0]].concat(sim.weeks.map(function (w) { return [w.w, w.cum]; })); };
+    lineChart(host, {
+      label: "Running loss if listed at the top of the market price", height: 260,
+      series: [{ pts: toPts(b.top.sim), color: "var(--floor)", width: 3 }, { pts: toPts(b.topGood.sim), color: "var(--floor)", dash: true }],
+      hlines: budgetLine(b.budget, [b.top.sim, b.topGood.sim]),
+      xMin: 0, xMax: b.horizon, xTicks: [0, 4, 8, 12, 16, 20, 26], xFmt: function (v) { return "wk " + v; }, xLabel: "Weeks since launch"
+    });
+  }
+
+  function bindLaunch() {
+    var lp = $("#lp"), lw = $("#lw");
+    if (!lp || !lw) return;
+    var upd = function () {
+      var L = +lp.value, k = +lw.value, r = state.last.r;
+      var l = E.launchOption(M, state.last.inp, r, L, k);
+      state.launch = l;
+      var o = $("#lp-out");
+      o.textContent = inr(L) + (L < r.floor ? ", below floor" : "");
+      o.classList.toggle("loss", L < r.floor);
+      $("#lw-out").textContent = k + (k === 1 ? " week" : " weeks");
+      $("#launch-body").innerHTML = launchBodyHTML(r, l);
+      var tz = $("#teaser-launch"); if (tz) tz.innerHTML = launchTeaser(r, l);
+      drawLaunchChart(l, r);
+    };
+    lp.addEventListener("input", upd);
+    lw.addEventListener("input", upd);
+    upd();
+  }
+
+  function acc(key, title, teaser, body) {
+    if (!body) return "";
+    return '<details class="acc" data-k="' + key + '"' + (state.open[key] ? " open" : "") + '><summary><span class="acc-title">' + title +
+      '</span><span class="acc-teaser" id="teaser-' + key + '">' + teaser + '</span><span class="acc-chev" aria-hidden="true">' + CHEV +
+      '</span></summary><div class="acc-body">' + body + "</div></details>";
+  }
+
+  function fixHTML(r) {
+    var lev = [];
+    if (r.maxProductCostAtMedian !== null) lev.push("<b>Bring your making cost down to about " + inr(r.maxProductCostAtMedian) + ".</b> Then the typical price of " + inr(r.market.median) + " starts to work.");
+    lev.push("<b>Sell a pack of 2 or 3</b>, so one " + inr(r.ship) + " delivery charge covers more pieces.");
+    lev.push("<b>Cut packaging or the free gift.</b> Both are paid on every parcel, even the ones that come back.");
+    lev.push("<b>Is it a premium " + catName(r.category) + "?</b> Organic, gift box or luxury products compete with premium listings that sell for more. This demo has one " + catName(r.category) + " market; the full tool would compare you with close matches found from your photo and title.");
+    return '<ul class="reasons">' + lev.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+  }
+
+  function launchTeaser(r, l) {
+    var v = l.worthIt ? '<span class="good">Worth trying</span>' : '<span class="bad">Not worth it for your costs</span>';
+    return v + ": " + inr(l.launch) + " for " + l.weeks + (l.weeks === 1 ? " week" : " weeks") + " changes 26-week profit by " + signed(l.gainIfGood) + " even with good ratings";
+  }
+
+  function render(inp, r, flash) {
+    state.launch = null;
+    var u = r.floorEcon, k = u ? u.kept : 1, per = function (x) { return Math.round(x / k); };
+    var billTotal = u ? per(u.parts.product) + per(u.parts.packaging) + per(u.parts.forward) + per(u.parts.reverse) + (u.parts.gift > 0 ? per(u.parts.gift) : 0) : 0;
+    var billTeaser = "Costs " + inr(billTotal) + " + GST " + inr(r.floor - billTotal) + " = your floor <b>" + inr(r.floor) + "</b>";
+    var parts = [heroHTML(inp, r), '<p class="acc-hint">Tap a section for the details.</p><div class="accs">'];
+    if (r.status === "ok") {
+      var cs = r.cohorts, g = function (pos, good) { return cs.filter(function (x) { return x.pos === pos && x.good === good; })[0]; };
+      var bg = g("below", true), bw = g("below", false);
+      parts.push(acc("why", "Why " + inr(r.start) + "?", "About <b>" + Math.round(r.startSim.orders) + " orders placed</b> (" + Math.round(r.startSim.orders * r.startEcon.kept) + " paid) and <b>" + inr(r.startSim.total) + " profit</b> in 12 weeks. Most " + catName(r.category, true) + " sell for " + inr(r.market.p25) + " to " + inr(r.market.p75) + ".", whyHTML(r)));
+      parts.push(acc("bill", "What one paid order really costs you", billTeaser, receiptHTML(r)));
+      parts.push(acc("launch", "Should I launch at a loss to get reviews?", launchTeaser(r, r.launch), launchHTML(r)));
+      parts.push(acc("similar", "What similar listings did", "Launched below the typical price: rated well " + inr(bg ? bg.profit : 0) + ", rated poorly " + inr(bw ? bw.profit : 0) + " in 12 weeks, with your costs", cohortHTML(r)));
+      parts.push(acc("later", "When to change the price later", "At " + r.rating.good.toFixed(1) + "★ with 30+ reviews, try <b>" + inr(r.triggers.raiseTo) + "</b>. Check every sale against your " + inr(r.floor) + " floor.", triggersHTML(r)));
+    } else {
+      if (state.open.fix === undefined) state.open.fix = true;
+      var top = r.bleed.top;
+      r.bleed.noBudget = inp.budget === null;
+      parts.push(acc("fix", "How to make this product work", r.maxProductCostAtMedian !== null ? "Cut making cost to about <b>" + inr(r.maxProductCostAtMedian) + "</b>, sell a pack, or cut packaging" : "Sell a pack, or cut packaging and gifts", fixHTML(r)));
+      parts.push(acc("bleed", "What if I sell anyway?", "At " + inr(top.price) + " you lose <b>" + inr(top.lossPerPaid) + "</b> on every paid order" + (r.bleed.budget > 0 && top.weeksBudget ? "; your " + inr(r.bleed.budget) + " lasts about " + top.weeksBudget + (top.weeksBudget === 1 ? " week" : " weeks") : ""), bleedHTML(r)));
+      parts.push(acc("bill", "What one paid order really costs you", billTeaser, receiptHTML(r)));
+    }
+    parts.push(acc("how", "How this works", "The data, the three models, and how accurate they are", howHTML(r)));
+    parts.push("</div>");
+    $("#results").innerHTML = parts.join("");
+    $$("details.acc").forEach(function (d) {
+      d.addEventListener("toggle", function () {
+        state.open[d.dataset.k] = d.open;
+        if (d.open) drawCharts(state.last.r);
+      });
+    });
+    bindLaunch();
+    drawCharts(r);
+    if (flash) { var t = $("#tag"); if (t) { t.classList.remove("flash"); void t.offsetWidth; t.classList.add("flash"); } }
+  }
+
+
+  var rt;
+  window.addEventListener("resize", function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () { if (state.last) drawCharts(state.last.r); }, 150);
+  });
+
+  fill(EXAMPLES.soap);
+  $$("[data-example]")[0].setAttribute("aria-pressed", "true");
+  run(false);
+})();
+</script>
+</body>
+</html>

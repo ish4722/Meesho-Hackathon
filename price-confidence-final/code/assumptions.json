@@ -1,0 +1,71 @@
+{
+  "version": "2.0",
+  "provenance": "Team assumptions for a synthetic demo. None of these are Meesho's published fees or policies; replace them with authorised values before any real use.",
+  "economics": {
+    "gst_rate_included_in_price": 0.05,
+    "platform_commission_rate": 0.0,
+    "payment_fee_rate": 0.0,
+    "forward_shipping_inr": {
+      "soap": 30,
+      "tshirt": 70,
+      "bedsheet": 80,
+      "earrings": 35
+    },
+    "return_pickup_fee_multiplier": 1.0,
+    "rto_return_fee_inr": 0.0,
+    "cancellation_cost_inr": 0.0,
+    "rto_units_restockable": true,
+    "resale_refurb_cost_inr": 0.0,
+    "ads_cost_per_1000_impressions_inr": 60.0,
+    "notes": {
+      "gst_rate_included_in_price": "Listing price includes GST at this rate; the seller keeps price / (1 + rate) per kept order.",
+      "platform_commission_rate": "Share of the GST-exclusive price kept by the platform on kept orders. 0 is an assumption, not a statement of current policy.",
+      "payment_fee_rate": "Share of the GST-exclusive price charged on kept orders for payment collection.",
+      "forward_shipping_inr": "Charged on every dispatched parcel, including parcels that come back as RTO or customer returns.",
+      "return_pickup_fee_multiplier": "Reverse-pickup charge for a customer return, as a multiple of the forward fee.",
+      "rto_return_fee_inr": "Extra charge when an undelivered (RTO) parcel comes back. 0 means only the forward fee is lost.",
+      "cancellation_cost_inr": "Cost of an order cancelled before dispatch. Packaging, gift and shipping are not used.",
+      "rto_units_restockable": "If true, RTO parcels come back unopened and the product can be sold again.",
+      "resale_refurb_cost_inr": "Cost to put a returned, resellable unit back into stock.",
+      "ads_cost_per_1000_impressions_inr": "Only used when a seller enters a weekly ad budget: sponsored impressions = budget / this x 1000."
+    }
+  },
+  "policy": {
+    "horizon_weeks": 12,
+    "long_horizon_weeks": 26,
+    "n_simulations": 400,
+    "n_parameter_draws_for_decision_uncertainty": 60,
+    "seed": 20261021,
+    "candidate_step_inr": 10,
+    "candidate_low_vs_p25": 0.6,
+    "candidate_high_vs_p75": 1.0,
+    "explore_high_vs_p75": 1.3,
+    "max_loss_probability": 0.25,
+    "max_budget_breach_probability": 0.1,
+    "prefer_lower_within_share_of_best_mean": 0.0,
+    "good_range_share_of_best_mean": 0.9,
+    "learning_max_optimal_price_width_vs_median": 0.2,
+    "experiment_weeks": 8,
+    "experiment_block_weeks": 2,
+    "baseline": "median",
+    "notes": {
+      "candidate_high_vs_p75": "Recommendations are capped at this multiple of the band's p75 for a new listing with no reviews. Prices up to explore_high_vs_p75 are still simulated so the app can say when the optimum lies above the cap.",
+      "max_loss_probability": "A candidate is excluded if its probability of a negative 12-week contribution exceeds this.",
+      "max_budget_breach_probability": "If the seller gives a loss budget, a candidate is excluded if the probability that cumulative contribution ever falls below minus the budget exceeds this.",
+      "learning_max_optimal_price_width_vs_median": "If the 10th-90th percentile range of the best price across plausible price-response parameters is wider than this share of the market median, the app recommends a price test instead of a confident price.",
+      "baseline": "Reference strategy for 'probability of beating the baseline': 'median' (flat at the band median) or 'offline' (the seller's offline price, when given).",
+      "prefer_lower_within_share_of_best_mean": "Tie-break for the balanced policy: take the lowest eligible price whose mean is within this share of the best. 0 = pure maximisation of the mean. The simulation already credits lower prices with faster reviews, so a positive value double-counts that benefit.",
+      "stop_loss_share_of_budget": "Seller stop rule used when a plan launches below break-even: inside each simulation, the launch price is abandoned for the target price once running contribution falls below this share of the loss budget. Budget breaches are still counted.",
+      "experiment_weeks": "Length of the price test proposed by the learning policy; arms are held for experiment_block_weeks each, in the order mid, low, high, mid."
+    },
+    "stop_loss_share_of_budget": 0.5
+  },
+  "modeling": {
+    "price_slope_prior_sd": 1.0,
+    "price_slope_prior_listings": 20,
+    "notes": {
+      "price_slope_prior_sd": "Prior guess of how much listings' own price sensitivity varies around their tier's slope (in log-conversion per 100% price change). Used so that a small training set cannot claim that every listing responds identically.",
+      "price_slope_prior_listings": "How many listings of evidence the prior is worth. The fitted spread is a weighted average of the data estimate (weight = listings with enough price variation) and the prior."
+    }
+  }
+}

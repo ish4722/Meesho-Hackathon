@@ -1,4 +1,10 @@
-numpy>=1.26
-pandas>=2.0
-statsmodels>=0.14
-openpyxl>=3.1
+# Versions used to produce the committed data, model and reports (see dataset_manifest.json).
+# numpy changes its random streams between releases, so other versions can give different (equally valid)
+# synthetic data; run_all.sh then reports a manifest hash mismatch rather than silently differing.
+numpy==2.5.3
+pandas==3.0.5
+scipy==1.18.1
+statsmodels==0.15.0
+openpyxl==3.1.5
+pytest==9.1.1
+# JavaScript: Node.js 22 (engine.js, eval_runner.js, tests/engine.test.js); no npm packages.
