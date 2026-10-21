@@ -1,5 +1,7 @@
 # Phase 1 audit: the pipeline as it was (commit `ea8422b`)
 
+> How each problem below was fixed, and the v2 results, are in [`METHODOLOGY.md`](METHODOLOGY.md) (section 1 maps every item to its fix).
+
 This records what the code actually did before the v2 changes, from reading every file and running the pipeline in a clean copy (Python 3.13, numpy 2.5.3, pandas 3.0.5, statsmodels 0.15.0, Node 22).
 
 ## Pipeline as implemented

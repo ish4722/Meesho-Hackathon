@@ -1,0 +1,1484 @@
+{
+ "provenance": "SYNTHETIC evaluation. Metrics measure recovery of the generator's assumptions, not real-world accuracy.",
+ "design": {
+  "train_cutoff": "2026-03-02",
+  "split_seed": 11,
+  "split_counts": {
+   "train": 360,
+   "holdout": 120,
+   "validation": 120
+  },
+  "diagnostic_launch": "2026-06-29",
+  "truth_reps": 40,
+  "generator_version": "2.0.0",
+  "seed": 20261021,
+  "quick": false,
+  "tuning": "none: no parameter was chosen using validation or holdout results"
+ },
+ "task_a_one_week_ahead": {
+  "validation": {
+   "overall": {
+    "category x week average": {
+     "n": 2351,
+     "mae": 21.339788892316342,
+     "wape": 0.8995202726330499,
+     "bias": -0.11478108384893337,
+     "mean_actual": 23.723521905572095
+    },
+    "last week's orders": {
+     "n": 2351,
+     "mae": 9.013185878349638,
+     "wape": 0.37992613045505075,
+     "bias": -0.022698748520816152,
+     "mean_actual": 23.723521905572095
+    },
+    "pooled price response": {
+     "n": 2351,
+     "mae": 21.22247364115675,
+     "wape": 0.8945751699781174,
+     "bias": -0.11039702454642668,
+     "mean_actual": 23.723521905572095
+    },
+    "v1 spec (same-week market, teacher-forced)": {
+     "n": 2351,
+     "mae": 16.4725311947144,
+     "wape": 0.6943543737005335,
+     "bias": -0.0785702892370586,
+     "mean_actual": 23.723521905572095
+    },
+    "v2, launch-time effect only": {
+     "n": 2351,
+     "mae": 14.257343819622344,
+     "wape": 0.6009792254443312,
+     "bias": 0.01726362945452179,
+     "mean_actual": 23.723521905572095
+    },
+    "v2, no price change": {
+     "n": 2351,
+     "mae": 7.2451043868040275,
+     "wape": 0.3053975044532626,
+     "bias": 0.02348759641365494,
+     "mean_actual": 23.723521905572095
+    },
+    "v2, online listing effect": {
+     "n": 2351,
+     "mae": 7.082698631786244,
+     "wape": 0.29855173527682183,
+     "bias": 0.03422878106951297,
+     "mean_actual": 23.723521905572095
+    }
+   },
+   "coverage_80": 0.7528711186729051
+  },
+  "holdout": {
+   "overall": {
+    "category x week average": {
+     "n": 2259,
+     "mae": 27.029295219007935,
+     "wape": 0.8773626735025853,
+     "bias": -0.3333652194526,
+     "mean_actual": 30.807436918990703
+    },
+    "last week's orders": {
+     "n": 2259,
+     "mae": 11.19477644975653,
+     "wape": 0.3633790269276087,
+     "bias": -0.03228726614363307,
+     "mean_actual": 30.807436918990703
+    },
+    "pooled price response": {
+     "n": 2259,
+     "mae": 26.271604656081713,
+     "wape": 0.8527682690761933,
+     "bias": -0.3439343436148877,
+     "mean_actual": 30.807436918990703
+    },
+    "v1 spec (same-week market, teacher-forced)": {
+     "n": 2259,
+     "mae": 14.673908340219137,
+     "wape": 0.47631058626541123,
+     "bias": -0.23362752196975256,
+     "mean_actual": 30.807436918990703
+    },
+    "v2, launch-time effect only": {
+     "n": 2259,
+     "mae": 18.42558894040464,
+     "wape": 0.5980889935393006,
+     "bias": -0.30376436420041103,
+     "mean_actual": 30.807436918990703
+    },
+    "v2, no price change": {
+     "n": 2259,
+     "mae": 9.184535988985365,
+     "wape": 0.2981272350938003,
+     "bias": 0.0182515235374308,
+     "mean_actual": 30.807436918990703
+    },
+    "v2, online listing effect": {
+     "n": 2259,
+     "mae": 9.053783653400723,
+     "wape": 0.29388305418616884,
+     "bias": 0.03889689462408982,
+     "mean_actual": 30.807436918990703
+    }
+   },
+   "coverage_80": 0.7361664453297919
+  },
+  "holdout_by_category": {
+   "bedsheet": {
+    "category x week average": {
+     "n": 612,
+     "mae": 12.724443305155996,
+     "wape": 1.2238502754605485,
+     "bias": 0.8721573441701104,
+     "mean_actual": 10.397058823529411
+    },
+    "pooled price response": {
+     "n": 612,
+     "mae": 10.53833725363273,
+     "wape": 1.0135883072800926,
+     "bias": 0.545108369167636,
+     "mean_actual": 10.397058823529411
+    },
+    "v2, online listing effect": {
+     "n": 612,
+     "mae": 3.5648694033936787,
+     "wape": 0.34287287048199455,
+     "bias": -0.035437593441942535,
+     "mean_actual": 10.397058823529411
+    }
+   },
+   "earrings": {
+    "category x week average": {
+     "n": 585,
+     "mae": 51.80695802881604,
+     "wape": 0.8607517877551089,
+     "bias": -0.469062718903638,
+     "mean_actual": 60.18803418803419
+    },
+    "pooled price response": {
+     "n": 585,
+     "mae": 51.75845228286627,
+     "wape": 0.8599458842793744,
+     "bias": -0.5069651037626559,
+     "mean_actual": 60.18803418803419
+    },
+    "v2, online listing effect": {
+     "n": 585,
+     "mae": 16.989655748238768,
+     "wape": 0.28227630254813063,
+     "bias": 0.06313648666436221,
+     "mean_actual": 60.18803418803419
+    }
+   },
+   "soap": {
+    "category x week average": {
+     "n": 557,
+     "mae": 20.190855874853405,
+     "wape": 0.8351631310183681,
+     "bias": -0.24373475806013872,
+     "mean_actual": 24.175942549371634
+    },
+    "pooled price response": {
+     "n": 557,
+     "mae": 20.19786149793005,
+     "wape": 0.8354529076449605,
+     "bias": -0.16120991890071132,
+     "mean_actual": 24.175942549371634
+    },
+    "v2, online listing effect": {
+     "n": 557,
+     "mae": 6.696088432755836,
+     "wape": 0.2769732108306105,
+     "bias": -0.008957457686160818,
+     "mean_actual": 24.175942549371634
+    }
+   },
+   "tshirt": {
+    "category x week average": {
+     "n": 505,
+     "mae": 23.204834510559866,
+     "wape": 0.8051144917782709,
+     "bias": -0.615041269591462,
+     "mean_actual": 28.821782178217823
+    },
+    "pooled price response": {
+     "n": 505,
+     "mae": 22.513245701072382,
+     "wape": 0.7811191397486467,
+     "bias": -0.5072619162588852,
+     "mean_actual": 28.821782178217823
+    },
+    "v2, online listing effect": {
+     "n": 505,
+     "mae": 9.113123422555683,
+     "wape": 0.3161887549564149,
+     "bias": 0.05702956518650876,
+     "mean_actual": 28.821782178217823
+    }
+   }
+  },
+  "holdout_by_archetype": {
+   "commodity": {
+    "category x week average": {
+     "n": 628,
+     "mae": 19.5222808164227,
+     "wape": 0.8743397769728609,
+     "bias": -0.07858389586766303,
+     "mean_actual": 22.328025477707005
+    },
+    "pooled price response": {
+     "n": 628,
+     "mae": 18.668229315137157,
+     "wape": 0.8360895742337852,
+     "bias": -0.11387694206050065,
+     "mean_actual": 22.328025477707005
+    },
+    "v2, online listing effect": {
+     "n": 628,
+     "mae": 6.659698346767545,
+     "wape": 0.29826633588432594,
+     "bias": -0.08112037015876904,
+     "mean_actual": 22.328025477707005
+    }
+   },
+   "insensitive": {
+    "category x week average": {
+     "n": 330,
+     "mae": 32.66351685924593,
+     "wape": 0.8592236399801639,
+     "bias": -0.5163075660257391,
+     "mean_actual": 38.015151515151516
+    },
+    "pooled price response": {
+     "n": 330,
+     "mae": 30.2258113326599,
+     "wape": 0.7950990625570161,
+     "bias": -0.5243752027783561,
+     "mean_actual": 38.015151515151516
+    },
+    "v2, online listing effect": {
+     "n": 330,
+     "mae": 10.457908824031827,
+     "wape": 0.2750984385755682,
+     "bias": 0.08264372702398819,
+     "mean_actual": 38.015151515151516
+    }
+   },
+   "moderate": {
+    "category x week average": {
+     "n": 789,
+     "mae": 37.51427090876449,
+     "wape": 0.8548131388845139,
+     "bias": -0.5286318122303915,
+     "mean_actual": 43.88593155893536
+    },
+    "pooled price response": {
+     "n": 789,
+     "mae": 37.33724729188551,
+     "wape": 0.8507794175849843,
+     "bias": -0.5238123517409765,
+     "mean_actual": 43.88593155893536
+    },
+    "v2, online listing effect": {
+     "n": 789,
+     "mae": 13.022949425530632,
+     "wape": 0.29674542530883347,
+     "bias": 0.08979569291729284,
+     "mean_actual": 43.88593155893536
+    }
+   },
+   "premium_signal": {
+    "category x week average": {
+     "n": 77,
+     "mae": 18.2180509284022,
+     "wape": 0.6112374385564137,
+     "bias": -0.15790522395581721,
+     "mean_actual": 29.805194805194805
+    },
+    "pooled price response": {
+     "n": 77,
+     "mae": 19.373796876519144,
+     "wape": 0.650014099996503,
+     "bias": -0.2647653852591124,
+     "mean_actual": 29.805194805194805
+    },
+    "v2, online listing effect": {
+     "n": 77,
+     "mae": 8.436594023641494,
+     "wape": 0.28305783870169715,
+     "bias": -0.015268492247075782,
+     "mean_actual": 29.805194805194805
+    }
+   },
+   "reputation_penalty": {
+    "category x week average": {
+     "n": 197,
+     "mae": 13.382571278032037,
+     "wape": 1.1563011148124174,
+     "bias": 0.7690034179022814,
+     "mean_actual": 11.573604060913706
+    },
+    "pooled price response": {
+     "n": 197,
+     "mae": 14.087315803857061,
+     "wape": 1.2171935146315092,
+     "bias": 0.8738188869844906,
+     "mean_actual": 11.573604060913706
+    },
+    "v2, online listing effect": {
+     "n": 197,
+     "mae": 3.8292589712467824,
+     "wape": 0.33086141111211237,
+     "bias": -0.14460351681690628,
+     "mean_actual": 11.573604060913706
+    }
+   },
+   "too_cheap_distrust": {
+    "category x week average": {
+     "n": 238,
+     "mae": 18.41306207226829,
+     "wape": 1.1454021884997003,
+     "bias": 0.33775027378880335,
+     "mean_actual": 16.07563025210084
+    },
+    "pooled price response": {
+     "n": 238,
+     "mae": 16.4845272363664,
+     "wape": 1.0254358291309993,
+     "bias": 0.25932009386314697,
+     "mean_actual": 16.07563025210084
+    },
+    "v2, online listing effect": {
+     "n": 238,
+     "mae": 4.789949350554756,
+     "wape": 0.2979633939968719,
+     "bias": 0.01650975023905876,
+     "mean_actual": 16.07563025210084
+    }
+   }
+  },
+  "holdout_by_price_segment": {
+   "above median (>10%)": {
+    "category x week average": {
+     "n": 295,
+     "mae": 31.49640081905886,
+     "wape": 0.8080214141770905,
+     "bias": -0.48246821180977717,
+     "mean_actual": 38.97966101694915
+    },
+    "pooled price response": {
+     "n": 295,
+     "mae": 28.52307474088587,
+     "wape": 0.7317425035708611,
+     "bias": -0.44544512678170417,
+     "mean_actual": 38.97966101694915
+    },
+    "v2, online listing effect": {
+     "n": 295,
+     "mae": 11.335448286047246,
+     "wape": 0.2908041781358325,
+     "bias": 0.026294719585377522,
+     "mean_actual": 38.97966101694915
+    }
+   },
+   "below median (>10%)": {
+    "category x week average": {
+     "n": 886,
+     "mae": 19.87334943354449,
+     "wape": 0.9582990964471765,
+     "bias": -0.03178389697693975,
+     "mean_actual": 20.738148984198645
+    },
+    "pooled price response": {
+     "n": 886,
+     "mae": 19.907162821474603,
+     "wape": 0.9599295885395939,
+     "bias": -0.018048135485707075,
+     "mean_actual": 20.738148984198645
+    },
+    "v2, online listing effect": {
+     "n": 886,
+     "mae": 6.734982944866563,
+     "wape": 0.3247629742653627,
+     "bias": -0.015352905573687506,
+     "mean_actual": 20.738148984198645
+    }
+   },
+   "near median (+-10%)": {
+    "category x week average": {
+     "n": 1078,
+     "mae": 31.688267217065064,
+     "wape": 0.8599972825456594,
+     "bias": -0.42970518848793643,
+     "mean_actual": 36.8469387755102
+    },
+    "pooled price response": {
+     "n": 1078,
+     "mae": 30.886365129592544,
+     "wape": 0.8382342239546023,
+     "bias": -0.4652948504634149,
+     "mean_actual": 36.8469387755102
+    },
+    "v2, online listing effect": {
+     "n": 1078,
+     "mae": 10.335199572816807,
+     "wape": 0.2804900465621842,
+     "bias": 0.06763983260662079,
+     "mean_actual": 36.8469387755102
+    }
+   }
+  }
+ },
+ "task_b_launch_time": {
+  "validation": {
+   "n_listings": 57,
+   "week1": {
+    "category x week average": {
+     "n": 57,
+     "mae": 12.09517842224609,
+     "wape": 0.695686347192762,
+     "bias": -0.10997789630483878,
+     "mean_actual": 17.385964912280702
+    },
+    "pooled price response": {
+     "n": 57,
+     "mae": 15.058300715201309,
+     "wape": 0.8661182046079461,
+     "bias": 0.14130180714995647,
+     "mean_actual": 17.385964912280702
+    },
+    "v1 spec (deterministic path)": {
+     "n": 57,
+     "mae": 12.073332147930563,
+     "wape": 0.694429800637782,
+     "bias": -0.15106449461129934,
+     "mean_actual": 17.385964912280702
+    },
+    "v2 engine (median)": {
+     "n": 57,
+     "mae": 10.298245614035087,
+     "wape": 0.5923309788092835,
+     "bias": -0.060544904137235116,
+     "mean_actual": 17.385964912280702
+    },
+    "v2 engine (mean)": {
+     "n": 57,
+     "mae": 11.804298245614035,
+     "wape": 0.6789556004036327,
+     "bias": 0.2217003027245207,
+     "mean_actual": 17.385964912280702
+    }
+   },
+   "weeks1_4": {
+    "category x week average": {
+     "n": 57,
+     "mae": 93.00698927172293,
+     "wape": 1.029597667214645,
+     "bias": -0.06605230083886429,
+     "mean_actual": 90.33333333333333
+    },
+    "pooled price response": {
+     "n": 57,
+     "mae": 92.2121285705517,
+     "wape": 1.0207984712607199,
+     "bias": -0.07962575652042835,
+     "mean_actual": 90.33333333333333
+    },
+    "v1 spec (deterministic path)": {
+     "n": 57,
+     "mae": 82.10297307176664,
+     "wape": 0.9088890007944646,
+     "bias": -0.13262706711315755,
+     "mean_actual": 90.33333333333333
+    },
+    "v2 engine (median)": {
+     "n": 57,
+     "mae": 65.1140350877193,
+     "wape": 0.7208195766168188,
+     "bias": -0.23198679355214605,
+     "mean_actual": 90.33333333333333
+    },
+    "v2 engine (mean)": {
+     "n": 57,
+     "mae": 101.32543859649121,
+     "wape": 1.1216838221013787,
+     "bias": 0.5499164886385705,
+     "mean_actual": 90.33333333333333
+    }
+   },
+   "coverage_80_weeks1_4": 0.7543859649122807
+  },
+  "holdout": {
+   "n_listings": 50,
+   "week1": {
+    "category x week average": {
+     "n": 50,
+     "mae": 10.818333333333333,
+     "wape": 0.6908258833546189,
+     "bias": 0.05743868428597488,
+     "mean_actual": 15.66
+    },
+    "pooled price response": {
+     "n": 50,
+     "mae": 14.030705614306548,
+     "wape": 0.8959582129186813,
+     "bias": 0.37311164533357627,
+     "mean_actual": 15.66
+    },
+    "v1 spec (deterministic path)": {
+     "n": 50,
+     "mae": 10.736125954403892,
+     "wape": 0.68557637001302,
+     "bias": -0.1972869753500745,
+     "mean_actual": 15.66
+    },
+    "v2 engine (median)": {
+     "n": 50,
+     "mae": 11.56,
+     "wape": 0.7381864623243933,
+     "bias": 0.24904214559386972,
+     "mean_actual": 15.66
+    },
+    "v2 engine (mean)": {
+     "n": 50,
+     "mae": 15.728650000000002,
+     "wape": 1.0043837803320563,
+     "bias": 0.6404501915708812,
+     "mean_actual": 15.66
+    }
+   },
+   "weeks1_4": {
+    "category x week average": {
+     "n": 50,
+     "mae": 85.24964756147263,
+     "wape": 1.0053024476588754,
+     "bias": 0.053657524770483994,
+     "mean_actual": 84.8
+    },
+    "pooled price response": {
+     "n": 50,
+     "mae": 85.63206082933819,
+     "wape": 1.0098120380818183,
+     "bias": 0.06967897537440379,
+     "mean_actual": 84.8
+    },
+    "v1 spec (deterministic path)": {
+     "n": 50,
+     "mae": 72.70007954575523,
+     "wape": 0.8573122587942833,
+     "bias": -0.3767650406239083,
+     "mean_actual": 84.8
+    },
+    "v2 engine (median)": {
+     "n": 50,
+     "mae": 60.62,
+     "wape": 0.7148584905660378,
+     "bias": 0.03844339622641509,
+     "mean_actual": 84.8
+    },
+    "v2 engine (mean)": {
+     "n": 50,
+     "mae": 116.16115000000002,
+     "wape": 1.369824882075472,
+     "bias": 0.8938284198113208,
+     "mean_actual": 84.8
+    }
+   },
+   "coverage_80_weeks1_4": 0.82
+  }
+ },
+ "task_c_recursive_12_weeks": {
+  "validation": {
+   "n_listings": 57,
+   "n_full_12_weeks": 44,
+   "orders_observed_weeks": {
+    "category x week average": {
+     "n": 57,
+     "mae": 254.35343706691407,
+     "wape": 1.0253285652626662,
+     "bias": -0.12007239297636507,
+     "mean_actual": 248.0701754385965
+    },
+    "pooled price response": {
+     "n": 57,
+     "mae": 252.12229730205578,
+     "wape": 1.0163345789403946,
+     "bias": -0.13462563816219061,
+     "mean_actual": 248.0701754385965
+    },
+    "v1 spec (deterministic path)": {
+     "n": 57,
+     "mae": 231.1465870083546,
+     "wape": 0.9317790282515002,
+     "bias": -0.18592975237714462,
+     "mean_actual": 248.0701754385965
+    },
+    "v2 engine, launch price held (no price change)": {
+     "n": 57,
+     "mae": 174.58771929824562,
+     "wape": 0.7037835926449788,
+     "bias": -0.2751414427157001,
+     "mean_actual": 248.0701754385965
+    },
+    "v2 engine, recursive (median)": {
+     "n": 57,
+     "mae": 181.9298245614035,
+     "wape": 0.7333804809052333,
+     "bias": -0.2613154172560113,
+     "mean_actual": 248.0701754385965
+    },
+    "v2 engine, recursive (mean)": {
+     "n": 57,
+     "mae": 290.3900438596491,
+     "wape": 1.1705963578500707,
+     "bias": 0.6392710396039604,
+     "mean_actual": 248.0701754385965
+    },
+    "v2 teacher-forced (uses realised history)": {
+     "n": 57,
+     "mae": 121.21912794233045,
+     "wape": 0.4886485355525343,
+     "bias": -0.09521121733854064,
+     "mean_actual": 248.0701754385965
+    }
+   },
+   "contribution_observed_weeks": {
+    "mae": 11236.185538847118,
+    "bias": -3454.0252882205527,
+    "bias_of_mean": 9808.974073036754,
+    "mean_actual": 12515.077543859648
+   },
+   "coverage_80_orders_12w": 0.7727272727272727,
+   "coverage_80_contribution_12w": 0.75,
+   "p_loss": {
+    "mean_predicted": 0.17710227272727272,
+    "observed_share": 0.11363636363636363,
+    "brier": 0.0892015625
+   }
+  },
+  "holdout": {
+   "n_listings": 50,
+   "n_full_12_weeks": 36,
+   "orders_observed_weeks": {
+    "category x week average": {
+     "n": 50,
+     "mae": 217.23284115448993,
+     "wape": 0.9987716834689193,
+     "bias": 0.04109881343383282,
+     "mean_actual": 217.5
+    },
+    "pooled price response": {
+     "n": 50,
+     "mae": 215.82842251428858,
+     "wape": 0.9923145862725912,
+     "bias": 0.05762788939180191,
+     "mean_actual": 217.5
+    },
+    "v1 spec (deterministic path)": {
+     "n": 50,
+     "mae": 201.9055204060209,
+     "wape": 0.9283012432460732,
+     "bias": -0.4171812935754753,
+     "mean_actual": 217.5
+    },
+    "v2 engine, launch price held (no price change)": {
+     "n": 50,
+     "mae": 167.89,
+     "wape": 0.7719080459770115,
+     "bias": 0.02266666666666667,
+     "mean_actual": 217.5
+    },
+    "v2 engine, recursive (median)": {
+     "n": 50,
+     "mae": 160.51,
+     "wape": 0.7379770114942529,
+     "bias": -0.018528735632183907,
+     "mean_actual": 217.5
+    },
+    "v2 engine, recursive (mean)": {
+     "n": 50,
+     "mae": 309.30545,
+     "wape": 1.4220940229885057,
+     "bias": 0.9085652873563219,
+     "mean_actual": 217.5
+    },
+    "v2 teacher-forced (uses realised history)": {
+     "n": 50,
+     "mae": 118.19642603778954,
+     "wape": 0.5434318438519059,
+     "bias": 0.01510013578227853,
+     "mean_actual": 217.5
+    }
+   },
+   "contribution_observed_weeks": {
+    "mae": 8911.44658095238,
+    "bias": 2868.617790476188,
+    "bias_of_mean": 13956.437096380945,
+    "mean_actual": 8269.4138
+   },
+   "coverage_80_orders_12w": 0.8611111111111112,
+   "coverage_80_contribution_12w": 0.8611111111111112,
+   "p_loss": {
+    "mean_predicted": 0.18104166666666666,
+    "observed_share": 0.2222222222222222,
+    "brier": 0.07413246527777778
+   }
+  },
+  "holdout_by_category": {
+   "bedsheet": {
+    "category x week average": {
+     "n": 12,
+     "mae": 120.84196810188992,
+     "wape": 1.8930856621705994,
+     "bias": 1.6772936676387695,
+     "mean_actual": 63.833333333333336
+    },
+    "pooled price response": {
+     "n": 12,
+     "mae": 128.6795287923494,
+     "wape": 2.0158672917861526,
+     "bias": 1.8374481013480095,
+     "mean_actual": 63.833333333333336
+    },
+    "v2 engine, recursive (median)": {
+     "n": 12,
+     "mae": 32.958333333333336,
+     "wape": 0.5163185378590078,
+     "bias": -0.30221932114882505,
+     "mean_actual": 63.833333333333336
+    }
+   },
+   "earrings": {
+    "category x week average": {
+     "n": 12,
+     "mae": 271.3690837428667,
+     "wape": 0.9726490456733573,
+     "bias": 0.1796330439391115,
+     "mean_actual": 279.0
+    },
+    "pooled price response": {
+     "n": 12,
+     "mae": 263.10126206471625,
+     "wape": 0.9430152762176209,
+     "bias": 0.2011164178605575,
+     "mean_actual": 279.0
+    },
+    "v2 engine, recursive (median)": {
+     "n": 12,
+     "mae": 290.25,
+     "wape": 1.0403225806451613,
+     "bias": 0.6308243727598566,
+     "mean_actual": 279.0
+    }
+   },
+   "soap": {
+    "category x week average": {
+     "n": 14,
+     "mae": 225.84591206576783,
+     "wape": 1.0769219240193288,
+     "bias": 0.14963717244367913,
+     "mean_actual": 209.71428571428572
+    },
+    "pooled price response": {
+     "n": 14,
+     "mae": 221.12123229232324,
+     "wape": 1.054392797034239,
+     "bias": 0.11941830262297642,
+     "mean_actual": 209.71428571428572
+    },
+    "v2 engine, recursive (median)": {
+     "n": 14,
+     "mae": 67.5,
+     "wape": 0.32186648501362397,
+     "bias": -0.05688010899182561,
+     "mean_actual": 209.71428571428572
+    }
+   },
+   "tshirt": {
+    "category x week average": {
+     "n": 12,
+     "mae": 249.4388888888889,
+     "wape": 0.7825533769063181,
+     "bias": -0.4911381758748111,
+     "mean_actual": 318.75
+    },
+    "pooled price response": {
+     "n": 12,
+     "mae": 249.5295319447596,
+     "wape": 0.7828377472776772,
+     "bias": -0.47182532078298955,
+     "mean_actual": 318.75
+    },
+    "v2 engine, recursive (median)": {
+     "n": 12,
+     "mae": 266.8333333333333,
+     "wape": 0.8371241830065359,
+     "bias": -0.5006535947712418,
+     "mean_actual": 318.75
+    }
+   }
+  },
+  "holdout_by_archetype": {
+   "commodity": {
+    "category x week average": {
+     "n": 14,
+     "mae": 167.79905397944881,
+     "wape": 1.1261681475130791,
+     "bias": 0.5317031037125013,
+     "mean_actual": 149.0
+    },
+    "pooled price response": {
+     "n": 14,
+     "mae": 162.60746799309808,
+     "wape": 1.0913252885442826,
+     "bias": 0.5296176212658625,
+     "mean_actual": 149.0
+    },
+    "v2 engine, recursive (median)": {
+     "n": 14,
+     "mae": 109.10714285714286,
+     "wape": 0.7322627037392138,
+     "bias": -0.1354266538830297,
+     "mean_actual": 149.0
+    }
+   },
+   "insensitive": {
+    "category x week average": {
+     "n": 7,
+     "mae": 262.5098741301003,
+     "wape": 1.0802875478604952,
+     "bias": -0.20180299312051767,
+     "mean_actual": 243.0
+    },
+    "pooled price response": {
+     "n": 7,
+     "mae": 264.08387917072156,
+     "wape": 1.0867649348589363,
+     "bias": -0.19470341997743065,
+     "mean_actual": 243.0
+    },
+    "v2 engine, recursive (median)": {
+     "n": 7,
+     "mae": 44.5,
+     "wape": 0.1831275720164609,
+     "bias": 0.14785420340975897,
+     "mean_actual": 243.0
+    }
+   },
+   "moderate": {
+    "category x week average": {
+     "n": 16,
+     "mae": 273.74319643391857,
+     "wape": 0.7086055885686292,
+     "bias": -0.42289455219416905,
+     "mean_actual": 386.3125
+    },
+    "pooled price response": {
+     "n": 16,
+     "mae": 269.9793050408609,
+     "wape": 0.698862462490499,
+     "bias": -0.4034216279575093,
+     "mean_actual": 386.3125
+    },
+    "v2 engine, recursive (median)": {
+     "n": 16,
+     "mae": 357.78125,
+     "wape": 0.9261446367901635,
+     "bias": -0.044248503478401556,
+     "mean_actual": 386.3125
+    }
+   },
+   "premium_signal": {
+    "category x week average": {
+     "n": 1,
+     "mae": 205.58199489564873,
+     "wape": 4.282958226992682,
+     "bias": 4.282958226992682,
+     "mean_actual": 48.0
+    },
+    "pooled price response": {
+     "n": 1,
+     "mae": 203.9036425155595,
+     "wape": 4.2479925524074895,
+     "bias": 4.2479925524074895,
+     "mean_actual": 48.0
+    },
+    "v2 engine, recursive (median)": {
+     "n": 1,
+     "mae": 21.0,
+     "wape": 0.4375,
+     "bias": 0.4375,
+     "mean_actual": 48.0
+    }
+   },
+   "reputation_penalty": {
+    "category x week average": {
+     "n": 9,
+     "mae": 169.98859881972874,
+     "wape": 2.1367281974546906,
+     "bias": 2.1367281974546906,
+     "mean_actual": 79.55555555555556
+    },
+    "pooled price response": {
+     "n": 9,
+     "mae": 178.21297375494728,
+     "wape": 2.2401072120035272,
+     "bias": 2.2401072120035272,
+     "mean_actual": 79.55555555555556
+    },
+    "v2 engine, recursive (median)": {
+     "n": 9,
+     "mae": 44.833333333333336,
+     "wape": 0.5635474860335196,
+     "bias": 0.10125698324022346,
+     "mean_actual": 79.55555555555556
+    }
+   },
+   "too_cheap_distrust": {
+    "category x week average": {
+     "n": 3,
+     "mae": 186.50521862853552,
+     "wape": 3.9126968943049407,
+     "bias": 3.9126968943049407,
+     "mean_actual": 47.666666666666664
+    },
+    "pooled price response": {
+     "n": 3,
+     "mae": 179.6133775507152,
+     "wape": 3.76811281574927,
+     "bias": 3.76811281574927,
+     "mean_actual": 47.666666666666664
+    },
+    "v2 engine, recursive (median)": {
+     "n": 3,
+     "mae": 12.5,
+     "wape": 0.26223776223776224,
+     "bias": 0.06643356643356643,
+     "mean_actual": 47.666666666666664
+    }
+   }
+  },
+  "holdout_by_launch_price": {
+   "above median (>10%)": {
+    "category x week average": {
+     "n": 9,
+     "mae": 195.32886298880314,
+     "wape": 1.4280745466281302,
+     "bias": 1.0653468175280691,
+     "mean_actual": 136.77777777777777
+    },
+    "pooled price response": {
+     "n": 9,
+     "mae": 187.5832926363605,
+     "wape": 1.3714456813381353,
+     "bias": 1.1435667681943944,
+     "mean_actual": 136.77777777777777
+    },
+    "v2 engine, recursive (median)": {
+     "n": 9,
+     "mae": 319.0,
+     "wape": 2.332250203086921,
+     "bias": 2.2664500406173844,
+     "mean_actual": 136.77777777777777
+    }
+   },
+   "below median (>10%)": {
+    "category x week average": {
+     "n": 20,
+     "mae": 144.5048772787431,
+     "wape": 1.0422277481337403,
+     "bias": 0.4430173372849835,
+     "mean_actual": 138.65
+    },
+    "pooled price response": {
+     "n": 20,
+     "mae": 150.78941219409404,
+     "wape": 1.0875543612989111,
+     "bias": 0.5294889596105937,
+     "mean_actual": 138.65
+    },
+    "v2 engine, recursive (median)": {
+     "n": 20,
+     "mae": 94.95,
+     "wape": 0.6848178867652363,
+     "bias": -0.11864406779661017,
+     "mean_actual": 138.65
+    }
+   },
+   "near median (+-10%)": {
+    "category x week average": {
+     "n": 21,
+     "mae": 295.8849878690669,
+     "wape": 0.90432029475337,
+     "bias": -0.30461059708563243,
+     "mean_actual": 327.1904761904762
+    },
+    "pooled price response": {
+     "n": 21,
+     "mae": 289.87539276691916,
+     "wape": 0.8859530269400818,
+     "bias": -0.3273614145701689,
+     "mean_actual": 327.1904761904762
+    },
+    "v2 engine, recursive (median)": {
+     "n": 21,
+     "mae": 155.02380952380952,
+     "wape": 0.473802939892301,
+     "bias": -0.38749818075971476,
+     "mean_actual": 327.1904761904762
+    }
+   }
+  },
+  "holdout_by_seller_strategy": {
+   "cost_plus_stale": {
+    "category x week average": {
+     "n": 6,
+     "mae": 121.39947196245724,
+     "wape": 0.7176323465761019,
+     "bias": 0.30230585601886256,
+     "mean_actual": 169.16666666666666
+    },
+    "pooled price response": {
+     "n": 6,
+     "mae": 112.28585486730935,
+     "wape": 0.6637587479840947,
+     "bias": 0.2935191766157004,
+     "mean_actual": 169.16666666666666
+    },
+    "v2 engine, recursive (median)": {
+     "n": 6,
+     "mae": 122.75,
+     "wape": 0.725615763546798,
+     "bias": 0.12955665024630542,
+     "mean_actual": 169.16666666666666
+    }
+   },
+   "experimenter": {
+    "category x week average": {
+     "n": 4,
+     "mae": 105.85036442303306,
+     "wape": 1.09974404595359,
+     "bias": 1.09974404595359,
+     "mean_actual": 96.25
+    },
+    "pooled price response": {
+     "n": 4,
+     "mae": 107.41065217217823,
+     "wape": 1.1159548277628908,
+     "bias": 1.1159548277628908,
+     "mean_actual": 96.25
+    },
+    "v2 engine, recursive (median)": {
+     "n": 4,
+     "mae": 21.5,
+     "wape": 0.22337662337662337,
+     "bias": -0.22337662337662337,
+     "mean_actual": 96.25
+    }
+   },
+   "investment": {
+    "category x week average": {
+     "n": 13,
+     "mae": 289.36993362179686,
+     "wape": 0.8726070835266433,
+     "bias": -0.3498821253112853,
+     "mean_actual": 331.61538461538464
+    },
+    "pooled price response": {
+     "n": 13,
+     "mae": 294.34789356805607,
+     "wape": 0.8876183290152468,
+     "bias": -0.3240769492033911,
+     "mean_actual": 331.61538461538464
+    },
+    "v2 engine, recursive (median)": {
+     "n": 13,
+     "mae": 96.57692307692308,
+     "wape": 0.29123173277661796,
+     "bias": -0.14764555787520298,
+     "mean_actual": 331.61538461538464
+    }
+   },
+   "market": {
+    "category x week average": {
+     "n": 12,
+     "mae": 153.49533184320802,
+     "wape": 1.320389951339424,
+     "bias": 0.7930679411842257,
+     "mean_actual": 116.25
+    },
+    "pooled price response": {
+     "n": 12,
+     "mae": 154.24891222141835,
+     "wape": 1.3268723631949966,
+     "bias": 0.7821567352684108,
+     "mean_actual": 116.25
+    },
+    "v2 engine, recursive (median)": {
+     "n": 12,
+     "mae": 89.625,
+     "wape": 0.7709677419354839,
+     "bias": -0.1860215053763441,
+     "mean_actual": 116.25
+    }
+   },
+   "premium": {
+    "category x week average": {
+     "n": 10,
+     "mae": 187.4663475354547,
+     "wape": 1.2866599007237798,
+     "bias": 0.9755438894128847,
+     "mean_actual": 145.7
+    },
+    "pooled price response": {
+     "n": 10,
+     "mae": 178.1069183660035,
+     "wape": 1.222422226259461,
+     "bias": 1.0232837900584164,
+     "mean_actual": 145.7
+    },
+    "v2 engine, recursive (median)": {
+     "n": 10,
+     "mae": 286.75,
+     "wape": 1.9680851063829787,
+     "bias": 1.8013040494166095,
+     "mean_actual": 145.7
+    }
+   },
+   "reactive": {
+    "category x week average": {
+     "n": 5,
+     "mae": 446.28543474024366,
+     "wape": 0.965150161635475,
+     "bias": -0.5634289308252433,
+     "mean_actual": 462.4
+    },
+    "pooled price response": {
+     "n": 5,
+     "mae": 445.896928224015,
+     "wape": 0.9643099658823855,
+     "bias": -0.5561412956818904,
+     "mean_actual": 462.4
+    },
+    "v2 engine, recursive (median)": {
+     "n": 5,
+     "mae": 400.9,
+     "wape": 0.8669982698961938,
+     "bias": -0.854455017301038,
+     "mean_actual": 462.4
+    }
+   }
+  }
+ },
+ "parameter_recovery": [
+  {
+   "category": "bedsheet",
+   "tier": "basic",
+   "n": 25,
+   "typical_rel": -0.175,
+   "true_mean_slope": -4.2,
+   "fitted_slope": -2.45,
+   "true_sd_within_tier": 2.02,
+   "fitted_listing_sd": 0.84,
+   "naive_between_listing": -1.73
+  },
+  {
+   "category": "bedsheet",
+   "tier": "standard",
+   "n": 45,
+   "typical_rel": -0.007,
+   "true_mean_slope": -2.16,
+   "fitted_slope": -2.11,
+   "true_sd_within_tier": 1.4,
+   "fitted_listing_sd": 0.84,
+   "naive_between_listing": -1.73
+  },
+  {
+   "category": "bedsheet",
+   "tier": "premium",
+   "n": 20,
+   "typical_rel": 0.174,
+   "true_mean_slope": -1.41,
+   "fitted_slope": -2.28,
+   "true_sd_within_tier": 1.01,
+   "fitted_listing_sd": 0.84,
+   "naive_between_listing": -1.73
+  },
+  {
+   "category": "earrings",
+   "tier": "basic",
+   "n": 30,
+   "typical_rel": -0.184,
+   "true_mean_slope": -5.02,
+   "fitted_slope": -3.29,
+   "true_sd_within_tier": 1.84,
+   "fitted_listing_sd": 0.76,
+   "naive_between_listing": -0.08
+  },
+  {
+   "category": "earrings",
+   "tier": "standard",
+   "n": 39,
+   "typical_rel": -0.03,
+   "true_mean_slope": -2.78,
+   "fitted_slope": -1.92,
+   "true_sd_within_tier": 1.9,
+   "fitted_listing_sd": 0.76,
+   "naive_between_listing": -0.08
+  },
+  {
+   "category": "earrings",
+   "tier": "premium",
+   "n": 21,
+   "typical_rel": 0.15,
+   "true_mean_slope": -1.17,
+   "fitted_slope": -0.47,
+   "true_sd_within_tier": 0.87,
+   "fitted_listing_sd": 0.76,
+   "naive_between_listing": -0.08
+  },
+  {
+   "category": "soap",
+   "tier": "basic",
+   "n": 21,
+   "typical_rel": -0.154,
+   "true_mean_slope": -3.44,
+   "fitted_slope": -2.93,
+   "true_sd_within_tier": 1.39,
+   "fitted_listing_sd": 0.69,
+   "naive_between_listing": 0.6
+  },
+  {
+   "category": "soap",
+   "tier": "standard",
+   "n": 45,
+   "typical_rel": 0.005,
+   "true_mean_slope": -2.5,
+   "fitted_slope": -3.07,
+   "true_sd_within_tier": 1.48,
+   "fitted_listing_sd": 0.69,
+   "naive_between_listing": 0.6
+  },
+  {
+   "category": "soap",
+   "tier": "premium",
+   "n": 24,
+   "typical_rel": 0.203,
+   "true_mean_slope": -1.5,
+   "fitted_slope": -2.94,
+   "true_sd_within_tier": 0.92,
+   "fitted_listing_sd": 0.69,
+   "naive_between_listing": 0.6
+  },
+  {
+   "category": "tshirt",
+   "tier": "basic",
+   "n": 21,
+   "typical_rel": -0.131,
+   "true_mean_slope": -3.18,
+   "fitted_slope": -2.37,
+   "true_sd_within_tier": 1.94,
+   "fitted_listing_sd": 1.15,
+   "naive_between_listing": 1.05
+  },
+  {
+   "category": "tshirt",
+   "tier": "standard",
+   "n": 40,
+   "typical_rel": 0.01,
+   "true_mean_slope": -2.62,
+   "fitted_slope": -2.49,
+   "true_sd_within_tier": 1.38,
+   "fitted_listing_sd": 1.15,
+   "naive_between_listing": 1.05
+  },
+  {
+   "category": "tshirt",
+   "tier": "premium",
+   "n": 29,
+   "typical_rel": 0.18,
+   "true_mean_slope": -1.23,
+   "fitted_slope": -0.76,
+   "true_sd_within_tier": 1.2,
+   "fitted_listing_sd": 1.15,
+   "naive_between_listing": 1.05
+  }
+ ],
+ "decisions": {
+  "declined_by_v2": {
+   "n": 13,
+   "v1_rule_priced": 10,
+   "v1_rule_true_mean": 2096.597809523809,
+   "v1_rule_true_p_loss": 0.22249999999999998,
+   "v1_rule_share_true_mean_negative": 0.2,
+   "oracle_true_mean": 2372.017964285714
+  },
+  "n_listings": 120,
+  "status": {
+   "ok": 107,
+   "no_feasible_candidate": 13
+  },
+  "learning_policy": {
+   "experiment": 59,
+   "price": 46,
+   "abstain": 2
+  },
+  "confident_share": 0.475,
+  "policies": {
+   "Balanced (v2)": {
+    "n": 107,
+    "mean_regret_inr": 2248.7737275255895,
+    "median_regret_inr": 358.8839999999997,
+    "median_relative_regret": 0.12969454120357615,
+    "share_within_10pct_of_best": 0.45794392523364486,
+    "mean_true_p_loss": 0.08341121495327103,
+    "share_true_mean_negative": 0.06542056074766354,
+    "share_below_true_break_even": 0.06542056074766354,
+    "share_budget_breach_over_10pct": 0.0,
+    "mean_price_vs_oracle": 1.028447346657549
+   },
+   "Conservative (v2)": {
+    "n": 107,
+    "mean_regret_inr": 2176.996016577659,
+    "median_regret_inr": 185.9730714285714,
+    "median_relative_regret": 0.06953547698416178,
+    "share_within_10pct_of_best": 0.5700934579439252,
+    "mean_true_p_loss": 0.08060747663551404,
+    "share_true_mean_negative": 0.056074766355140186,
+    "share_below_true_break_even": 0.056074766355140186,
+    "share_budget_breach_over_10pct": 0.0,
+    "mean_price_vs_oracle": 1.0721084219588994
+   },
+   "v1 rule (point estimate, no risk limits)": {
+    "n": 117,
+    "mean_regret_inr": 1995.6105729548228,
+    "median_regret_inr": 206.696880952426,
+    "median_relative_regret": 0.1271899242211649,
+    "share_within_10pct_of_best": 0.49572649572649574,
+    "mean_true_p_loss": 0.0923076923076923,
+    "share_true_mean_negative": 0.05982905982905983,
+    "share_below_true_break_even": 0.05982905982905983,
+    "share_budget_breach_over_10pct": 0.0,
+    "mean_price_vs_oracle": 1.0968180645080767
+   },
+   "Market median, held": {
+    "n": 120,
+    "mean_regret_inr": 3524.8237311507933,
+    "median_regret_inr": 627.5484285714292,
+    "median_relative_regret": 0.2745654053140857,
+    "share_within_10pct_of_best": 0.2833333333333333,
+    "mean_true_p_loss": 0.16541666666666668,
+    "share_true_mean_negative": 0.13333333333333333,
+    "share_below_true_break_even": 0.13333333333333333,
+    "share_budget_breach_over_10pct": 0.016666666666666666,
+    "mean_price_vs_oracle": 0.9665301206395519
+   }
+  },
+  "experiment": {
+   "n": 104,
+   "mean_regret_inr": 2720.645357600733,
+   "mean_true_p_loss": 0.09687499999999999
+  },
+  "oracle_above_cap_share": 0.25833333333333336,
+  "p_loss_calibration": [
+   {
+    "bin": "(-0.01, 0.05]",
+    "n": 1050,
+    "predicted": 0.016638095238095237,
+    "observed": 0.03880952380952381
+   },
+   {
+    "bin": "(0.05, 0.15]",
+    "n": 406,
+    "predicted": 0.08722906403940886,
+    "observed": 0.10991379310344827
+   },
+   {
+    "bin": "(0.15, 0.3]",
+    "n": 185,
+    "predicted": 0.2160810810810811,
+    "observed": 0.2685135135135135
+   },
+   {
+    "bin": "(0.3, 0.5]",
+    "n": 118,
+    "predicted": 0.3883050847457627,
+    "observed": 0.3574152542372881
+   },
+   {
+    "bin": "(0.5, 0.75]",
+    "n": 99,
+    "predicted": 0.6072474747474748,
+    "observed": 0.5234848484848486
+   },
+   {
+    "bin": "(0.75, 1.0]",
+    "n": 562,
+    "predicted": 0.9745685053380783,
+    "observed": 0.9789145907473309
+   }
+  ],
+  "mean_contribution_prediction": {
+   "corr": 0.4760813410784742,
+   "mean_predicted": 4012.612553125243,
+   "mean_true": -725.8937666125557
+  },
+  "by_archetype": [
+   {
+    "archetype": "commodity",
+    "n": 37,
+    "oracle_vs_median": 0.9621402340741083,
+    "balanced_vs_median": 1.0463691774180501,
+    "balanced_regret": 3117.2481002885993,
+    "point_regret": 3349.1460472972963,
+    "uncertain_share": 0.4594594594594595
+   },
+   {
+    "archetype": "insensitive",
+    "n": 14,
+    "oracle_vs_median": 1.1767896770718955,
+    "balanced_vs_median": 1.057608949100008,
+    "balanced_regret": 5615.7477234432245,
+    "point_regret": 3086.6328163265293,
+    "uncertain_share": 0.7142857142857143
+   },
+   {
+    "archetype": "moderate",
+    "n": 38,
+    "oracle_vs_median": 1.0838490231413125,
+    "balanced_vs_median": 1.0716149617698616,
+    "balanced_regret": 955.9052329931972,
+    "point_regret": 659.7545504385978,
+    "uncertain_share": 0.5789473684210527
+   },
+   {
+    "archetype": "premium_signal",
+    "n": 4,
+    "oracle_vs_median": 1.1906756801303393,
+    "balanced_vs_median": 1.062027266779471,
+    "balanced_regret": 2230.328089285712,
+    "point_regret": 1769.0317410714283,
+    "uncertain_share": 0.75
+   },
+   {
+    "archetype": "reputation_penalty",
+    "n": 13,
+    "oracle_vs_median": 1.0026811789789067,
+    "balanced_vs_median": 1.0564182352062168,
+    "balanced_regret": 914.4366835317459,
+    "point_regret": 1018.6263680555559,
+    "uncertain_share": 0.3076923076923077
+   },
+   {
+    "archetype": "too_cheap_distrust",
+    "n": 14,
+    "oracle_vs_median": 1.1401607325935117,
+    "balanced_vs_median": 1.0574548069553933,
+    "balanced_regret": 1139.3645416666668,
+    "point_regret": 1832.0714632936513,
+    "uncertain_share": 0.5
+   }
+  ]
+ }
+}
