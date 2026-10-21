@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Price Confidence: launch price for new Meesho sellers (demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Hind:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #FFFFFF;
+  --wash: #F7F1F8;
+  --ink: #2A0B2F;
+  --ink2: #67516B;
+  --line: #E6DAE9;
+  --pink: #B5145D;
+  --pink-soft: #FBE4EF;
+  --floor: #B42318;
+  --floor-soft: #FDECEA;
+  --gain: #1B7A49;
+  --band: #EBD6EE;
+  --tag: #FFF4F9;
+  --plum: #5B2A86;
+  --focus: #1A5FD6;
+  --display: "Baloo 2", "Hind", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --body: "Hind", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #170D1B; --wash: #22152A; --ink: #F6EDF8; --ink2: #BEAAC3; --line: #3B2944;
+    --pink: #FF7DB6; --pink-soft: #3A1830; --floor: #FF8B7D; --floor-soft: #3B1C1A; --gain: #6CD69D;
+    --band: #3D2344; --tag: #2A1527; --plum: #C9A2F2; --focus: #8AB4FF;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #170D1B; --wash: #22152A; --ink: #F6EDF8; --ink2: #BEAAC3; --line: #3B2944;
+  --pink: #FF7DB6; --pink-soft: #3A1830; --floor: #FF8B7D; --floor-soft: #3B1C1A; --gain: #6CD69D;
+  --band: #3D2344; --tag: #2A1527; --plum: #C9A2F2; --focus: #8AB4FF;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 400 16px/1.55 var(--body); font-feature-settings: "tnum" 1;
+}
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; margin: 0; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--pink); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- top bar ---------- */
+.top {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  max-width: 1240px; margin: 0 auto; padding: 18px 24px 8px;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand svg { flex: none; }
+.brand-name { font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: -0.01em; }
+.top-note { margin-left: auto; font-size: 14px; color: var(--ink2); }
+.top-note b { color: var(--ink); font-weight: 600; }
+
+/* ---------- layout ---------- */
+.wrap {
+  max-width: 1240px; margin: 0 auto; padding: 8px 24px 64px;
+  display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); gap: 40px; align-items: start;
+}
+@media (max-width: 920px) { .wrap { grid-template-columns: 1fr; gap: 28px; } }
+
+/* ---------- form ---------- */
+.form {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px);
+  background: var(--wash); border-radius: 20px; padding: 22px 22px 20px;
+}
+@media (max-width: 920px) { .form { position: static; } }
+.form h1 { font-size: 26px; margin-bottom: 4px; }
+.form .lede { color: var(--ink2); font-size: 15px; margin-bottom: 16px; }
+.examples { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.chip {
+  font: 500 14px/1 var(--body); padding: 8px 12px; border-radius: 999px; cursor: pointer;
+  background: var(--paper); color: var(--ink); border: 1px solid var(--line);
+}
+.chip:hover { border-color: var(--pink); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+fieldset { border: 0; margin: 0 0 18px; padding: 0; min-width: 0; }
+legend { font-family: var(--display); font-weight: 700; font-size: 17px; padding: 0; margin-bottom: 8px; }
+.field { margin-bottom: 12px; }
+.field label, .field .label { display: block; font-weight: 500; font-size: 15px; margin-bottom: 4px; }
+.hint { font-size: 13px; color: var(--ink2); margin-top: 3px; }
+.money { position: relative; }
+.money span {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ink2); pointer-events: none;
+}
+input[type="text"], input[type="number"] {
+  width: 100%; font: 400 16px/1.2 var(--body); color: var(--ink); background: var(--paper);
+  border: 1.5px solid var(--line); border-radius: 10px; padding: 11px 12px;
+}
+.money input { padding-left: 28px; }
+input:hover { border-color: var(--ink2); }
+input[aria-invalid="true"] { border-color: var(--floor); }
+.err { color: var(--floor); font-size: 13px; margin-top: 3px; display: none; }
+.err.on { display: block; }
+.cat-row { display: flex; gap: 8px; margin-top: 8px; }
+.ship-line { font-size: 14px; color: var(--ink2); background: var(--paper); border-radius: 10px; padding: 9px 12px; }
+.ship-line b { color: var(--ink); }
+.checks label { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; margin-bottom: 7px; cursor: pointer; }
+.checks input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--pink); flex: none; }
+.photo { display: flex; align-items: center; gap: 12px; }
+.photo-thumb {
+  width: 64px; height: 64px; border-radius: 12px; background: var(--paper); border: 1.5px dashed var(--line);
+  display: grid; place-items: center; overflow: hidden; flex: none; color: var(--ink2); font-size: 12px; text-align: center;
+}
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.file-btn {
+  font: 500 15px/1 var(--body); padding: 10px 14px; border-radius: 10px; background: var(--paper);
+  border: 1.5px solid var(--line); color: var(--ink); cursor: pointer;
+}
+.file-btn:hover { border-color: var(--ink2); }
+.go {
+  width: 100%; font: 700 18px/1 var(--display); padding: 15px 18px; border: 0; border-radius: 12px; cursor: pointer;
+  background: var(--pink); color: #fff;
+}
+.go:hover { filter: brightness(1.06); }
+:root[data-theme="dark"] .go { color: #1b0714; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .go { color: #1b0714; } }
+
+/* ---------- results ---------- */
+.results { min-width: 0; }
+.results section { margin-bottom: 44px; }
+.results h2 { font-size: 26px; margin-bottom: 10px; }
+.results .sub { color: var(--ink2); margin-bottom: 16px; max-width: 70ch; }
+
+/* price tag: the one bold object on the page */
+.hero { display: grid; grid-template-columns: 1fr; gap: 18px; }
+.tag {
+  position: relative; background: var(--tag); border: 2px solid var(--pink);
+  border-radius: 22px 22px 22px 22px; padding: 26px 28px 22px 76px; max-width: 640px;
+}
+.tag::before {
+  content: ""; position: absolute; left: 28px; top: 40px; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--paper); border: 2px solid var(--pink);
+}
+.tag::after {
+  content: ""; position: absolute; left: 37px; top: 0; width: 2px; height: 42px; background: var(--pink); opacity: .5;
+}
+.tag-top { display: flex; align-items: center; gap: 14px; }
+.tag-img { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; border: 1.5px solid var(--line); }
+.tag-kicker { font: 600 18px/1.2 var(--body); color: var(--ink2); }
+.tag-title { font-weight: 600; font-size: 16px; }
+.tag-price {
+  font: 800 clamp(64px, 11vw, 112px)/0.95 var(--display); letter-spacing: -0.02em; color: var(--ink);
+  margin: 6px 0 4px;
+}
+.tag-price .rs { font-size: .55em; vertical-align: .45em; margin-right: .04em; font-weight: 700; color: var(--pink); }
+.tag-range { font-size: 18px; }
+.tag-range b { font-weight: 600; }
+.tag-floor {
+  margin-top: 16px; padding-top: 14px; border-top: 1.5px dashed var(--line); color: var(--floor); font-size: 16px;
+}
+.tag-floor b { font-weight: 600; }
+.tag.warn { border-color: var(--floor); background: var(--floor-soft); }
+.tag.warn::before { border-color: var(--floor); }
+.tag.warn::after { background: var(--floor); }
+.tag.warn .tag-price { font-size: clamp(40px, 7vw, 64px); color: var(--floor); }
+.notes { display: grid; gap: 8px; max-width: 640px; }
+.note { font-size: 15px; padding: 10px 14px; border-radius: 12px; background: var(--wash); }
+.note.bad { background: var(--floor-soft); color: var(--ink); }
+.note.bad b { color: var(--floor); }
+
+/* price ruler */
+.ruler { position: relative; height: 96px; margin: 4px 6px 0; max-width: 640px; }
+.r-track { position: absolute; left: 0; right: 0; top: 48px; height: 8px; border-radius: 4px; background: var(--line); }
+.r-band { position: absolute; top: 44px; height: 16px; border-radius: 8px; background: var(--band); }
+.r-range { position: absolute; top: 46px; height: 12px; border-radius: 6px; background: var(--pink); opacity: .85; }
+.r-med { position: absolute; top: 38px; width: 2px; height: 28px; background: var(--ink2); }
+.r-floor { position: absolute; top: 30px; width: 3px; height: 44px; background: var(--floor); border-radius: 2px; }
+.r-start { position: absolute; top: 40px; width: 20px; height: 24px; margin-left: -10px; }
+.r-lab { position: absolute; font-size: 13px; white-space: nowrap; transform: translateX(-50%); line-height: 1.2; }
+.r-lab.top { top: 6px; }
+.r-lab.bot { top: 74px; }
+.r-lab b { font-weight: 600; }
+.r-lab.floor { color: var(--floor); }
+.r-lab.start { color: var(--pink); }
+.r-lab.muted { color: var(--ink2); }
+.r-cap { font-size: 13px; color: var(--ink2); margin: -4px 6px 0; max-width: 640px; }
+.r-cap .sw { display: inline-block; width: 18px; height: 10px; border-radius: 5px; background: var(--band); margin-right: 6px; vertical-align: -1px; }
+.r-cap .tick { display: inline-block; width: 2px; height: 12px; background: var(--ink2); margin: 0 6px 0 4px; vertical-align: -2px; }
+.r-off { position: absolute; top: 40px; width: 2px; height: 24px; background: var(--ink2); opacity: .7; }
+
+/* receipt */
+.receipt {
+  background: var(--wash); border-radius: 16px; padding: 18px 20px; max-width: 560px;
+}
+.receipt .intro { font-size: 15px; margin-bottom: 12px; }
+.rline { display: flex; align-items: baseline; gap: 8px; padding: 4px 0; font-size: 16px; }
+.rline .l { flex: none; max-width: 70%; }
+.rline .dots { flex: 1; border-bottom: 2px dotted var(--line); transform: translateY(-4px); min-width: 16px; }
+.rline .v { flex: none; font-variant-numeric: tabular-nums; }
+.rline.total { font-weight: 600; border-top: 1.5px solid var(--line); margin-top: 6px; padding-top: 8px; }
+.rline.floor { color: var(--floor); font-weight: 600; font-size: 18px; }
+.rline .l small { color: var(--ink2); font-size: 13px; display: block; font-weight: 400; }
+
+/* reasons */
+.reasons { list-style: none; padding: 0; margin: 0 0 20px; display: grid; gap: 10px; max-width: 72ch; }
+.reasons li { position: relative; padding-left: 22px; }
+.reasons li::before {
+  content: ""; position: absolute; left: 2px; top: .62em; width: 9px; height: 9px; border-radius: 50%; background: var(--pink);
+}
+.reasons li b { font-weight: 600; }
+
+/* charts */
+figure { margin: 0; }
+.chart { width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font-family: var(--body); font-size: 12px; fill: var(--ink2); }
+.chart .axis-line { stroke: var(--line); }
+.chart .grid { stroke: var(--line); stroke-dasharray: 2 4; }
+.chart .zero { stroke: var(--ink2); stroke-width: 1; }
+figcaption { font-size: 14px; color: var(--ink2); margin-top: 6px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; margin: 4px 0 8px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 22px; height: 0; border-top: 3px solid; }
+.legend i.dash { border-top-style: dashed; }
+
+/* verdict */
+.verdict { font-size: 17px; max-width: 72ch; margin-bottom: 16px; }
+.verdict b { font-weight: 600; }
+.pill {
+  display: inline-block; font: 700 14px/1 var(--display); padding: 6px 10px 5px; border-radius: 999px; margin-right: 6px;
+  vertical-align: 2px;
+}
+.pill.no { background: var(--floor-soft); color: var(--floor); }
+.pill.yes { background: var(--pink-soft); color: var(--pink); }
+
+/* accordions */
+.acc-hint { font-size: 14px; color: var(--ink2); margin: 26px 0 6px; }
+.accs { max-width: 760px; }
+details.acc { border-top: 1px solid var(--line); }
+details.acc:last-child { border-bottom: 1px solid var(--line); }
+details.acc > summary {
+  list-style: none; cursor: pointer; display: grid; grid-template-columns: 1fr auto; column-gap: 16px;
+  align-items: center; padding: 16px 4px;
+}
+details.acc > summary::-webkit-details-marker { display: none; }
+details.acc > summary:hover .acc-title { color: var(--pink); }
+.acc-title { font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.2; }
+.acc-teaser { grid-column: 1; font-size: 15px; color: var(--ink2); margin-top: 2px; }
+.acc-teaser b { color: var(--ink); font-weight: 600; }
+.acc-teaser .bad { color: var(--floor); font-weight: 600; }
+.acc-teaser .good { color: var(--pink); font-weight: 600; }
+.acc-chev {
+  grid-column: 2; grid-row: 1 / span 2; width: 34px; height: 34px; border-radius: 50%; background: var(--wash);
+  display: grid; place-items: center; color: var(--ink);
+}
+details.acc[open] .acc-chev svg { transform: rotate(180deg); }
+.acc-body { padding: 2px 4px 26px; }
+@media (prefers-reduced-motion: no-preference) { .acc-chev svg { transition: transform .2s ease; } }
+details.more { background: var(--paper); border-radius: 12px; margin: 4px 0 18px; }
+details.more > summary { list-style: none; cursor: pointer; padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; column-gap: 10px; align-items: center; }
+details.more > summary::-webkit-details-marker { display: none; }
+details.more .more-title { font-family: var(--display); font-weight: 700; font-size: 17px; }
+details.more .more-teaser { grid-column: 1; font-size: 13px; color: var(--ink2); }
+details.more .acc-chev { width: 30px; height: 30px; }
+details.more[open] .acc-chev svg { transform: rotate(180deg); }
+details.more .more-body { padding: 4px 14px 14px; }
+details.more .sub-legend { font-weight: 600; font-size: 15px; margin: 6px 0 6px; }
+
+/* launch controls */
+.controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 28px; background: var(--wash);
+  border-radius: 16px; padding: 16px 18px; margin-bottom: 16px; max-width: 720px; }
+@media (max-width: 560px) { .controls { grid-template-columns: 1fr; } }
+.ctl label { display: flex; justify-content: space-between; gap: 8px; font-weight: 500; font-size: 15px; margin-bottom: 4px; }
+.ctl output { font-family: var(--display); font-weight: 700; font-size: 18px; color: var(--pink); }
+.ctl output.loss { color: var(--floor); }
+.ctl input[type="range"] { width: 100%; accent-color: var(--pink); }
+.ctl-scale { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink2); }
+.facts { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 8px; max-width: 72ch; }
+.facts li { padding-left: 22px; position: relative; }
+.facts li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 9px; height: 9px; border-radius: 2px; background: var(--plum); }
+.facts li.bad::before { background: var(--floor); }
+.facts b { font-weight: 600; }
+.bleed { max-width: 720px; margin-top: 8px; }
+.bleed h3 { font-size: 20px; margin: 10px 0 8px; }
+.bleed p { margin-bottom: 10px; max-width: 72ch; }
+.bleed b { font-weight: 600; }
+
+/* evidence table */
+.tbl-wrap { overflow-x: auto; max-width: 100%; }
+table { border-collapse: collapse; font-size: 15px; min-width: 560px; }
+th, td { text-align: right; padding: 8px 12px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; }
+thead th { font-weight: 600; font-size: 14px; color: var(--ink2); vertical-align: bottom; }
+thead tr.grp th { color: var(--ink); font-size: 15px; border-bottom: 0; text-align: center; }
+td.neg { color: var(--floor); }
+td.mine { background: var(--pink-soft); }
+.small { font-size: 14px; color: var(--ink2); max-width: 72ch; }
+
+/* triggers */
+.triggers { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; max-width: 72ch; }
+.triggers li { padding: 12px 16px; border-left: 4px solid var(--band); background: var(--paper); }
+.triggers li b { font-weight: 600; }
+
+/* how it works */
+details.how { background: var(--wash); border-radius: 16px; padding: 16px 20px; }
+details.how summary { cursor: pointer; font-family: var(--display); font-weight: 700; font-size: 20px; }
+details.how h3, .how-body h3 { font-size: 17px; margin: 18px 0 6px; }
+.how-body h3:first-child { margin-top: 4px; }
+.how-body p, .how-body li { font-size: 15px; max-width: 76ch; }
+.how-body ol, .how-body ul { padding-left: 20px; margin: 6px 0; }
+.how-body .kv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 10px 0; max-width: 680px; }
+@media (max-width: 560px) { .how-body .kv { grid-template-columns: 1fr; } }
+.how-body .kv div { background: var(--wash); border-radius: 12px; padding: 10px 12px; }
+.how-body .kv b { display: block; font-family: var(--display); font-size: 22px; }
+details.how p, details.how li { font-size: 15px; max-width: 76ch; }
+details.how ol, details.how ul { padding-left: 20px; margin: 6px 0; }
+details.how .kv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 10px 0; max-width: 680px; }
+@media (max-width: 560px) { details.how .kv { grid-template-columns: 1fr; } }
+details.how .kv div { background: var(--paper); border-radius: 12px; padding: 10px 12px; }
+details.how .kv b { display: block; font-family: var(--display); font-size: 22px; }
+
+.foot { max-width: 1240px; margin: 0 auto; padding: 0 24px 40px; color: var(--ink2); font-size: 14px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .tag.flash { animation: flash .5s ease-out; }
+  @keyframes flash { from { transform: scale(.985); box-shadow: 0 0 0 8px var(--pink-soft); } to { transform: none; box-shadow: none; } }
+}
+@media (max-width: 560px) {
+  .top, .wrap, .foot { padding-left: 16px; padding-right: 16px; }
+  .tag { padding: 22px 18px 18px 58px; }
+  .tag::before { left: 20px; }
+  .tag::after { left: 29px; }
+  .results h2 { font-size: 23px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+      <path d="M4 16.5 16.5 4H29a1 1 0 0 1 1 1v12.5L17.5 30a1.4 1.4 0 0 1-2 0L4 18.5a1.4 1.4 0 0 1 0-2Z" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--pink)"/>
+      <circle cx="23.5" cy="10.5" r="2.6" fill="currentColor" style="color:var(--pink)"/>
+    </svg>
+    <span class="brand-name">Price Confidence</span>
+  </div>
+  <p class="top-note">Demo for Meesho DICE S3 by <b>Team Edge Case</b>, IIT Roorkee. All data is synthetic.</p>
+</header>
+
+<main class="wrap">
+  <form class="form" id="form" novalidate>
+    <h1>What should I charge?</h1>
+    <p class="lede">Tell us about one product. We work out your lowest safe price, check it against the market, and suggest where to start.</p>
+    <div class="examples" role="group" aria-label="Load an example">
+      <button type="button" class="chip" data-example="soap">Try the soap example</button>
+      <button type="button" class="chip" data-example="tshirt">Try the t-shirt example</button>
+    </div>
+
+    <fieldset>
+      <legend>Your product</legend>
+      <div class="field">
+        <label for="title">Product title</label>
+        <input type="text" id="title" autocomplete="off" placeholder="e.g. Handmade neem soap">
+        <div class="cat-row" role="group" aria-label="Category">
+          <button type="button" class="chip" data-cat="soap" aria-pressed="false">Soap</button>
+          <button type="button" class="chip" data-cat="tshirt" aria-pressed="false">T-shirt</button>
+        </div>
+        <p class="err" id="err-cat">Pick soap or t-shirt. This demo covers only these two.</p>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Your costs for one piece</legend>
+      <div class="field">
+        <label for="product">Making or buying cost</label>
+        <div class="money"><span>₹</span><input type="number" id="product" min="0" step="1" inputmode="decimal"></div>
+        <p class="err" id="err-product">Enter what one piece costs you to make or buy.</p>
+      </div>
+      <div class="field">
+        <label for="packaging">Packaging per parcel</label>
+        <div class="money"><span>₹</span><input type="number" id="packaging" min="0" step="1" inputmode="decimal"></div>
+      </div>
+      <p class="ship-line" id="ship-line">Meesho delivery: <b>₹30</b> per soap parcel, <b>₹70</b> per t-shirt parcel.</p>
+    </fieldset>
+
+    <details class="more" id="more">
+      <summary><span class="more-title">More details (optional)</span><span class="more-teaser" id="more-teaser"></span><span class="acc-chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 6 8 10.5 12.5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+      <div class="more-body">
+        <div class="field">
+          <span class="label">Photo</span>
+          <div class="photo">
+            <div class="photo-thumb" id="thumb">No photo</div>
+            <label class="file-btn" for="photo">Add photo</label>
+            <input type="file" id="photo" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0">
+          </div>
+        </div>
+        <div class="field">
+          <label for="gift">Free gift in each parcel</label>
+          <div class="money"><span>₹</span><input type="number" id="gift" min="0" step="1" inputmode="decimal"></div>
+          <p class="hint">A sample or extra piece you add to win reviews.</p>
+        </div>
+        <p class="sub-legend">Your listing has</p>
+        <div class="checks" id="checks">
+          <label><input type="checkbox" value="1"> 4 or more clear photos</label>
+          <label><input type="checkbox" value="1"> Plain, well-lit background</label>
+          <label><input type="checkbox" value="1"> Full description: material, size, weight</label>
+          <label><input type="checkbox" value="1"> Size chart or ingredient list</label>
+        </div>
+        <div class="field" style="margin-top:10px">
+          <label for="budget">How much can you afford to lose while building reviews?</label>
+          <div class="money"><span>₹</span><input type="number" id="budget" min="0" step="100" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="offline">Price you sell at offline</label>
+          <div class="money"><span>₹</span><input type="number" id="offline" min="0" step="1" inputmode="decimal"></div>
+        </div>
+      </div>
+    </details>
+    <button type="submit" class="go">Show my price</button>
+  </form>
+
+  <div class="results" id="results" aria-live="polite"></div>
+</main>
+
+<footer class="foot">
+  Built on 300 synthetic listings (150 soap, 150 t-shirt) generated to demonstrate the method. The numbers show how the
+  tool reasons; they are not a forecast for real Meesho sellers.
+</footer>
+
+<script>
+window.PC_MODEL = /*__MODEL__*/null;
+</script>
+<script>
+/*__ENGINE__*/
+</script>
+<script>
+(function () {
+  "use strict";
+  var M = window.PC_MODEL, E = window.PriceEngine;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  if (!M || !E) {
+    document.getElementById("form").addEventListener("submit", function (e) { e.preventDefault(); });
+    document.getElementById("results").innerHTML =
+      '<p class="note bad" style="font-size:17px;max-width:560px"><b>This is the unbuilt template, not the demo.</b> ' +
+      'Open <b>OPEN_THIS_Price_Confidence_demo.html</b> instead. To rebuild it yourself, run <code>python build_app.py</code>.</p>';
+    return;
+  }
+  if (!M || !E) {
+    document.getElementById("form").addEventListener("submit", function (e) { e.preventDefault(); });
+    document.getElementById("results").innerHTML =
+      '<p class="note bad" style="max-width:640px"><b>This file is the unbuilt template, so it has no data.</b> ' +
+      'Close it and open <b>OPEN_THIS_Price_Confidence_demo.html</b> from the same folder (or run <code>python build_app.py</code>).</p>';
+    return;
+  }
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var state = { cat: null, img: null, last: null, open: {} };
+  var CHEV = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 6 8 10.5 12.5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  var inr = function (x) {
+    var v = Math.round(x), s = Math.abs(v).toLocaleString("en-IN");
+    return (v < 0 ? "−\u2060₹\u2060" : "₹\u2060") + s;
+  };
+  var signed = function (x) { var v = Math.round(x); return (v > 0 ? "+\u2060" : v < 0 ? "−\u2060" : "") + "₹\u2060" + Math.abs(v).toLocaleString("en-IN"); };
+  var pct = function (x, d) { var s = (Math.abs(x) * 100).toFixed(d || 0) + "%"; return (x < 0 && s !== "0%" ? "−" : "") + s; };
+  var catName = function (c, plural) { return c === "soap" ? (plural ? "soaps" : "soap") : (plural ? "t-shirts" : "t-shirt"); };
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+
+  var EXAMPLES = {
+    soap: { title: "Handmade herbal soap, 200 g", product: 64, packaging: 12, gift: 15, checks: 2, budget: 3000, offline: 134 },
+    tshirt: { title: "Cotton round-neck t-shirt", product: 120, packaging: 10, gift: 0, checks: 2, budget: 5000, offline: 250 }
+  };
+
+  // ---------------------------------------------------------------- form
+  function setCat(c) {
+    state.cat = c;
+    $$("[data-cat]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.cat === c)); });
+    var line = $("#ship-line");
+    if (c) line.innerHTML = "Meesho delivery: <b>" + inr(M.categories[c].ship) + "</b> per " + catName(c) + " parcel, paid on every parcel you send.";
+    $("#err-cat").classList.remove("on");
+  }
+  function fill(ex) {
+    $("#title").value = ex.title;
+    ["product", "packaging", "gift", "budget", "offline"].forEach(function (k) { $("#" + k).value = (k === "offline" && !ex[k]) ? "" : ex[k]; });
+    $$("#checks input").forEach(function (c, i) { c.checked = i < ex.checks; });
+    setCat(E.detectCategory(ex.title));
+    moreTeaser();
+  }
+  function moreTeaser() {
+    var bits = [], g = parseFloat($("#gift").value), b = $("#budget").value.trim(), o = parseFloat($("#offline").value);
+    var n = $$("#checks input").filter(function (c) { return c.checked; }).length;
+    if (state.img) bits.push("photo added");
+    if (g > 0) bits.push("free gift " + inr(g));
+    bits.push(n + " of 4 listing boxes ticked");
+    if (b !== "") bits.push("loss budget " + inr(parseFloat(b) || 0));
+    if (o > 0) bits.push("offline " + inr(o));
+    var s = bits.join(", ");
+    $("#more-teaser").textContent = s.charAt(0).toUpperCase() + s.slice(1);
+  }
+  function read() {
+    return {
+      category: state.cat,
+      title: $("#title").value.trim(),
+      product: parseFloat($("#product").value),
+      packaging: parseFloat($("#packaging").value) || 0,
+      gift: parseFloat($("#gift").value) || 0,
+      checks: $$("#checks input").filter(function (c) { return c.checked; }).length,
+      budget: $("#budget").value.trim() === "" ? null : (parseFloat($("#budget").value) || 0),
+      offline: parseFloat($("#offline").value) || 0
+    };
+  }
+  function validate(inp) {
+    var ok = true;
+    if (!inp.category) { $("#err-cat").classList.add("on"); ok = false; }
+    var bad = !(inp.product > 0);
+    $("#err-product").classList.toggle("on", bad);
+    $("#product").setAttribute("aria-invalid", String(bad));
+    if (bad) ok = false;
+    return ok;
+  }
+
+  $("#title").addEventListener("input", function () {
+    var c = E.detectCategory(this.value);
+    if (c) setCat(c);
+  });
+  $$("[data-cat]").forEach(function (b) { b.addEventListener("click", function () { setCat(b.dataset.cat); }); });
+  $$("[data-example]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      $$("[data-example]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      fill(EXAMPLES[b.dataset.example]);
+      state.img = null; $("#thumb").textContent = "No photo";
+      run(true);
+    });
+  });
+  ["#gift", "#budget", "#offline"].forEach(function (id) { $(id).addEventListener("input", moreTeaser); });
+  $$("#checks input").forEach(function (c) { c.addEventListener("change", moreTeaser); });
+  $("#photo").addEventListener("change", function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      state.img = rd.result;
+      $("#thumb").innerHTML = '<img alt="Your product photo" src="' + rd.result + '">';
+      moreTeaser();
+      if (state.last) render(state.last.inp, state.last.r, false);
+    };
+    rd.readAsDataURL(f);
+  });
+  $("#form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!state.cat) { var c = E.detectCategory($("#title").value); if (c) setCat(c); }
+    run(true, true);
+  });
+
+  function run(flash, scroll) {
+    var inp = read();
+    if (!validate(inp)) return;
+    var r;
+    try { r = E.recommend(M, inp); }
+    catch (err) {
+      $("#results").innerHTML = '<p class="note bad" style="max-width:640px"><b>Could not calculate a price.</b> ' + esc(err.message) +
+        '. Check that every cost is a number and try again.</p>';
+      return;
+    }
+    state.last = { inp: inp, r: r };
+    render(inp, r, flash);
+    if (scroll && window.matchMedia("(max-width: 920px)").matches) {
+      $("#results").scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    }
+  }
+
+  // ---------------------------------------------------------------- charts (hand-built SVG)
+  function niceTicks(min, max, n) {
+    var span = max - min || 1, step = Math.pow(10, Math.floor(Math.log10(span / n)));
+    var err = span / n / step;
+    step *= err >= 7.5 ? 10 : err >= 3.5 ? 5 : err >= 1.5 ? 2 : 1;
+    var t = [], s = Math.ceil(min / step) * step;
+    for (var v = s; v <= max + 1e-9; v += step) t.push(Math.round(v * 1e6) / 1e6);
+    return t;
+  }
+  function kfmt(v) {
+    var a = Math.abs(v), s = a >= 100000 ? (a / 100000).toFixed(a >= 1000000 ? 0 : 1) + "L" : a >= 1000 ? (a / 1000).toFixed(a >= 10000 ? 0 : 1) + "k" : String(Math.round(a));
+    return (v < 0 ? "−₹" : "₹") + s;
+  }
+  function lineChart(host, o) {
+    var W = Math.max(300, host.clientWidth || 600), H = o.height || 280;
+    var P = { l: 58, r: 18, t: 26, b: 42 };
+    var xs = [], ys = [];
+    o.series.forEach(function (s) { s.pts.forEach(function (p) { xs.push(p[0]); ys.push(p[1]); }); });
+    (o.hlines || []).forEach(function (hl) { ys.push(hl.y); });
+    var x0 = o.xMin !== undefined ? o.xMin : Math.min.apply(null, xs), x1 = o.xMax !== undefined ? o.xMax : Math.max.apply(null, xs);
+    var y0 = Math.min(0, Math.min.apply(null, ys)), y1 = Math.max(0, Math.max.apply(null, ys));
+    if (o.yFloor !== undefined) y0 = Math.max(y0, o.yFloor);
+    var pad = (y1 - y0) * 0.08; y1 += pad; if (y0 < 0) y0 -= pad;
+    var X = function (v) { return P.l + (v - x0) / (x1 - x0 || 1) * (W - P.l - P.r); };
+    var Y = function (v) { return P.t + (1 - (Math.max(v, y0) - y0) / (y1 - y0 || 1)) * (H - P.t - P.b); };
+    var g = [];
+    g.push('<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(o.label) + '">');
+    if (o.band) g.push('<rect x="' + X(o.band[0]) + '" y="' + P.t + '" width="' + (X(o.band[1]) - X(o.band[0])) + '" height="' + (H - P.t - P.b) + '" style="fill:var(--band);opacity:.55"/>');
+    niceTicks(y0, y1, 5).forEach(function (t) {
+      g.push('<line x1="' + P.l + '" x2="' + (W - P.r) + '" y1="' + Y(t) + '" y2="' + Y(t) + '" class="' + (t === 0 ? "zero" : "grid") + '"/>');
+      g.push('<text x="' + (P.l - 8) + '" y="' + (Y(t) + 4) + '" text-anchor="end">' + kfmt(t) + "</text>");
+    });
+    (o.xTicks || niceTicks(x0, x1, 6)).forEach(function (t) {
+      g.push('<text x="' + X(t) + '" y="' + (H - P.b + 18) + '" text-anchor="middle">' + (o.xFmt ? o.xFmt(t) : t) + "</text>");
+    });
+    if (o.xLabel) g.push('<text x="' + ((P.l + W - P.r) / 2) + '" y="' + (H - 4) + '" text-anchor="middle">' + esc(o.xLabel) + "</text>");
+    (o.hlines || []).forEach(function (hl) {
+      if (hl.y < y0 || hl.y > y1) return;
+      g.push('<line x1="' + P.l + '" x2="' + (W - P.r) + '" y1="' + Y(hl.y) + '" y2="' + Y(hl.y) + '" style="stroke:' + hl.color + ';stroke-width:2;stroke-dasharray:6 4"/>');
+      g.push('<text x="' + (W - P.r) + '" y="' + (Y(hl.y) - 6) + '" text-anchor="end" style="fill:' + hl.color + ';font-weight:600">' + esc(hl.label) + "</text>");
+    });
+    (o.vlines || []).forEach(function (v) {
+      if (v.x < x0 || v.x > x1) return;
+      g.push('<line x1="' + X(v.x) + '" x2="' + X(v.x) + '" y1="' + (P.t - 6) + '" y2="' + (H - P.b) + '" style="stroke:' + v.color + ';stroke-width:2' + (v.dash ? ";stroke-dasharray:5 4" : "") + '"/>');
+      var anchor = X(v.x) > W - 90 ? "end" : X(v.x) < P.l + 60 ? "start" : "middle";
+      g.push('<text x="' + X(v.x) + '" y="' + (P.t - 10) + '" text-anchor="' + anchor + '" style="fill:' + v.color + ';font-weight:600">' + esc(v.label) + "</text>");
+    });
+    o.series.forEach(function (s) {
+      var d = s.pts.map(function (p, i) { return (i ? "L" : "M") + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1); }).join(" ");
+      g.push('<path d="' + d + '" fill="none" style="stroke:' + s.color + ";stroke-width:" + (s.width || 2.5) + (s.dash ? ";stroke-dasharray:7 5" : "") + ';stroke-linejoin:round;stroke-linecap:round"/>');
+    });
+    (o.dots || []).forEach(function (p) {
+      g.push('<circle cx="' + X(p.x) + '" cy="' + Y(p.y) + '" r="6" style="fill:' + p.color + ';stroke:var(--paper);stroke-width:2"/>');
+      if (p.label) g.push('<text x="' + X(p.x) + '" y="' + (Y(p.y) - 12) + '" text-anchor="middle" style="fill:' + p.color + ';font-weight:600">' + esc(p.label) + "</text>");
+    });
+    g.push("</svg>");
+    host.innerHTML = g.join("");
+  }
+
+  // ---------------------------------------------------------------- sections
+  function ruler(r, inp) {
+    var mk = r.market, pts = [mk.p25, mk.p75, r.floor || mk.p25];
+    if (r.status === "ok") pts.push(r.range[0], r.range[1], r.start);
+    if (inp.offline) pts.push(inp.offline);
+    var lo = Math.min.apply(null, pts) * 0.88, hi = Math.max.apply(null, pts) * 1.08;
+    var X = function (v) { return ((v - lo) / (hi - lo) * 100).toFixed(2) + "%"; };
+    var fx = function (v) { return (v - lo) / (hi - lo) * 100; };
+    var h = ['<div class="ruler" role="img" aria-label="Price scale: floor ' + inr(r.floor) + ", market middle half " + inr(mk.p25) + " to " + inr(mk.p75) +
+      (r.status === "ok" ? ", suggested start " + inr(r.start) : "") + '">'];
+    h.push('<div class="r-track"></div>');
+    h.push('<div class="r-band" style="left:' + X(mk.p25) + ";width:" + (fx(mk.p75) - fx(mk.p25)).toFixed(2) + '%"></div>');
+    h.push('<div class="r-med" style="left:' + X(mk.median) + '"></div>');
+    if (r.status === "ok") h.push('<div class="r-range" style="left:' + X(r.range[0]) + ";width:" + Math.max(1.2, fx(r.range[1]) - fx(r.range[0])).toFixed(2) + '%"></div>');
+    if (inp.offline) h.push('<div class="r-off" style="left:' + X(inp.offline) + '"></div>');
+    h.push('<div class="r-floor" style="left:' + X(r.floor) + '"></div>');
+    if (r.status === "ok") {
+      h.push('<svg class="r-start" style="left:' + X(r.start) + '" viewBox="0 0 20 24" aria-hidden="true"><path d="M10 24 2 12V2h16v10Z" style="fill:var(--pink)"/><circle cx="10" cy="7" r="2.4" style="fill:var(--paper)"/></svg>');
+    }
+    // labels: top row = start + offline, bottom row = floor + market
+    var top = [], bot = [];
+    if (r.status === "ok") top.push({ x: fx(r.start), html: "<b>Start " + inr(r.start) + "</b>", cls: "start" });
+    if (inp.offline) top.push({ x: fx(inp.offline), html: "Offline " + inr(inp.offline), cls: "muted" });
+    bot.push({ x: fx(r.floor), html: "<b>Floor " + inr(r.floor) + "</b>", cls: "floor" });
+    [top, bot].forEach(function (row) {
+      row.sort(function (a, b) { return a.x - b.x; });
+      for (var i = 1; i < row.length; i++) if (row[i].x - row[i - 1].x < 26) { row[i - 1].x -= 6; row[i].x = row[i - 1].x + 26; }
+    });
+    top.forEach(function (l) { h.push('<div class="r-lab top ' + l.cls + '" style="left:' + Math.min(92, Math.max(8, l.x)) + '%">' + l.html + "</div>"); });
+    bot.forEach(function (l) { h.push('<div class="r-lab bot ' + l.cls + '" style="left:' + Math.min(88, Math.max(10, l.x)) + '%">' + l.html + "</div>"); });
+    h.push("</div>");
+    h.push('<p class="r-cap"><i class="sw"></i>Where most ' + catName(r.category, true) + " sell: " + inr(mk.p25) + " to " + inr(mk.p75) + '. <i class="tick"></i>Typical price ' + inr(mk.median) + ".</p>");
+    return h.join("");
+  }
+
+  function heroHTML(inp, r) {
+    var img = state.img ? '<img class="tag-img" alt="" src="' + state.img + '">' : "";
+    var head = '<div class="tag-top">' + img + '<div><p class="tag-title">' + esc(inp.title || "Your " + catName(r.category)) + '</p></div></div>';
+    var h = ['<section class="hero" aria-labelledby="hero-h"><h2 id="hero-h" class="sr" style="position:absolute;left:-9999px">Suggested price</h2>'];
+    if (r.status === "ok") {
+      h.push('<div class="tag" id="tag">' + head +
+        '<p class="tag-kicker" style="margin-top:14px">Start at</p>' +
+        '<p class="tag-price num"><span class="rs">₹</span>' + r.start.toLocaleString("en-IN") + "</p>" +
+        '<p class="tag-range">Good range <b>' + inr(r.range[0]) + " to " + inr(r.range[1]) + "</b>. You keep about <b>" + inr(r.startEcon.profit / r.startEcon.kept) + "</b> on each paid order.</p>" +
+        '<p class="tag-floor"><b>Never list below ' + inr(r.floor) + ".</b> Below this, every order loses money.</p></div>");
+      h.push(ruler(r, inp));
+      var note = null;
+      if (r.offline && r.offline.econ.profit < 0) note = '<p class="note bad"><b>Your offline price loses money online.</b> At ' + inr(r.offline.price) + " you lose about " + inr(-r.offline.econ.profit / r.offline.econ.kept) + " on every paid order.</p>";
+      else if (r.thinMargin) note = '<p class="note bad"><b>Thin margin.</b> You keep under 8% of the price, so one bad week of returns wipes it out.</p>';
+      if (note) h.push('<div class="notes">' + note + "</div>");
+    } else {
+      h.push('<div class="tag warn" id="tag">' + head + '<p class="tag-kicker" style="margin-top:14px">No safe price yet</p>' +
+        '<p class="tag-price num">Floor ' + inr(r.floor) + "</p>" +
+        '<p class="tag-range">Most ' + catName(r.category, true) + " sell for " + inr(r.market.p25) + " to " + inr(r.market.p75) + ". At those prices your costs are not covered, so every order loses money.</p></div>");
+      h.push(ruler(r, inp));
+    }
+    h.push("</section>");
+    return h.join("");
+  }
+
+
+  function bleedHTML(r) {
+    var b = r.bleed, tr = r.trust, top = b.top, cn = catName(r.category), cns = catName(r.category, true);
+    var h = ['<div class="bleed">'];
+    var p1 = "At " + inr(top.price) + ", about the most buyers pay for a " + cn + ", you lose <b>" + inr(top.lossPerPaid) + "</b> on every paid order. ";
+    if (b.noBudget) p1 += "";
+    else if (b.budget <= 0) p1 += "You said you can't afford any loss, so this product should not go live at these costs. ";
+    else if (top.weeksBudget) p1 += "Your budget runs out in about <b>" + top.weeksBudget + (top.weeksBudget === 1 ? " week" : " weeks") + "</b>. ";
+    else p1 += "Your budget lasts beyond " + b.horizon + " weeks, but you lose money every single week. ";
+    p1 += "After " + b.horizon + " weeks you would be <b>" + inr(top.sim.total) + "</b>. Good ratings make it worse, not better: more orders, each one losing money (" + inr(b.topGood.sim.total) + " at " + r.rating.good.toFixed(1) + "★).";
+    h.push("<p>" + p1 + "</p>");
+    var room = tr.room.map(function (x) { return "about " + pct(x.pct) + " at " + x.rating.toFixed(1) + "★"; }).join(", ");
+    var need = tr.needRating > 5 ? "more than a perfect 5★, so no rating closes it" : "about a <b>" + tr.needRating.toFixed(1) + "★</b> average, and only the top quarter of " + cns + " even reach " + tr.good.toFixed(1) + "★";
+    h.push("<p>The loss does not turn around by itself. To reach your " + inr(r.floor) + " floor, buyers would have to pay <b>" + pct(tr.needPct) + " more</b> than " + inr(tr.top) +
+      ". Good ratings do buy some room (" + room + "), but closing this gap needs " + need + ". <b>A loss budget buys time, not profit.</b> Fix the cost first.</p>");
+    h.push('<figure><div class="chart" id="chart-bleed"></div><figcaption>Running profit if you list at ' + inr(top.price) + " anyway.</figcaption></figure></div>");
+    return h.join("");
+  }
+
+  function receiptHTML(r) {
+    var u = r.floorEcon; if (!u) return "";
+    var k = u.kept, per = function (x) { return Math.round(x / k); };
+    var lines = [
+      ["Making cost", "includes pieces lost when a return can't be resold", per(u.parts.product)],
+      ["Packaging", "paid on every parcel", per(u.parts.packaging)],
+      ["Meesho delivery", "paid on every parcel, including ones that come back", per(u.parts.forward)],
+      ["Return pickups", "", per(u.parts.reverse)]
+    ];
+    if (u.parts.gift > 0) lines.push(["Free gift", "in every parcel", per(u.parts.gift)]);
+    var total = lines.reduce(function (s, l) { return s + l[2]; }, 0);
+    var gst = r.floor - total;
+    var paid = Math.round(k * 100), rto = Math.round(u.rto * 100), ret = Math.round(u.ret * 100);
+    var h = ['<div class="receipt"><p class="intro">Out of every 100 parcels you send, about ' + rto + " come back undelivered (RTO) and " + ret +
+      "% of the delivered ones are returned. Only about <b>" + paid + "</b> get paid for, so their price has to cover all 100.</p>"];
+    lines.forEach(function (l) {
+      h.push('<div class="rline"><span class="l">' + l[0] + (l[1] ? "<small>" + l[1] + "</small>" : "") + '</span><span class="dots"></span><span class="v">' + inr(l[2]) + "</span></div>");
+    });
+    h.push('<div class="rline total"><span class="l">Cost of one paid order</span><span class="dots"></span><span class="v">' + inr(total) + "</span></div>");
+    h.push('<div class="rline"><span class="l">GST (5%)</span><span class="dots"></span><span class="v">' + inr(gst) + "</span></div>");
+    h.push('<div class="rline floor"><span class="l">Your floor price</span><span class="dots"></span><span class="v">' + inr(r.floor) + "</span></div></div>");
+    return h.join("");
+  }
+
+  function whyHTML(r) {
+    if (r.status !== "ok") return "";
+    var mk = r.market, s = r.startSim, cn = catName(r.category, true);
+    var li = [];
+    li.push("<b>Your floor is " + inr(r.floor) + ".</b> Packaging" + (r.costs.gift > 0 ? ", the free gift" : "") + ", delivery, returns and GST add " + inr(r.floor - r.costs.product) + " on top of your making cost of " + inr(r.costs.product) + ".");
+    var trend = mk.demand_last4 / mk.demand_prev4 - 1;
+    li.push("<b>Most " + cn + " on Meesho sell for " + inr(mk.p25) + " to " + inr(mk.p75) + "</b>, typically around " + inr(mk.median) + ". Over the last 4 weeks the typical price " +
+      (Math.abs(mk.median_last4 - mk.median_prev4) < 3 ? "held steady" : "moved from " + inr(mk.median_prev4) + " to " + inr(mk.median_last4)) +
+      " and demand " + (Math.abs(trend) < 0.01 ? "was flat" : (trend > 0 ? "rose " : "fell ") + pct(Math.abs(trend)) ) + ".");
+    var paid = Math.round(s.orders * r.startEcon.kept);
+    var t = "<b>At " + inr(r.start) + " we expect about " + Math.round(s.orders) + " orders placed in your first 12 weeks, about " + paid + " of them paid, and " + inr(s.total) + " profit</b> (" + paid + " paid orders × about " + inr(r.startEcon.profit / r.startEcon.kept) + " each).";
+    if (r.compareLower) t += " At " + inr(r.compareLower.p) + " you would get more orders (" + Math.round(r.compareLower.orders) + " placed) but " + (r.compareLower.total < 0 ? "lose " + inr(-r.compareLower.total) : "only " + inr(r.compareLower.total) + " profit") + ".";
+    li.push(t);
+    if (r.modelBest !== r.start) li.push("A slightly higher price earns a little more, but within 5% we pick the lower one: more orders means reviews arrive sooner.");
+    var c = r.complaint;
+    if (c.at && c.at.price_share !== null) {
+      li.push("At this price level, <b>" + pct(c.at.price_share) + " of negative reviews complain about price</b>, against " + pct(c.base.price_share) + " for " + cn + " priced near the typical price" +
+        (c.at.n < 40 ? " (based on only " + c.at.n + " reviews)" : "") + ".");
+    }
+    li.push("Expect about " + pct(r.triggers.expectedReturnRate) + " returns and " + pct(r.triggers.expectedRto) + " RTO for " + cn + ". Both are already inside your floor.");
+    if (r.cappedAtBand) li.push("The numbers point even higher, but a new listing has no reviews yet, so we stop at the top of what most buyers pay (" + inr(mk.p75) + ").");
+    if (r.offline && r.offline.econ.profit >= 0) li.push("At your offline price of " + inr(r.offline.price) + " you would keep about " + inr(r.offline.econ.profit / r.offline.econ.kept) + " per paid order, less than at " + inr(r.start) + ".");
+    return '<ul class="reasons">' + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>" +
+      '<figure><div class="chart" id="chart-price"></div><figcaption>Profit over your first 12 weeks if you launch at each price and keep it there. Shaded: where most ' + cn + " sell. Red line: your floor.</figcaption></figure>";
+  }
+
+  function launchHTML(r) {
+    if (r.status !== "ok") return "";
+    var b = r.launchBounds, l = r.launch;
+    return '<p class="sub">Pick a launch price and how long to hold it before moving to ' + inr(r.start) + ". We follow your next " + l.horizon +
+      " weeks for good and weak ratings. It starts 10% below your floor.</p>" +
+      '<div class="controls"><div class="ctl"><label for="lp"><span>Launch price</span><output id="lp-out"></output></label>' +
+      '<input type="range" id="lp" min="' + b.min + '" max="' + b.max + '" step="10" value="' + l.launch + '">' +
+      '<div class="ctl-scale"><span>' + inr(b.min) + "</span><span>" + inr(b.max) + "</span></div></div>" +
+      '<div class="ctl"><label for="lw"><span>Hold it for</span><output id="lw-out"></output></label>' +
+      '<input type="range" id="lw" min="1" max="8" step="1" value="' + l.weeks + '">' +
+      '<div class="ctl-scale"><span>1 week</span><span>8 weeks</span></div></div></div>' +
+      '<div id="launch-body"></div>';
+  }
+
+  function launchBodyHTML(r, l) {
+    var R = r.rating, T = inr(r.start);
+    var head = l.worthIt
+      ? '<span class="pill yes">Worth trying</span> With good ratings you end ' + l.horizon + " weeks <b>" + signed(l.gainIfGood) + "</b> compared with starting at " + T + ". With weak ratings the change is <b>" + signed(l.changeIfWeak) + "</b>, so set the stop below." +
+        (l.withinBudget === false ? " <b>But the worst-case dip is more than your budget.</b>" : "")
+      : '<span class="pill no">Not worth it for your costs</span> The reviews you would buy don\'t earn the money back within ' + l.horizon + " weeks: <b>" + signed(l.gainIfGood) + "</b> with good ratings (" + R.good.toFixed(1) + "★) and <b>" + signed(l.changeIfWeak) + "</b> with weak ones (" + R.weak.toFixed(1) + "★), compared with starting at " + T + ".";
+    var f = [];
+    f.push(l.belowFloor
+      ? ['bad', "<b>Each paid order at " + inr(l.launch) + " loses " + inr(-l.perPaid) + ".</b> Your floor is " + inr(r.floor) + "."]
+      : ['', "Each paid order at " + inr(l.launch) + " still earns " + inr(l.perPaid) + ". This is a cheaper launch, not a loss."]);
+    var rv = "With good ratings (the solid lines), in those " + l.weeks + (l.weeks === 1 ? " week" : " weeks") + ": about " + Math.round(l.ordersLaunch) + " orders placed and " + Math.round(l.reviewsLaunch) + " reviews, against " + Math.round(l.reviewsFlat) + " reviews if you started at " + T + ".";
+    if (l.costPerReview) rv += " By week " + l.weeks + " you are at " + inr(l.cumAtK.launch) + " instead of " + inr(l.cumAtK.flat) + ": the extra " + Math.round(l.extraReviews) + " reviews cost " + inr(l.launchCost) + ", <b>about " + inr(l.costPerReview) + " per review</b>.";
+    f.push(['', rv]);
+    if (l.worstDip <= 0) f.push(['', "You never go below zero at this price."]);
+    else if (l.budget === null) f.push(['', "Worst case you are <b>" + inr(l.worstDip) + " down</b> before it turns around. Add a loss budget under More details to check whether you can afford that."]);
+    else if (l.budget <= 0) f.push(['bad', "Worst case you are " + inr(l.worstDip) + " down, and you said you can't afford any loss. Keep the launch at or above " + inr(r.floor) + "."]);
+    else if (l.withinBudget) f.push(['', "Worst case you are <b>" + inr(l.worstDip) + " down</b>. Your " + inr(l.budget) + " budget covers that, and up to " + (l.maxWeeks >= 12 ? "12 or more" : l.maxWeeks) + " weeks at this price even if ratings come in weak."]);
+    else f.push(['bad', "Worst case you are <b>" + inr(l.worstDip) + " down</b>, more than your " + inr(l.budget) + " budget. At this price you can afford " + (l.maxWeeks ? "at most " + l.maxWeeks + (l.maxWeeks === 1 ? " week" : " weeks") : "no weeks at all") + "."]);
+    if (l.worstDip > 0) {
+      var back = function (w) { return w === null ? "not within " + l.horizon + " weeks" : "by week " + w; };
+      f.push(['', "You are back above zero " + back(l.backToZeroGood) + " with good ratings, " + back(l.backToZeroWeak) + " with weak ones. " +
+        (l.catchUpGood ? "With good ratings you overtake simply starting at " + T + " by week " + l.catchUpGood + "." : "Either way, you never catch up with simply starting at " + T + " within " + l.horizon + " weeks.")]);
+    }
+    var alt = r.launchAlt;
+    if (l.belowFloor && alt && alt.worstDip <= 0) {
+      f.push(['', "<b>Gentler option:</b> stay just above your floor at " + inr(alt.launch) + " for " + alt.weeks + " weeks. You get about " + Math.round(alt.reviewsLaunch) + " reviews instead of " + Math.round(alt.reviewsFlat) +
+        (alt.costPerReview ? ", at about " + inr(alt.costPerReview) + " per extra review," : "") + " and you never go below zero (26-week change " + signed(alt.gainIfGood) + " with good ratings)."]);
+    }
+    var h = ['<p class="verdict">' + head + "</p>", '<ul class="facts">' + f.map(function (x) { return '<li class="' + x[0] + '">' + x[1] + "</li>"; }).join("") + "</ul>"];
+    h.push('<div class="legend"><span><i style="border-color:var(--pink)"></i>Start at ' + T + ", good ratings</span>" +
+      '<span><i class="dash" style="border-color:var(--pink)"></i>Start at ' + T + ", weak ratings</span>" +
+      '<span><i style="border-color:var(--plum)"></i>Launch at ' + inr(l.launch) + ", good ratings</span>" +
+      '<span><i class="dash" style="border-color:var(--plum)"></i>Launch at ' + inr(l.launch) + ", weak ratings</span></div>");
+    var cap = "Running profit over " + l.horizon + " weeks.";
+    if (Math.abs(l.flatGood.total - l.flatWeak.total) > 3 * Math.abs(l.gainIfGood)) cap += " The gap between good and weak ratings is bigger than the gap between the two launch plans: how buyers rate the product matters more than the launch discount.";
+    h.push('<figure><div class="chart" id="chart-invest"></div><figcaption>' + cap + "</figcaption></figure>");
+    return h.join("");
+  }
+
+  function cohortHTML(r) {
+    var R = r.rating, l = r.launch;
+    var g = function (pos, good) { return r.cohorts.filter(function (x) { return x.pos === pos && x.good === good; })[0]; };
+    var rowName = { below: "Below the typical price", at: "Near the typical price", above: "Above the typical price" };
+    var cell = function (x, mine) {
+      if (!x || !x.n) return '<td colspan="3">No listings</td>';
+      var cls = mine ? ' class="mine"' : "";
+      return "<td" + cls + ">" + x.n + "</td><td" + cls + ">" + pct(x.survival) + "</td><td" + (x.profit < 0 ? ' class="neg' + (mine ? " mine" : "") + '"' : cls) + ">" + inr(x.profit) + "</td>";
+    };
+    var h = [];
+    h.push('<p class="small" style="margin-bottom:10px">Every listing in the data, grouped by where it launched and how buyers rated it later. Profit is recalculated with <b>your</b> costs, because other sellers\' costs are unknown. Your start price falls in the highlighted row.</p>');
+    h.push('<div class="tbl-wrap"><table><thead><tr class="grp"><th></th><th colspan="3">Rated ' + R.expected.toFixed(1) + '★ or better</th><th colspan="3">Rated below ' + R.expected.toFixed(1) + "★</th></tr>" +
+      "<tr><th>Launched</th><th>Listings</th><th>Still live at week 12</th><th>12-week profit, your costs</th><th>Listings</th><th>Still live at week 12</th><th>12-week profit, your costs</th></tr></thead><tbody>");
+    ["below", "at", "above"].forEach(function (pos) {
+      var mine = pos === r.position;
+      h.push("<tr><td" + (mine ? ' class="mine"' : "") + ">" + rowName[pos] + "</td>" + cell(g(pos, true), mine) + cell(g(pos, false), mine) + "</tr>");
+    });
+    h.push("</tbody></table></div>");
+    var bg = g("below", true), bw = g("below", false), ag = g("at", true);
+    var stop = " If you do launch low to build reviews, <b>set a stop: go back to " + inr(r.start) + " if you are under " + R.expected.toFixed(1) + "★ after 15 reviews.</b>";
+    var take;
+    if (bg && ag && bw && bg.profit > ag.profit) {
+      take = "Listings that launched below the typical price and went on to earn good ratings made the most (" + inr(bg.profit) + ", against " + inr(ag.profit) +
+        " for well-rated ones that launched near it). Poorly rated ones that launched low made " + inr(bw.profit) + ". Part of that gap is simply better products selling more; the simulation above separates out the effect of the launch price itself." + stop;
+    } else {
+      take = "In this data, launching below the typical price did not beat launching near it, even for well-rated listings (" + inr(bg ? bg.profit : 0) + " against " + inr(ag ? ag.profit : 0) + ")." + stop;
+    }
+    h.push('<p class="verdict" style="margin-top:14px">' + take + "</p>");
+    return h.join("");
+  }
+
+  function triggersHTML(r) {
+    if (r.status !== "ok") return "";
+    var t = r.triggers, R = r.rating, mk = r.market, cn = catName(r.category, true);
+    var li = [];
+    li.push("<b>You reach " + R.good.toFixed(1) + "★ with 30 or more reviews.</b> In our demo data, " + cn + " at that rating sell as well about " + pct(t.raisePct) + " higher. Try " + inr(t.raiseTo) + ", and keep it only if orders hold up.");
+    li.push("<b>Meesho offers you a sale.</b> A 20% discount takes " + inr(r.start) + " to " + inr(t.saleFloorCheck.priceAfter) + ". " +
+      (t.saleFloorCheck.breaksFloor ? "That is below your " + inr(r.floor) + " floor, so skip it or offer 10% instead." : "That is still above your " + inr(r.floor) + " floor, so it is safe to join."));
+    li.push("<b>Returns climb above " + pct(Math.min(0.6, t.expectedReturnRate * 1.5)) + ".</b> Your floor goes up. Read the return reasons first: if buyers say size or quality, a lower price won't fix it.");
+    li.push("<b>Views come in but orders don't.</b> Fix photos and title first. If orders stay slow for 2 weeks, move toward " + inr(mk.median) + ", never below " + inr(r.floor) + ".");
+    return '<ul class="triggers">' + li.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+  }
+
+  function howHTML(r) {
+    var C = M.categories[r.category], st = C.stats, cn = catName(r.category, true);
+    var within = E.priceEffect(C, 0.1);
+    var naive = Math.exp(st.naive_price_coef * Math.log(1.1)) - 1;
+    var rev = Math.exp(C.impr.logrev * Math.log(2)) - 1;
+    var bt = st.backtest, meta = M.meta;
+    return '<div class="how-body">' + "<h3>The data</h3><p>" + meta.listings + " synthetic listings (150 soap, 150 t-shirt), followed week by week from launch (" + meta.first_launch + ") to " + meta.data_to +
+      ": " + meta.listing_weeks.toLocaleString("en-IN") + " listing-weeks and " + meta.reviews.toLocaleString("en-IN") + " reviews. Each week records price, impressions, views, wishlist and cart adds, orders, RTO, returns with reasons, reviews and rating. The data is generated from assumed buyer behaviour, so it demonstrates the method; it is not a forecast.</p>" +
+      '<div class="kv"><div><b>' + pct(within) + "</b>orders per impression when " + cn + " cost 10% more, learnt from price changes on the same listing</div>" +
+      "<div><b>" + (naive >= 0 ? "+" : "") + pct(naive) + "</b>what comparing different listings suggests instead. Better products charge more and still sell more, which hides how much price matters</div>" +
+      "<div><b>+" + pct(rev) + "</b>more impressions each time a listing's review count doubles</div>" +
+      "<div><b>" + pct(bt.model_median_abs_pct_error) + "</b>typical error predicting 8-week orders on " + bt.n_listings + " held-out listings (a simple average is off by " + pct(bt.naive_median_abs_pct_error) + ")</div></div>" +
+      "<h3>The models</h3><ul>" +
+      "<li><b>Conversion:</b> orders <i>per impression</i>, so impressions are the exposure and more views are never mistaken for better conversion. Inputs: price relative to the market, rating, review count, festival weeks. Fitted within each listing, so the price effect isn't confused with product quality.</li>" +
+      "<li><b>Visibility:</b> impressions per week from launch phase, recent sales, reviews, rating and category demand, also fitted within each listing. This is how early orders turn into later traffic.</li>" +
+      "<li><b>What you keep:</b> RTO rate, return rate by price and listing quality, how many returns can be resold, and how many buyers leave a review.</li>" +
+      "<li><b>Good, typical and weak products:</b> a good product (top quarter) gets a better rating <i>and</i> converts better and is returned less; a weak one the opposite.</li></ul>" +
+      "<h3>Checked against the simulator</h3><p>We also ran Seller 6's soap through the simulator that generated the data, 300 times per plan. It agrees that launching below the floor loses money for good, typical and weak products. Our models are more cautious than the simulator about discounts that stay above the floor: sellers in the data cut prices when sales are slow, which blurs the price effect. Only a randomised price test removes that, so the pilot includes one.</p>" +
+      "<h3>Your answer, step by step</h3><ol>" +
+      "<li>Work out what one paid order costs you, spreading RTO and returns over the orders that do get paid. That gives the floor.</li>" +
+      "<li>Take today's market for " + cn + ", weighting the last few weeks most.</li>" +
+      "<li>Simulate 12 weeks at every price from well below the market up to its top end: impressions, orders, reviews, and how reviews feed back into impressions.</li>" +
+      "<li>Pick the price with the best 12-week profit above your floor. If a lower price earns within 5% of it, pick that one for faster reviews.</li>" +
+      "<li>If no price buyers accept covers your costs, show how long your loss budget would last and what rating it would take to close the gap.</li>" +
+      "<li>Let you try launching lower for a few weeks: we follow 26 weeks for good and weak products, count what each extra review costs, compare it with staying just above your floor, and check it against your loss budget.</li>" +
+      "<li>Check what similar listings actually did, recalculated with your costs.</li></ol>" +
+      "<p style=\"margin-top:10px\">In a real rollout these models would train on Meesho's own order, return and review history, and every change would be tested against a control group before it reached sellers.</p>" +
+      "</div>";
+  }
+
+  function drawCharts(r) {
+    if (r.status !== "ok") { drawBleedChart(r); return; }
+    var hostP = $("#chart-price");
+    if (hostP && hostP.offsetParent !== null) {
+      var xStart = Math.max(r.curve[0].p, Math.floor(r.floor * 0.85));
+      var pts = r.curve.filter(function (c) { return c.p >= xStart; }).map(function (c) { return [c.p, c.total]; });
+      var ys = pts.map(function (p) { return p[1]; });
+      var best = Math.max.apply(null, ys);
+      lineChart(hostP, {
+        label: "Twelve-week profit by launch price", height: 290,
+        series: [{ pts: pts, color: "var(--pink)", width: 3 }],
+        band: [r.market.p25, r.market.p75],
+        vlines: [{ x: r.floor, label: "Floor " + inr(r.floor), color: "var(--floor)" }],
+        dots: [{ x: r.start, y: r.startSim.total, color: "var(--pink)", label: "Start " + inr(r.start) }],
+        xFmt: function (v) { return "₹" + v; }, xLabel: "Launch price"
+      });
+    }
+    drawLaunchChart(state.launch || r.launch, r);
+  }
+
+  function budgetLine(budget, sims) {
+    var worst = Math.min.apply(null, sims.map(function (s) { return s.minCum; }).concat([0]));
+    return budget > 0 && budget <= 3 * Math.max(-worst, 500) ? [{ y: -budget, label: "Your loss budget " + inr(budget), color: "var(--floor)" }] : [];
+  }
+
+  function drawLaunchChart(l, r) {
+    var hostI = $("#chart-invest");
+    if (!hostI || !l || hostI.offsetParent === null) return;
+    var toPts = function (sim) { return [[0, 0]].concat(sim.weeks.map(function (w) { return [w.w, w.cum]; })); };
+    lineChart(hostI, {
+      label: "Running profit over " + l.horizon + " weeks for each launch plan", height: 300,
+      series: [
+        { pts: toPts(l.flatGood), color: "var(--pink)" },
+        { pts: toPts(l.flatWeak), color: "var(--pink)", dash: true },
+        { pts: toPts(l.good), color: "var(--plum)" },
+        { pts: toPts(l.weak), color: "var(--plum)", dash: true }
+      ],
+      hlines: budgetLine(l.budget, [l.good, l.weak]),
+      vlines: [{ x: l.weeks, label: "Move to " + inr(r.start), color: "var(--ink2)", dash: true }],
+      xMin: 0, xMax: l.horizon, xTicks: [0, 4, 8, 12, 16, 20, 26], xFmt: function (v) { return "wk " + v; }, xLabel: "Weeks since launch"
+    });
+  }
+
+  function drawBleedChart(r) {
+    var host = $("#chart-bleed");
+    if (!host || !r.bleed || host.offsetParent === null) return;
+    var b = r.bleed, toPts = function (sim) { return [[0, 0]].concat(sim.weeks.map(function (w) { return [w.w, w.cum]; })); };
+    lineChart(host, {
+      label: "Running loss if listed at the top of the market price", height: 260,
+      series: [{ pts: toPts(b.top.sim), color: "var(--floor)", width: 3 }, { pts: toPts(b.topGood.sim), color: "var(--floor)", dash: true }],
+      hlines: budgetLine(b.budget, [b.top.sim, b.topGood.sim]),
+      xMin: 0, xMax: b.horizon, xTicks: [0, 4, 8, 12, 16, 20, 26], xFmt: function (v) { return "wk " + v; }, xLabel: "Weeks since launch"
+    });
+  }
+
+  function bindLaunch() {
+    var lp = $("#lp"), lw = $("#lw");
+    if (!lp || !lw) return;
+    var upd = function () {
+      var L = +lp.value, k = +lw.value, r = state.last.r;
+      var l = E.launchOption(M, state.last.inp, r, L, k);
+      state.launch = l;
+      var o = $("#lp-out");
+      o.textContent = inr(L) + (L < r.floor ? ", below floor" : "");
+      o.classList.toggle("loss", L < r.floor);
+      $("#lw-out").textContent = k + (k === 1 ? " week" : " weeks");
+      $("#launch-body").innerHTML = launchBodyHTML(r, l);
+      var tz = $("#teaser-launch"); if (tz) tz.innerHTML = launchTeaser(r, l);
+      drawLaunchChart(l, r);
+    };
+    lp.addEventListener("input", upd);
+    lw.addEventListener("input", upd);
+    upd();
+  }
+
+  function acc(key, title, teaser, body) {
+    if (!body) return "";
+    return '<details class="acc" data-k="' + key + '"' + (state.open[key] ? " open" : "") + '><summary><span class="acc-title">' + title +
+      '</span><span class="acc-teaser" id="teaser-' + key + '">' + teaser + '</span><span class="acc-chev" aria-hidden="true">' + CHEV +
+      '</span></summary><div class="acc-body">' + body + "</div></details>";
+  }
+
+  function fixHTML(r) {
+    var lev = [];
+    if (r.maxProductCostAtMedian !== null) lev.push("<b>Bring your making cost down to about " + inr(r.maxProductCostAtMedian) + ".</b> Then the typical price of " + inr(r.market.median) + " starts to work.");
+    lev.push("<b>Sell a pack of 2 or 3</b>, so one " + inr(r.ship) + " delivery charge covers more pieces.");
+    lev.push("<b>Cut packaging or the free gift.</b> Both are paid on every parcel, even the ones that come back.");
+    lev.push("<b>Is it a premium " + catName(r.category) + "?</b> Organic, gift box or luxury products compete with premium listings that sell for more. This demo has one " + catName(r.category) + " market; the full tool would compare you with close matches found from your photo and title.");
+    return '<ul class="reasons">' + lev.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+  }
+
+  function launchTeaser(r, l) {
+    var v = l.worthIt ? '<span class="good">Worth trying</span>' : '<span class="bad">Not worth it for your costs</span>';
+    return v + ": " + inr(l.launch) + " for " + l.weeks + (l.weeks === 1 ? " week" : " weeks") + " changes 26-week profit by " + signed(l.gainIfGood) + " even with good ratings";
+  }
+
+  function render(inp, r, flash) {
+    state.launch = null;
+    var u = r.floorEcon, k = u ? u.kept : 1, per = function (x) { return Math.round(x / k); };
+    var billTotal = u ? per(u.parts.product) + per(u.parts.packaging) + per(u.parts.forward) + per(u.parts.reverse) + (u.parts.gift > 0 ? per(u.parts.gift) : 0) : 0;
+    var billTeaser = "Costs " + inr(billTotal) + " + GST " + inr(r.floor - billTotal) + " = your floor <b>" + inr(r.floor) + "</b>";
+    var parts = [heroHTML(inp, r), '<p class="acc-hint">Tap a section for the details.</p><div class="accs">'];
+    if (r.status === "ok") {
+      var cs = r.cohorts, g = function (pos, good) { return cs.filter(function (x) { return x.pos === pos && x.good === good; })[0]; };
+      var bg = g("below", true), bw = g("below", false);
+      parts.push(acc("why", "Why " + inr(r.start) + "?", "About <b>" + Math.round(r.startSim.orders) + " orders placed</b> (" + Math.round(r.startSim.orders * r.startEcon.kept) + " paid) and <b>" + inr(r.startSim.total) + " profit</b> in 12 weeks. Most " + catName(r.category, true) + " sell for " + inr(r.market.p25) + " to " + inr(r.market.p75) + ".", whyHTML(r)));
+      parts.push(acc("bill", "What one paid order really costs you", billTeaser, receiptHTML(r)));
+      parts.push(acc("launch", "Should I launch at a loss to get reviews?", launchTeaser(r, r.launch), launchHTML(r)));
+      parts.push(acc("similar", "What similar listings did", "Launched below the typical price: rated well " + inr(bg ? bg.profit : 0) + ", rated poorly " + inr(bw ? bw.profit : 0) + " in 12 weeks, with your costs", cohortHTML(r)));
+      parts.push(acc("later", "When to change the price later", "At " + r.rating.good.toFixed(1) + "★ with 30+ reviews, try <b>" + inr(r.triggers.raiseTo) + "</b>. Check every sale against your " + inr(r.floor) + " floor.", triggersHTML(r)));
+    } else {
+      if (state.open.fix === undefined) state.open.fix = true;
+      var top = r.bleed.top;
+      r.bleed.noBudget = inp.budget === null;
+      parts.push(acc("fix", "How to make this product work", r.maxProductCostAtMedian !== null ? "Cut making cost to about <b>" + inr(r.maxProductCostAtMedian) + "</b>, sell a pack, or cut packaging" : "Sell a pack, or cut packaging and gifts", fixHTML(r)));
+      parts.push(acc("bleed", "What if I sell anyway?", "At " + inr(top.price) + " you lose <b>" + inr(top.lossPerPaid) + "</b> on every paid order" + (r.bleed.budget > 0 && top.weeksBudget ? "; your " + inr(r.bleed.budget) + " lasts about " + top.weeksBudget + (top.weeksBudget === 1 ? " week" : " weeks") : ""), bleedHTML(r)));
+      parts.push(acc("bill", "What one paid order really costs you", billTeaser, receiptHTML(r)));
+    }
+    parts.push(acc("how", "How this works", "The data, the three models, and how accurate they are", howHTML(r)));
+    parts.push("</div>");
+    $("#results").innerHTML = parts.join("");
+    $$("details.acc").forEach(function (d) {
+      d.addEventListener("toggle", function () {
+        state.open[d.dataset.k] = d.open;
+        if (d.open) drawCharts(state.last.r);
+      });
+    });
+    bindLaunch();
+    drawCharts(r);
+    if (flash) { var t = $("#tag"); if (t) { t.classList.remove("flash"); void t.offsetWidth; t.classList.add("flash"); } }
+  }
+
+
+  var rt;
+  window.addEventListener("resize", function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () { if (state.last) drawCharts(state.last.r); }, 150);
+  });
+
+  fill(EXAMPLES.soap);
+  $$("[data-example]")[0].setAttribute("aria-pressed", "true");
+  run(false);
+})();
+</script>
+</body>
+</html>
