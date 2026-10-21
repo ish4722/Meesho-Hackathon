@@ -15,7 +15,7 @@ Listings in validation / holdout, weeks on or after the cutoff, week 2 onwards. 
 | category x week average | 2351 | 21.34 | 90.0% | -11.5% |
 | last week's orders | 2351 | 9.01 | 38.0% | -2.3% |
 | pooled price response | 2351 | 21.22 | 89.5% | -11.0% |
-| v1 spec (same-week market, teacher-forced) | 2351 | 16.47 | 69.4% | -7.9% |
+| v1 spec (same-week market, teacher-forced) | 2351 | 14.67 | 61.8% | -4.6% |
 | v2, launch-time effect only | 2351 | 14.26 | 60.1% | 1.7% |
 | v2, no price change | 2351 | 7.25 | 30.5% | 2.3% |
 | v2, online listing effect | 2351 | 7.08 | 29.9% | 3.4% |
@@ -27,7 +27,7 @@ Listings in validation / holdout, weeks on or after the cutoff, week 2 onwards. 
 | category x week average | 2259 | 27.03 | 87.7% | -33.3% |
 | last week's orders | 2259 | 11.19 | 36.3% | -3.2% |
 | pooled price response | 2259 | 26.27 | 85.3% | -34.4% |
-| v1 spec (same-week market, teacher-forced) | 2259 | 14.67 | 47.6% | -23.4% |
+| v1 spec (same-week market, teacher-forced) | 2259 | 15.50 | 50.3% | -14.7% |
 | v2, launch-time effect only | 2259 | 18.43 | 59.8% | -30.4% |
 | v2, no price change | 2259 | 9.18 | 29.8% | 1.8% |
 | v2, online listing effect | 2259 | 9.05 | 29.4% | 3.9% |
@@ -92,7 +92,7 @@ Listings launched on or after the cutoff. Inputs: launch-time listing facts, the
 |---|---|---|---|---|
 | category x week average | 57 | 12.10 | 69.6% | -11.0% |
 | pooled price response | 57 | 15.06 | 86.6% | 14.1% |
-| v1 spec (deterministic path) | 57 | 12.07 | 69.4% | -15.1% |
+| v1 spec (deterministic path) | 57 | 10.10 | 58.1% | -12.4% |
 | v2 engine (median) | 57 | 10.30 | 59.2% | -6.1% |
 | v2 engine (mean) | 57 | 11.80 | 67.9% | 22.2% |
 
@@ -102,7 +102,7 @@ Weeks 1-4 (80% interval coverage 75.4%):
 |---|---|---|---|---|
 | category x week average | 57 | 93.01 | 103.0% | -6.6% |
 | pooled price response | 57 | 92.21 | 102.1% | -8.0% |
-| v1 spec (deterministic path) | 57 | 82.10 | 90.9% | -13.3% |
+| v1 spec (deterministic path) | 57 | 57.47 | 63.6% | -27.6% |
 | v2 engine (median) | 57 | 65.11 | 72.1% | -23.2% |
 | v2 engine (mean) | 57 | 101 | 112.2% | 55.0% |
 
@@ -112,7 +112,7 @@ Weeks 1-4 (80% interval coverage 75.4%):
 |---|---|---|---|---|
 | category x week average | 50 | 10.82 | 69.1% | 5.7% |
 | pooled price response | 50 | 14.03 | 89.6% | 37.3% |
-| v1 spec (deterministic path) | 50 | 10.74 | 68.6% | -19.7% |
+| v1 spec (deterministic path) | 50 | 9.57 | 61.1% | -12.4% |
 | v2 engine (median) | 50 | 11.56 | 73.8% | 24.9% |
 | v2 engine (mean) | 50 | 15.73 | 100.4% | 64.0% |
 
@@ -122,7 +122,7 @@ Weeks 1-4 (80% interval coverage 82.0%):
 |---|---|---|---|---|
 | category x week average | 50 | 85.25 | 100.5% | 5.4% |
 | pooled price response | 50 | 85.63 | 101.0% | 7.0% |
-| v1 spec (deterministic path) | 50 | 72.70 | 85.7% | -37.7% |
+| v1 spec (deterministic path) | 50 | 65.77 | 77.6% | -39.3% |
 | v2 engine (median) | 50 | 60.62 | 71.5% | 3.8% |
 | v2 engine (mean) | 50 | 116 | 137.0% | 89.4% |
 
@@ -136,7 +136,7 @@ engine.js simulates each listing from launch with no realised outcomes. Listings
 |---|---|---|---|---|
 | category x week average | 57 | 254 | 102.5% | -12.0% |
 | pooled price response | 57 | 252 | 101.6% | -13.5% |
-| v1 spec (deterministic path) | 57 | 231 | 93.2% | -18.6% |
+| v1 spec (deterministic path) | 57 | 162 | 65.3% | -37.5% |
 | v2 engine, launch price held (no price change) | 57 | 175 | 70.4% | -27.5% |
 | v2 engine, recursive (median) | 57 | 182 | 73.3% | -26.1% |
 | v2 engine, recursive (mean) | 57 | 290 | 117.1% | 63.9% |
@@ -144,6 +144,7 @@ engine.js simulates each listing from launch with no realised outcomes. Listings
 
 - Contribution over the observed weeks (seller's private costs, evaluation only): MAE of the median ₹11,236, bias of the median ₹-3,454, bias of the mean ₹9,809 (mean actual ₹12,515).
 - 80% interval coverage, 12-week orders: 77.3%; 12-week contribution: 75.0%.
+- Where the actual 12-week orders fall in the simulated distribution (PIT; listings with all 12 weeks), bins ['0-0.1', '0.1-0.25', '0.25-0.5', '0.5-0.75', '0.75-0.9', '0.9-1']: observed [5, 7, 8, 10, 9, 5], expected if calibrated [4.4, 6.6, 11.0, 11.0, 6.6, 4.4].
 - Probability of a loss: mean predicted 17.7%, observed 11.4%, Brier 0.09.
 
 **Holdout** (50 listings, 36 with all 12 weeks)
@@ -152,7 +153,7 @@ engine.js simulates each listing from launch with no realised outcomes. Listings
 |---|---|---|---|---|
 | category x week average | 50 | 217 | 99.9% | 4.1% |
 | pooled price response | 50 | 216 | 99.2% | 5.8% |
-| v1 spec (deterministic path) | 50 | 202 | 92.8% | -41.7% |
+| v1 spec (deterministic path) | 50 | 174 | 80.1% | -48.2% |
 | v2 engine, launch price held (no price change) | 50 | 168 | 77.2% | 2.3% |
 | v2 engine, recursive (median) | 50 | 161 | 73.8% | -1.9% |
 | v2 engine, recursive (mean) | 50 | 309 | 142.2% | 90.9% |
@@ -160,6 +161,7 @@ engine.js simulates each listing from launch with no realised outcomes. Listings
 
 - Contribution over the observed weeks (seller's private costs, evaluation only): MAE of the median ₹8,911, bias of the median ₹2,869, bias of the mean ₹13,956 (mean actual ₹8,269).
 - 80% interval coverage, 12-week orders: 86.1%; 12-week contribution: 86.1%.
+- Where the actual 12-week orders fall in the simulated distribution (PIT; listings with all 12 weeks), bins ['0-0.1', '0.1-0.25', '0.25-0.5', '0.5-0.75', '0.75-0.9', '0.9-1']: observed [2, 6, 10, 13, 2, 3], expected if calibrated [3.6, 5.4, 9.0, 9.0, 5.4, 3.6].
 - Probability of a loss: mean predicted 18.1%, observed 22.2%, Brier 0.07.
 
 Holdout, category:
@@ -260,18 +262,24 @@ Slope = d log(conversion) / d(price / subcategory median), evaluated at each lis
 
 ## Pricing decisions judged by the generator
 
-120 holdout listings, each launched at 2026-06-29 in the generator with its hidden response curve and the seller's private costs, 40 replications per price. Regret is measured against the best price at or below the cap. Status counts: {'ok': 107, 'no_feasible_candidate': 13}. Learning policy: {'experiment': 59, 'price': 46, 'abstain': 2}. Confident share: 47.5%. Best uncapped price lies above the cap for 25.8% of listings.
+120 holdout listings, each launched at 2026-06-29 in the generator with its hidden response curve and the seller's private costs, 40 replications per price. Regret is measured against the best price at or below the cap. Status counts: {'ok': 107, 'no_feasible_candidate': 13}. Learning policy: {'experiment': 59, 'price': 46, 'abstain': 2}. Flagged uncertain: 52.5% of all listings, 57.0% of the 107 priced ones. Best uncapped price lies above the cap for 25.8% of listings.
 
-| Policy | n | Mean regret | Median rel. regret | Within 10% of best | True P(loss) | True mean < 0 | Below true break-even | Budget breach > 10% |
+**All policies below are compared on the same 107 listings** (those v2 priced); the listings v2 declined are reported after the table.
+
+| Policy | n | Mean regret | Median rel. regret | Within 10% of best | True P(loss) | True mean < 0 | True P(loss) > limit | Budget breach > 10% |
 |---|---|---|---|---|---|---|---|---|
-| Balanced (v2) | 107 | ₹2,249 | 13.0% | 45.8% | 8.3% | 6.5% | 6.5% | 0.0% |
-| Conservative (v2) | 107 | ₹2,177 | 7.0% | 57.0% | 8.1% | 5.6% | 5.6% | 0.0% |
-| v1 rule (point estimate, no risk limits) | 117 | ₹1,996 | 12.7% | 49.6% | 9.2% | 6.0% | 6.0% | 0.0% |
-| Market median, held | 120 | ₹3,525 | 27.5% | 28.3% | 16.5% | 13.3% | 13.3% | 1.7% |
+| Balanced (v2) | 107 | ₹2,249 | 13.0% | 45.8% | 8.3% | 6.5% | 11.2% | 0.0% |
+| Conservative (v2) | 107 | ₹2,177 | 7.0% | 57.0% | 8.1% | 5.6% | 9.3% | 0.0% |
+| v1 rule (point estimate, no risk limits) | 107 | ₹2,156 | 13.5% | 48.6% | 8.0% | 4.7% | 12.1% | 0.0% |
+| Market median, held | 107 | ₹3,749 | 21.9% | 30.8% | 11.8% | 7.5% | 18.7% | 0.0% |
+
+Balanced picks: engine-predicted P(loss) 5.6% on average, generator 8.3%.
+
+Break-even accuracy (115 listings): the engine's break-even price is off from the generator's by ₹18 on average (7.1%; mean signed error ₹-0); it is more than 5% below the generator's for 27.8% of listings. (With no fixed costs in the generator, a price below break-even is the same thing as a negative expected contribution, so that column is not repeated.)
 
 v2 returned 'No feasible candidate under current constraints' for 13 listings. The v1 rule still priced 10 of them; at those prices the generator gives a mean 12-week contribution of ₹2,097, a true P(loss) of 22.2%, and a negative expected contribution for 20.0% of them (best achievable mean on the same listings ₹2,372).
 
-Price-test plans (evaluated for the 104 listings where a test design exists; the learning policy chose a test for 59): mean regret over 12 weeks ₹2,721, true P(loss) 9.7%. The value of what the test teaches is not counted.
+Price tests chosen by the learning policy (59 listings): mean regret over 12 weeks ₹3,087, true P(loss) 6.1% (over all 104 listings with a test design: ₹2,721). The value of what the test teaches is not counted.
 
 Loss-probability calibration (every candidate price the generator also evaluated):
 

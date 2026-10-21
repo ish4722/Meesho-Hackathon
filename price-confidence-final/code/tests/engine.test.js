@@ -88,7 +88,10 @@ test("nothing passes: explicit status, reasons and trade-offs, limits unchanged"
   assert.equal(r.message, "No feasible candidate under current constraints");
   assert.ok(r.reasons.length > 0);
   assert.equal(r.start, undefined);
+  assert.equal(r.recommended, null);
   assert.equal(r.constraints.maxLossProbability, BASE.assumptions.policy.max_loss_probability);
+  assert.equal(r.constraints.maxBudgetBreachProbability, BASE.assumptions.policy.max_budget_breach_probability);
+  assert.equal(r.constraints.budget, SOAP.budget);
   assert.ok(r.tradeoffs.some((t) => t.code === "lower_unit_cost"));
 });
 
@@ -128,6 +131,7 @@ test("no confident recommendation when price response is very uncertain", () => 
   const r = E.recommend(M, Object.assign({}, SOAP, { policy: "learning" }));
   assert.equal(r.decision.confident, false);
   assert.ok(["experiment", "abstain"].includes(r.status));
+  assert.equal(r.recommended, null);
   assert.ok(["experiment", "abstain"].includes(r.policies.learning.action));
   if (r.status === "experiment") {
     const [a, b, c] = r.experiment.arms;
@@ -138,6 +142,7 @@ test("no confident recommendation when price response is very uncertain", () => 
   const k = E.recommend(certain(BASE), Object.assign({}, SOAP, { policy: "learning" }));
   assert.equal(k.decision.confident, true);
   assert.equal(k.status, "ok");
+  assert.equal(k.recommended, k.start);
 });
 
 test("boundary report flags an optimum above the cap", () => {

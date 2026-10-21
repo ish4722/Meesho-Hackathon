@@ -487,7 +487,8 @@
     var chosen = out.policy === "conservative" ? out.policies.conservative : out.policies.balanced;
     out.status = "ok";
     if (out.policy === "learning" && lrn.action !== "price") out.status = lrn.action === "experiment" ? "experiment" : "abstain";
-    out.start = chosen.p;
+    out.start = chosen.p;                          // Balanced / Conservative price; for "experiment" and "abstain" only a reference
+    out.recommended = out.status === "ok" ? chosen.p : null;
     out.pick = chosen.metrics;
     out.modelBest = best.p;
     out.range = out.policies.balanced.range;
@@ -522,6 +523,7 @@
   function infeasible(V, out, cands, md) {
     var pol = V.A.policy, mk = V.market;
     out.status = "no_feasible_candidate";
+    out.recommended = null;
     out.message = "No feasible candidate under current constraints";
     var inSup = cands.filter(function (c) { return c.inSupport && c.withinCap; });
     var count = function (f) { return inSup.filter(function (c) { return c.fails.indexOf(f) >= 0; }).length; };

@@ -156,44 +156,61 @@ def effect_prior(model, cat):
 
 
 # ----------------------------------------------------------------------------------------------- v1-style specification
-def v1_style(train_fr, prior_all):
-    """The v1 specification refitted on the same training rows, for comparison only.
+def v1_rating_c(d, prior_all, prior_k):
+    """Rating shown at the start of the week, but shrunk towards v1's full-sample prior instead of the training prior."""
+    n = np.expm1(d.logrev.values)
+    pk = d.category.map(prior_k).values
+    return d.rating_c.values + (prior_all - pk) * F.SHRINK_M / (n + F.SHRINK_M)
+
+
+def v1_style(train_fr, prior_all, prior_k):
+    """The v1 specification refitted on the same training rows, per category, for comparison only.
 
     v1 used this week's market median and demand (not known when the week starts) and a rating prior taken from the
     final ratings of ALL listings (including evaluation listings, and their future). No tier, subcategory or attribute terms.
     """
-    d = train_fr.copy()
-    d["rel_c"] = d.selling_price / d.platform_median_price - 1
-    d["rel_c2"] = d.rel_c ** 2
-    d["log_di_c"] = np.log(d.category_demand_index)
-    d["rating_v1"] = d.rating_c + 4.0
     out = {}
-    tot = d.groupby("product_id").orders_placed.sum()
-    dc = d[(d.impressions > 0) & d.product_id.isin(tot[tot >= 5].index)].reset_index(drop=True)
-    Xc = dc[["rel_c", "rel_c2", "rating_c", "logrev", "festival_week"]].astype(float)
-    rc, cc, fe = T.fe_glm(dc.orders_placed, Xc, dc.product_id, sm.families.Poisson(), np.log(dc.impressions))
-    lqp = dc.groupby("product_id").lq.first().loc[fe.index]
-    s2 = sm.OLS(fe.values, sm.add_constant(lqp.values)).fit()
-    out["conv"] = dict(coef={c: float(rc.params[c]) for c in cc}, a=float(s2.params[0]), b_lq=float(s2.params[1]))
-    dv = d[d.in_stock_share > 0].reset_index(drop=True)
-    Xi = dv[["ph12", "ph34", "logrev", "rating_c", "convratio", "log_di_c"]].astype(float)
-    ri, ci, fei = T.fe_glm(dv.impressions, Xi, dv.product_id, sm.families.Poisson(), np.log(dv.in_stock_share))
-    lqi = dv.groupby("product_id").lq.first().loc[fei.index]
-    s2i = sm.OLS(fei.values, sm.add_constant(lqi.values)).fit()
-    out["impr"] = dict(coef={c: float(ri.params[c]) for c in ci}, a=float(s2i.params[0]), b_lq=float(s2i.params[1]))
-    out["prior_all"] = prior_all
+    for cat, d in train_fr.groupby("category"):
+        d = d.copy()
+        d["rel_c"] = d.selling_price / d.platform_median_price - 1
+        d["rel_c2"] = d.rel_c ** 2
+        d["log_di_c"] = np.log(d.category_demand_index)
+        d["rating_c"] = v1_rating_c(d, prior_all, prior_k)
+        m = {}
+        tot = d.groupby("product_id").orders_placed.sum()
+        dc = d[(d.impressions > 0) & d.product_id.isin(tot[tot >= 5].index)].reset_index(drop=True)
+        Xc = dc[["rel_c", "rel_c2", "rating_c", "logrev", "festival_week"]].astype(float)
+        rc, cc, fe = T.fe_glm(dc.orders_placed, Xc, dc.product_id, sm.families.Poisson(), np.log(dc.impressions))
+        lqp = dc.groupby("product_id").lq.first().loc[fe.index]
+        s2 = sm.OLS(fe.values, sm.add_constant(lqp.values)).fit()
+        m["conv"] = dict(coef={c: float(rc.params[c]) for c in cc}, a=float(s2.params[0]), b_lq=float(s2.params[1]))
+        dv = d[d.in_stock_share > 0].reset_index(drop=True)
+        Xi = dv[["ph12", "ph34", "logrev", "rating_c", "convratio", "log_di_c"]].astype(float)
+        ri, ci, fei = T.fe_glm(dv.impressions, Xi, dv.product_id, sm.families.Poisson(), np.log(dv.in_stock_share))
+        lqi = dv.groupby("product_id").lq.first().loc[fei.index]
+        s2i = sm.OLS(fei.values, sm.add_constant(lqi.values)).fit()
+        m["impr"] = dict(coef={c: float(ri.params[c]) for c in ci}, a=float(s2i.params[0]), b_lq=float(s2i.params[1]))
+        m["conv_ref"] = float(d.orders_placed.sum() / d.impressions.sum())
+        out[cat] = m
+    out["prior_all"], out["prior_k"] = prior_all, prior_k
     return out
 
 
-def v1_teacher_forced(m, fr):
-    d = fr
-    rel_c = d.selling_price / d.platform_median_price - 1
-    cv, iv = m["conv"]["coef"], m["impr"]["coef"]
-    lc = m["conv"]["a"] + m["conv"]["b_lq"] * d.lq + cv["rel_c"] * rel_c + cv["rel_c2"] * rel_c ** 2 + cv["rating_c"] * d.rating_c \
-        + cv["logrev"] * d.logrev + cv["festival_week"] * d.festival_week
-    li = m["impr"]["a"] + m["impr"]["b_lq"] * d.lq + iv["ph12"] * d.ph12 + iv["ph34"] * d.ph34 + iv["logrev"] * d.logrev \
-        + iv["rating_c"] * d.rating_c + iv["convratio"] * d.convratio + iv["log_di_c"] * np.log(d.category_demand_index)
-    return np.exp(li + lc).values
+def v1_teacher_forced(v1, fr):
+    pred = np.zeros(len(fr))
+    rating_c = v1_rating_c(fr, v1["prior_all"], v1["prior_k"])
+    for cat in fr.category.unique():
+        idx = (fr.category == cat).values
+        d, m = fr[idx], v1[cat]
+        rel_c = d.selling_price / d.platform_median_price - 1
+        rc_ = rating_c[idx]
+        cv, iv = m["conv"]["coef"], m["impr"]["coef"]
+        lc = m["conv"]["a"] + m["conv"]["b_lq"] * d.lq + cv["rel_c"] * rel_c + cv["rel_c2"] * rel_c ** 2 + cv["rating_c"] * rc_ \
+            + cv["logrev"] * d.logrev + cv["festival_week"] * d.festival_week
+        li = m["impr"]["a"] + m["impr"]["b_lq"] * d.lq + iv["ph12"] * d.ph12 + iv["ph34"] * d.ph34 + iv["logrev"] * d.logrev \
+            + iv["rating_c"] * rc_ + iv["convratio"] * d.convratio + iv["log_di_c"] * np.log(d.category_demand_index)
+        pred[idx] = np.exp(li + lc).values
+    return pred
 
 
 def v1_recursive(m, lq, prices, medians, demand, rating_prior, review_rate, keep):
@@ -320,8 +337,7 @@ def evaluate(data_dir, out_dir, quick=False):
                               d[["ph12", "ph34", "rel", "rel2"]].astype(float)], axis=1)
     pooled = sm.GLM(tr.orders_placed, Xp(tr), family=sm.families.Poisson()).fit()
     prior_all = float(P.final_rating.median())        # v1's leak: final ratings of every listing
-    v1 = v1_style(tr, prior_all)
-    v1["conv_ref"] = float(tr.orders_placed.sum() / tr.impressions.sum())
+    v1 = v1_style(tr, prior_all, {c: model["categories"][c]["constants"]["prior_rating"] for c in model["categories"]})
 
     def add_baselines(d):
         d = d.copy()
@@ -405,7 +421,7 @@ def evaluate(data_dir, out_dir, quick=False):
         sub = fr[fr.product_id == prow.product_id].sort_values("week_num").head(HORIZON)
         sub = add_baselines(sub)
         z = (prow.listing_quality_score - model["categories"][prow.category]["constants"]["lq_mean"]) / model["categories"][prow.category]["constants"]["lq_sd"]
-        v1p = v1_recursive(v1, z, rows.selling_price.values, [m0.platform_median_price_lag1] * n,
+        v1p = v1_recursive(v1[prow.category], z, rows.selling_price.values, [m0.platform_median_price_lag1] * n,
                            m0.category_demand_index_lag1, prior_all, C_rr[prow.category], 0.85)
         # totals over the observed weeks (a listing that stopped early is compared over the weeks it was live)
         tot_draws = np.array(f["orderTotals"]) if n == HORIZON else None
@@ -425,6 +441,7 @@ def evaluate(data_dir, out_dir, quick=False):
                    c_lo=float(np.quantile(f["totals"], 0.1)) if n == HORIZON else None,
                    c_hi=float(np.quantile(f["totals"], 0.9)) if n == HORIZON else None,
                    p_loss=float(np.mean(np.array(f["totals"]) < 0)) if n == HORIZON else None,
+                   pit12=float(np.mean(np.array(f["orderTotals"]) < rows.orders_placed.sum())) if n == HORIZON else None,
                    lo4=float(np.quantile(f["cum4"], 0.1)), hi4=float(np.quantile(f["cum4"], 0.9)))
         recs.append(rec)
     bc = pd.DataFrame(recs)
@@ -453,6 +470,9 @@ def evaluate(data_dir, out_dir, quick=False):
                                              bias=float(np.mean(d.e_contrib - d.contrib)), bias_of_mean=float(np.mean(d.m_contrib - d.contrib)),
                                              mean_actual=float(d.contrib.mean())),
             coverage_80_orders_12w=coverage(full.y12, full.lo12, full.hi12),
+            pit_12w_orders=dict(bins=["0-0.1", "0.1-0.25", "0.25-0.5", "0.5-0.75", "0.75-0.9", "0.9-1"],
+                                observed=[int(x) for x in np.histogram(full.pit12.astype(float), bins=[0, .1, .25, .5, .75, .9, 1.0001])[0]],
+                                expected=[round(len(full) * w, 1) for w in [.1, .15, .25, .25, .15, .1]]),
             coverage_80_contribution_12w=coverage(full.contrib, full.c_lo, full.c_hi),
             p_loss=dict(mean_predicted=float(full.p_loss.mean()) if len(full) else None,
                         observed_share=float((full.contrib < 0).mean()) if len(full) else None,
@@ -538,6 +558,16 @@ def evaluate(data_dir, out_dir, quick=False):
                    status=r["status"], learning=(r.get("learning") or {}).get("action"), confident=r["decision"]["confident"],
                    oracle_p=int(orc_key[1:]), oracle_mean=best, oracle_uncapped_p=int(orc_all[1:]),
                    median_p=med, cap=g["cap"], floor=r["floor"])
+        # the generator's break-even per placed order, interpolated on the price grid it evaluated
+        grid = sorted((int(k[1:]), v["per_order"]) for k, v in t.items() if k.startswith("p") and v["orders"] > 0)
+        tbe = None
+        for (p0, c0), (p1, c1) in zip(grid, grid[1:]):
+            if c0 < 0 <= c1:
+                tbe = p0 + (p1 - p0) * (-c0) / (c1 - c0)
+                break
+        if tbe is None and grid and grid[0][1] >= 0:
+            tbe = float(grid[0][0])
+        row["true_break_even"] = tbe
         for pol in ["balanced", "conservative", "point", "median"]:
             p = med if pol == "median" else r.get(pol)
             if p is None:
@@ -545,8 +575,8 @@ def evaluate(data_dir, out_dir, quick=False):
                 continue
             tt = t[f"p{p}"]
             row.update({f"{pol}_p": p, f"{pol}_mean": tt["mean"], f"{pol}_regret": best - tt["mean"], f"{pol}_ploss": tt["p_loss"],
-                        f"{pol}_pbudget": tt["p_budget"], f"{pol}_below_true_breakeven": tt["per_order"] < 0,
-                        f"{pol}_neg_mean": tt["mean"] < 0})
+                        f"{pol}_pbudget": tt["p_budget"], f"{pol}_neg_mean": tt["mean"] < 0,
+                        f"{pol}_ploss_over_limit": tt["p_loss"] > A["policy"]["max_loss_probability"]})
         if r["status"] == "ok" and r.get("pick"):
             row["engine_ploss"] = r["pick"]["probLoss"]
             row["engine_mean"] = r["pick"]["mean"]
@@ -561,17 +591,26 @@ def evaluate(data_dir, out_dir, quick=False):
     D = pd.DataFrame(dec)
     pol_names = {"balanced": "Balanced (v2)", "conservative": "Conservative (v2)", "point": "v1 rule (point estimate, no risk limits)",
                  "median": "Market median, held"}
+    # every policy is compared on the SAME listings: those v2 priced (status ok). Listings v2 declined are reported apart.
+    common = D[D.status == "ok"]
     dsum = {}
     for pol, name in pol_names.items():
-        d = D[D[f"{pol}_p"].notna()]
+        d = common[common[f"{pol}_p"].notna()]
         rel_reg = d[f"{pol}_regret"] / d.oracle_mean.abs().clip(lower=200)
         dsum[name] = dict(
             n=int(len(d)), mean_regret_inr=float(d[f"{pol}_regret"].mean()), median_regret_inr=float(d[f"{pol}_regret"].median()),
             median_relative_regret=float(rel_reg.median()), share_within_10pct_of_best=float((rel_reg <= 0.10).mean()),
             mean_true_p_loss=float(d[f"{pol}_ploss"].mean()), share_true_mean_negative=float(d[f"{pol}_neg_mean"].mean()),
-            share_below_true_break_even=float(d[f"{pol}_below_true_breakeven"].mean()),
+            share_true_p_loss_over_limit=float(d[f"{pol}_ploss_over_limit"].mean()),
             share_budget_breach_over_10pct=float((d[f"{pol}_pbudget"] > 0.10).mean()),
             mean_price_vs_oracle=float((d[f"{pol}_p"] / d.oracle_p).mean()))
+    fl = D[D.floor.notna() & D.true_break_even.notna()]
+    floor_acc = dict(n=int(len(fl)), mean_abs_error_inr=float((fl.floor - fl.true_break_even).abs().mean()),
+                     mean_abs_error_share=float(((fl.floor - fl.true_break_even).abs() / fl.true_break_even).mean()),
+                     mean_error_inr=float((fl.floor - fl.true_break_even).mean()),
+                     share_engine_floor_more_than_5pct_below_truth=float((fl.floor < 0.95 * fl.true_break_even).mean()))
+    ok_bal = common[common.engine_ploss.notna()]
+    pick_cal = dict(n=int(len(ok_bal)), mean_predicted_p_loss=float(ok_bal.engine_ploss.mean()), mean_true_p_loss=float(ok_bal.balanced_ploss.mean()))
     cal = [x for lst in D["_cal"].dropna() for x in lst] if "_cal" in D else []
     cal = pd.DataFrame(cal, columns=["pred_ploss", "true_ploss", "pred_mean", "true_mean"])
     cal["bin"] = pd.cut(cal.pred_ploss, [-0.01, 0.05, 0.15, 0.3, 0.5, 0.75, 1.0])
@@ -591,10 +630,13 @@ def evaluate(data_dir, out_dir, quick=False):
                         oracle_true_mean=float(declined[declined.point_p.notna()].oracle_mean.mean()) if declined.point_p.notna().any() else None)
     report["decisions"] = dict(declined_by_v2=declined_cmp, 
         n_listings=int(len(D)), status=D.status.value_counts().to_dict(), learning_policy=D.learning.value_counts().to_dict(),
-        confident_share=float(D.confident.mean()), policies=dsum,
-        experiment=dict(n=int(D.exp_mean.notna().sum()) if "exp_mean" in D else 0,
-                        mean_regret_inr=float(D.exp_regret.mean()) if "exp_regret" in D else None,
-                        mean_true_p_loss=float(D.exp_ploss.mean()) if "exp_ploss" in D else None),
+        confident_share=float(D.confident.mean()), uncertain_share_priced=float((~common.confident.astype(bool)).mean()),
+        common_n=int(len(common)), policies=dsum, floor_accuracy=floor_acc, balanced_pick_p_loss=pick_cal,
+        experiment=dict(n_designed=int(D.exp_mean.notna().sum()) if "exp_mean" in D else 0,
+                        n_chosen=int((D.learning == "experiment").sum()),
+                        mean_regret_inr_chosen=float(D[D.learning == "experiment"].exp_regret.mean()) if "exp_regret" in D else None,
+                        mean_true_p_loss_chosen=float(D[D.learning == "experiment"].exp_ploss.mean()) if "exp_ploss" in D else None,
+                        mean_regret_inr_all_designed=float(D.exp_regret.mean()) if "exp_regret" in D else None),
         oracle_above_cap_share=float((D.oracle_uncapped_p > D.cap).mean()),
         p_loss_calibration=cal_tab.to_dict(orient="records"),
         mean_contribution_prediction=dict(corr=float(np.corrcoef(cal.pred_mean, cal.true_mean)[0, 1]) if len(cal) > 2 else None,
@@ -669,6 +711,8 @@ def write_markdown(rep, path):
               f"bias of the median {_fmt(cc['contribution_observed_weeks']['bias'], 'inr')}, bias of the mean {_fmt(cc['contribution_observed_weeks']['bias_of_mean'], 'inr')} "
               f"(mean actual {_fmt(cc['contribution_observed_weeks']['mean_actual'], 'inr')}).",
               f"- 80% interval coverage, 12-week orders: {_fmt(cc['coverage_80_orders_12w'], 'pct')}; 12-week contribution: {_fmt(cc['coverage_80_contribution_12w'], 'pct')}.",
+              f"- Where the actual 12-week orders fall in the simulated distribution (PIT; listings with all 12 weeks), bins {cc['pit_12w_orders']['bins']}: "
+              f"observed {cc['pit_12w_orders']['observed']}, expected if calibrated {cc['pit_12w_orders']['expected']}.",
               f"- Probability of a loss: mean predicted {_fmt(cc['p_loss']['mean_predicted'], 'pct')}, observed {_fmt(cc['p_loss']['observed_share'], 'pct')}, Brier {_fmt(cc['p_loss']['brier'])}.", ""]
     for key in ["holdout_by_category", "holdout_by_archetype", "holdout_by_launch_price", "holdout_by_seller_strategy"]:
         rows = []
@@ -689,21 +733,29 @@ def write_markdown(rep, path):
     L += ["## Pricing decisions judged by the generator", "",
           f"{d['n_listings']} holdout listings, each launched at {rep['design']['diagnostic_launch']} in the generator with its hidden "
           f"response curve and the seller's private costs, {rep['design']['truth_reps']} replications per price. Regret is measured against the best "
-          f"price at or below the cap. Status counts: {d['status']}. Learning policy: {d['learning_policy']}. Confident share: {_fmt(d['confident_share'], 'pct')}. "
+          f"price at or below the cap. Status counts: {d['status']}. Learning policy: {d['learning_policy']}. Flagged uncertain: "
+          f"{_fmt(1 - d['confident_share'], 'pct')} of all listings, {_fmt(d['uncertain_share_priced'], 'pct')} of the {d['common_n']} priced ones. "
           f"Best uncapped price lies above the cap for {_fmt(d['oracle_above_cap_share'], 'pct')} of listings.", "",
+          f"**All policies below are compared on the same {d['common_n']} listings** (those v2 priced); the listings v2 declined are reported after the table.", "",
           _table([dict(name=k, **v) for k, v in d["policies"].items()],
                  [("Policy", "name"), ("n", "n"), ("Mean regret", "mean_regret_inr", "inr"), ("Median rel. regret", "median_relative_regret", "pct"),
                   ("Within 10% of best", "share_within_10pct_of_best", "pct"), ("True P(loss)", "mean_true_p_loss", "pct"),
-                  ("True mean < 0", "share_true_mean_negative", "pct"), ("Below true break-even", "share_below_true_break_even", "pct"),
+                  ("True mean < 0", "share_true_mean_negative", "pct"), ("True P(loss) > limit", "share_true_p_loss_over_limit", "pct"),
                   ("Budget breach > 10%", "share_budget_breach_over_10pct", "pct")]), "",
+          f"Balanced picks: engine-predicted P(loss) {_fmt(d['balanced_pick_p_loss']['mean_predicted_p_loss'], 'pct')} on average, generator {_fmt(d['balanced_pick_p_loss']['mean_true_p_loss'], 'pct')}.", "",
+          f"Break-even accuracy ({d['floor_accuracy']['n']} listings): the engine's break-even price is off from the generator's by {_fmt(d['floor_accuracy']['mean_abs_error_inr'], 'inr')} "
+          f"on average ({_fmt(d['floor_accuracy']['mean_abs_error_share'], 'pct')}; mean signed error {_fmt(d['floor_accuracy']['mean_error_inr'], 'inr')}); it is more than 5% below the "
+          f"generator's for {_fmt(d['floor_accuracy']['share_engine_floor_more_than_5pct_below_truth'], 'pct')} of listings. (With no fixed costs in the generator, a price below "
+          "break-even is the same thing as a negative expected contribution, so that column is not repeated.)", "",
           (f"v2 returned 'No feasible candidate under current constraints' for {d['declined_by_v2']['n']} listings. The v1 rule still priced "
            f"{d['declined_by_v2']['v1_rule_priced']} of them; at those prices the generator gives a mean 12-week contribution of "
            f"{_fmt(d['declined_by_v2']['v1_rule_true_mean'], 'inr')}, a true P(loss) of {_fmt(d['declined_by_v2']['v1_rule_true_p_loss'], 'pct')}, and a negative "
            f"expected contribution for {_fmt(d['declined_by_v2']['v1_rule_share_true_mean_negative'], 'pct')} of them (best achievable mean on the same listings "
            f"{_fmt(d['declined_by_v2']['oracle_true_mean'], 'inr')}).") if d['declined_by_v2']['n'] else "v2 priced every holdout listing.", "",
-          f"Price-test plans (evaluated for the {d['experiment']['n']} listings where a test design exists; the learning policy chose a test for "
-          f"{d['learning_policy'].get('experiment', 0)}): mean regret over 12 weeks {_fmt(d['experiment']['mean_regret_inr'], 'inr')}, "
-          f"true P(loss) {_fmt(d['experiment']['mean_true_p_loss'], 'pct')}. The value of what the test teaches is not counted.", "",
+          f"Price tests chosen by the learning policy ({d['experiment']['n_chosen']} listings): mean regret over 12 weeks "
+          f"{_fmt(d['experiment']['mean_regret_inr_chosen'], 'inr')}, true P(loss) {_fmt(d['experiment']['mean_true_p_loss_chosen'], 'pct')} "
+          f"(over all {d['experiment']['n_designed']} listings with a test design: {_fmt(d['experiment']['mean_regret_inr_all_designed'], 'inr')}). "
+          "The value of what the test teaches is not counted.", "",
           "Loss-probability calibration (every candidate price the generator also evaluated):", "",
           _table(d["p_loss_calibration"], [("Predicted P(loss) bin", "bin"), ("n", "n"), ("Mean predicted", "predicted", "pct"), ("Observed", "observed", "pct")]), "",
           "By archetype (hidden, evaluation only):", "",

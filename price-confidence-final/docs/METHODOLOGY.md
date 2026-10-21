@@ -86,7 +86,7 @@ f(rel) = −β·rel − κ_hi·max(rel, 0)² − κ_lo·max(−rel − θ, 0)² 
 
 **Provenance and reproducibility.** `dataset_manifest.json` records provenance ("SYNTHETIC … Not Meesho data"), generator and schema versions, seed, scenario, the full configuration and its SHA-256, row counts, SHA-256 of every file, Python / numpy / pandas versions and every column's role. Same seed, scenario and versions give byte-identical files (tested).
 
-**Data-quality report** (`reports/data_quality.md`, default data): 40 checks, 0 failures, 1 warning (the smallest category × subcategory × tier cell has 2 listings). 600 listings, 15,250 listing-weeks, 44,545 reviews. 79% of listings have more than one selling price; median within-listing SD of log price 0.046; 86% of price changes are exogenous. The `low_price_variation` scenario triggers the price-variation warning (tested).
+**Data-quality report** (`reports/data_quality.md`, default data): 40 checks, 0 failures, 1 warning (the smallest category × subcategory × tier cell has 2 listings). 600 listings, 15,250 listing-weeks, 44,545 reviews. 79% of listings have more than one selling price; median within-listing SD of log price 0.046; 88% of price changes are exogenous (campaigns, scheduled market-following, experiments) and 12% react to the listing's own sales (6.5% reactive cuts). The `low_price_variation` scenario triggers the price-variation warning (tested).
 
 ## 4. Feature whitelist and leakage safeguards (`schema.py`, `features.py`)
 
@@ -118,12 +118,12 @@ f(rel) = −β·rel − κ_hi·max(rel, 0)² − κ_lo·max(−rel − θ, 0)² 
 
 - **A, one week ahead.** Validation / holdout listing-weeks on or after the cutoff, week 2 onward. Inputs: the listing's own past, last week's market, this week's price and calendar. The listing's level is updated from its own past weeks by empirical Bayes: multiplier = (a + Σ past orders) / (a + Σ past model means), with a from the fitted listing-effect variance.
 - **B, launch time.** Listings launched on or after the cutoff: week-1 and weeks 1–4 orders from launch-time facts, the planned prices and calendar, and the market as of launch.
-- **C, recursive 12 weeks.** The same listings simulated from launch by `engine.js` without any realised outcome; market frozen at launch. Listings that stopped early are compared over the weeks they were live.
+- **C, recursive 12 weeks.** The same listings simulated from launch by `engine.js` with no realised orders, reviews or ratings; market frozen at launch. Two pieces of hindsight remain and apply equally to every method: the simulation is fed the listing's *realised* weekly prices (which include some reactive changes made after weak sales), and listings that stopped early (14 of 50 in the holdout; stopping depends on outcomes) are compared over the weeks they were live.
 - **Decisions.** Every holdout listing is relaunched in the generator on 29 Jun 2026 with its hidden response and its seller's private costs; 40 replications per price on a ₹20 grid plus every recommended price. Regret = generator's mean 12-week contribution at the best price at or below the cap minus that at the recommended price.
 
-**Metrics.** MAE, WAPE (Σ|error| / Σ actual), bias (Σ error / Σ actual), 80% interval coverage, Brier score and binned calibration for the probability of loss, slices by category, archetype, launch-price segment and seller strategy (archetype and strategy are generator-only and used for slicing only), regret, true probability of loss, share of picks with negative true expected contribution, below the true per-order break-even, or breaching the seller's budget more than 10% of the time.
+**Metrics.** MAE, WAPE (Σ|error| / Σ actual), bias (Σ error / Σ actual), 80% interval coverage, Brier score and binned calibration for the probability of loss, slices by category, archetype, launch-price segment and seller strategy (archetype and strategy are generator-only and used for slicing only), regret, true probability of loss, share of picks with negative true expected contribution (with no fixed costs this is the same as pricing below the true break-even), with a true probability of loss above the 25% limit, or breaching the seller's budget more than 10% of the time, and the error of the engine's break-even price against the generator's.
 
-**Baselines.** Category × week-since-launch average; pooled price response (Poisson GLM with category, launch phase, rel, rel², no listing effects); last week's orders (Task A); the v1 specification refitted on the same training rows (same-week market, full-sample rating prior, no tier / subcategory / attribute terms; teacher-forced in A, its deterministic path in B and C); v2 with no price change (last week's price in A, launch price held in C); the v1 decision rule on the v2 model (best expected path at the typical listing, between break-even and the cap, no uncertainty or risk limits); the market median held.
+**Baselines.** Category × week-since-launch average; pooled price response (Poisson GLM with category, launch phase, rel, rel², no listing effects); last week's orders (Task A); the v1 specification refitted per category on the same training rows (same-week market, rating shrunk towards the median final rating of all listings as v1 did, no tier / subcategory / attribute terms; teacher-forced in A, its deterministic path in B and C); v2 with no price change (last week's price in A, launch price held in C); the v1 decision rule on the v2 model (best expected path at the typical listing, between break-even and the cap, no uncertainty or risk limits); the market median held.
 
 ### Results (holdout unless stated)
 
@@ -133,58 +133,67 @@ f(rel) = −β·rel − κ_hi·max(rel, 0)² − κ_lo·max(−rel − θ, 0)² 
 |---|---|---|---|
 | Category × week average | 27.0 | 87.7% | −33.3% |
 | Pooled price response | 26.3 | 85.3% | −34.4% |
-| v1 spec (same-week market, teacher-forced) | 14.7 | 47.6% | −23.4% |
+| v1 spec (same-week market, teacher-forced) | 15.5 | 50.3% | −14.7% |
 | Last week's orders | 11.2 | 36.3% | −3.2% |
 | v2, launch-time listing level only | 18.4 | 59.8% | −30.4% |
 | v2, last week's price instead of this week's | 9.2 | 29.8% | +1.8% |
 | **v2, online listing level** | **9.1** | **29.4%** | +3.9% |
 
-80% interval coverage: 73.6% (validation 75.3%): intervals are somewhat too narrow. Validation WAPE for the main model: 29.9%. Knowing this week's price improves the one-week forecast only slightly over last week's price (29.4% vs 29.8%), which is expected when most weeks have no price change.
+Validation: v2 online 29.9%, v1 spec 61.8%, last week's orders 38.0%. 80% interval coverage of v2: 73.6% holdout, 75.3% validation, so the intervals are somewhat too narrow. Most of v2's gain over v1 here comes from updating each listing's level from its own past weeks, which v1 did not do. Knowing this week's price helps only slightly over last week's price (29.4% vs 29.8%), as expected when most weeks have no price change.
 
 **Task B: launch time** (50 holdout listings; validation 57)
 
-| Method | Week 1 WAPE | Weeks 1–4 WAPE | Weeks 1–4 bias |
+| Method | Week 1 WAPE (holdout / validation) | Weeks 1–4 WAPE (holdout / validation) | Weeks 1–4 bias (holdout) |
 |---|---|---|---|
-| Category × week average | 69.1% | 100.5% | +5.4% |
-| Pooled price response | 89.6% | 101.0% | +7.0% |
-| v1 spec, deterministic path | 68.6% | 85.7% | −37.7% |
-| **v2 engine, median of simulations** | 73.8% | **71.5%** | +3.8% |
+| Category × week average | 69.1% / 69.6% | 100.5% / 103.0% | +5.4% |
+| Pooled price response | 89.6% / 86.6% | 101.0% / 102.1% | +7.0% |
+| v1 spec, deterministic path | 61.1% / 58.1% | 77.6% / 63.6% | −39.3% |
+| v2 engine, median of simulations | 73.8% / 59.2% | 71.5% / 72.1% | +3.8% |
 
-Week 1 for a brand-new listing is barely predictable by any method (the v2 engine is slightly worse than the category average in the holdout and better in validation: 59.2% vs 69.6%). 80% coverage for weeks 1–4: 82.0% (validation 75.4%).
+The launch-time forecast is hard for every method. v2 and the v1 specification are close: v2 is better for weeks 1–4 on the holdout, v1 is better on validation and for week 1; v1 under-predicts by about 40%. 80% coverage of v2 for weeks 1–4: 82.0% holdout, 75.4% validation.
 
 **Task C: recursive 12 weeks** (50 holdout listings, 36 with all 12 weeks; validation 57 / 44)
 
-| Method | WAPE | Bias |
+| Method | WAPE (holdout / validation) | Bias (holdout / validation) |
 |---|---|---|
-| Category × week average | 99.9% | +4.1% |
-| Pooled price response | 99.2% | +5.8% |
-| v1 spec, deterministic path | 92.8% | −41.7% |
-| v2, launch price held (no price change) | 77.2% | +2.3% |
-| **v2 engine, recursive, median** | **73.8%** | −1.9% |
-| v2 engine, recursive, mean | 142.2% | +90.9% |
-| v2 teacher-forced (uses realised history; diagnostic only) | 54.3% | +1.5% |
+| Category × week average | 99.9% / 102.5% | +4.1% / −12.0% |
+| Pooled price response | 99.2% / 101.6% | +5.8% / −13.5% |
+| v1 spec, deterministic path | 80.1% / 65.3% | −48.2% / −37.5% |
+| v2, launch price held (no price change) | 77.2% / 70.4% | +2.3% / −27.5% |
+| **v2 engine, recursive, median** | **73.8%** / 73.3% | −1.9% / −26.1% |
+| v2 engine, recursive, mean | 142.2% / 117.1% | +90.9% / +63.9% |
+| v2 teacher-forced (uses realised history; diagnostic only) | 54.3% / 48.9% | +1.5% / −9.5% |
 
-Validation: recursive median 73.3% (bias −26.1%), teacher-forced 48.9%. The gap between teacher-forced and recursive (54% → 74%) is the cost of not knowing how a new listing will be received. 80% coverage of 12-week orders: 86.1% holdout, 77.3% validation; 12-week contribution: 86.1% / 75.0%. Predicted vs observed share of listings losing money: 18.1% vs 22.2% (Brier 0.07) holdout, 17.7% vs 11.4% (Brier 0.09) validation. Contribution over the observed weeks (seller's private costs, evaluation only): median-forecast MAE ₹8,911 against a mean actual of ₹8,269, so contribution for a single new listing is only roughly predictable.
+Both model-based methods beat the averages by a wide margin. Between v2 and the v1 specification the result is split: v2 is better on the holdout (73.8% vs 80.1%), v1 on validation (65.3% vs 73.3%), and v1 under-predicts by 38–48% in both. The gap between teacher-forced and recursive v2 (54% → 74%) is the cost of not knowing how a new listing will be received. What v2 adds over v1 here is a distribution rather than a point: 80% coverage of 12-week orders is 86.1% holdout and 77.3% validation (contribution 86.1% / 75.0%). Where actual 12-week orders fall in the simulated distribution (PIT, six bins from 0–10% to 90–100%): holdout 2 / 6 / 10 / 13 / 2 / 3 against 3.6 / 5.4 / 9 / 9 / 5.4 / 3.6 if calibrated (intervals a little wide), validation 5 / 7 / 8 / 10 / 9 / 5 against 4.4 / 6.6 / 11 / 11 / 6.6 / 4.4 (a little narrow); with 36–44 listings, both are close to calibrated. Predicted vs observed share of listings losing money: 18.1% vs 22.2% (Brier 0.07) holdout, 17.7% vs 11.4% (Brier 0.09) validation. Contribution over the observed weeks (seller's private costs, evaluation only): median-forecast MAE ₹8,911 against a mean actual of ₹8,269, so contribution for a single new listing is only roughly predictable.
 
-**Important finding: the simulated right tail is too heavy.** The mean over simulations overshoots actual orders by 64–91% while the median is close and the quantiles are roughly calibrated (validation PIT histogram near uniform). A few simulated futures in which a well-received listing gets more reviews, better rating and more visibility compound too strongly. The app therefore leads with the typical (median) future and warns when the average is far above it. Because the Balanced policy maximises the *mean*, this tail matters for decisions (below).
+**Important finding: the simulated right tail is too heavy.** The mean over simulations overshoots actual orders by 64–91% while the median is close and the quantiles are near calibrated. A few simulated futures in which a well-received listing gets more reviews, a better rating and more visibility compound too strongly. The app therefore leads with the typical (median) future and warns when the average is far above it. Because the Balanced policy maximises the *mean*, this tail matters for decisions (below).
 
-**Price-sensitivity recovery** (training listings; slope of log conversion per 100% price change, at each listing's own typical price): standard-tier slopes are recovered well (true vs fitted: bedsheet −2.16 / −2.11, soap −2.50 / −3.07, t-shirt −2.62 / −2.49, earrings −2.78 / −1.92). Budget-tier listings are more price-sensitive than fitted (e.g. earrings −5.02 / −3.29) and premium soap and bedsheet less (−1.50 / −2.94, −1.41 / −2.28). The fitted spread of listing slopes (0.7–1.2) is below the true within-tier spread (0.9–2.0). The naive between-listing slope is badly biased (soap +0.60, t-shirt +1.05: "dearer listings sell more"), which is why the models are fitted within listings.
+**Price-sensitivity recovery** (training listings; slope of log conversion per 100% price change, at each listing's own typical price): standard-tier slopes are recovered roughly (within 0.9; bedsheet −2.16 true / −2.11 fitted, soap −2.50 / −3.07, t-shirt −2.62 / −2.49, earrings −2.78 / −1.92). Budget-tier listings are more price-sensitive than fitted (e.g. earrings −5.02 / −3.29) and premium soap and bedsheet less (−1.50 / −2.94, −1.41 / −2.28). The fitted spread of listing slopes (0.7–1.2) is below the true within-tier spread (0.9–2.0). The naive between-listing slope is badly biased (soap +0.60, t-shirt +1.05: "dearer listings sell more"), which is why the models are fitted within listings.
 
-**Decisions judged by the generator** (120 holdout listings)
+**Decisions judged by the generator.** v2 priced 107 of the 120 holdout listings and declined 13. All policies are compared on the **same 107 listings**:
 
-| Policy | n priced | Mean regret | Median relative regret | Within 10% of best | True P(loss) | True mean < 0 | Budget breach > 10% |
-|---|---|---|---|---|---|---|---|
-| Balanced (v2) | 107 | ₹2,249 | 13.0% | 45.8% | 8.3% | 6.5% | 0.0% |
-| Conservative (v2) | 107 | ₹2,177 | 7.0% | 57.0% | 8.1% | 5.6% | 0.0% |
-| v1 rule on the v2 model | 117 | ₹1,996 | 12.7% | 49.6% | 9.2% | 6.0% | 0.0% |
-| Market median, held | 120 | ₹3,525 | 27.5% | 28.3% | 16.5% | 13.3% | 1.7% |
+| Policy | Mean regret | Median relative regret | Within 10% of best | True P(loss) | True mean < 0 | True P(loss) > 25% limit |
+|---|---|---|---|---|---|---|
+| Balanced (v2) | ₹2,249 | 13.0% | 45.8% | 8.3% | 6.5% | 11.2% |
+| Conservative (v2) | ₹2,177 | 7.0% | 57.0% | 8.1% | 5.6% | 9.3% |
+| v1 rule on the v2 model | ₹2,156 | 13.5% | 48.6% | 8.0% | 4.7% | 12.1% |
+| Market median, held | ₹3,749 | 21.9% | 30.8% | 11.8% | 7.5% | 18.7% |
 
-- v2 returned *No feasible candidate under current constraints* for 13 listings. The v1 rule still priced 10 of them; there the generator gives a true probability of loss of 22% and a negative expected contribution for 20% of them.
-- The engine's probability of loss is well calibrated against the generator: predicted 1.7% / 8.7% / 21.6% / 38.8% / 60.7% / 97.5% in six bins vs observed 3.9% / 11.0% / 26.9% / 35.7% / 52.3% / 97.9%.
-- The learning policy flagged 52.5% of listings as uncertain (best price spread wider than 20% of the median) and proposed a test for 59 of them; 2 abstained. Test plans cost ₹2,721 mean regret over 12 weeks with 9.7% true P(loss); what the test teaches is not credited.
-- No policy can tell archetypes apart at launch: the Balanced price is 1.05–1.07 × median for every archetype, while the best price ranges from 0.96 (commodity) to 1.18–1.19 (insensitive, premium signal). This is exactly where a price test is meant to help.
+No policy breached a seller's budget more than 10% of the time. With no fixed costs in the generator, "true mean < 0" is the same as pricing below the true break-even.
 
-**Reading these numbers honestly.** v2 forecasts are clearly better than every baseline in tasks A and C and for weeks 1–4 in task B. For decisions, risk-aware pricing did **not** beat the v1 decision rule on mean profit in this world: Balanced has slightly higher mean regret than the v1 rule (₹2,249 vs ₹1,996), Conservative has lower median regret and the most picks within 10% of the best. What v2 adds is a slightly lower loss rate, calibrated loss probabilities, refusal to price where losses are likely, and an explicit "we don't know, test it" for half the listings. We did not change the policies or their defaults after seeing these results.
+- **Declined listings.** On the 13 listings v2 declined, the v1 rule still priced 10. At those prices the generator gives a 22% chance of loss and a negative expected contribution for 2 of the 10, but a positive ₹2,097 on average (best achievable ₹2,372). Declining avoids those losses and also forgoes the profit of the other 8.
+- **Loss probability.** Roughly calibrated, but too low in the range that decides eligibility: predicted 1.7% / 8.7% / 21.6% in the three lowest bins vs observed 3.9% / 11.0% / 26.9%; higher bins 38.8% / 60.7% / 97.5% vs 35.7% / 52.3% / 97.9%. Balanced picks are predicted at 5.6% loss and have 8.3%; 11% of them have a true loss chance above the 25% limit.
+- **Break-even price.** The engine's break-even is off from the generator's by ₹18 (7.1%) on average with no overall bias, but it is more than 5% too low for 28% of listings.
+- **Uncertainty flag and tests.** 57% of priced listings were flagged uncertain (best price spread wider than 20% of the median). The learning policy proposed a test for 59 listings and abstained on 2. Over 12 weeks the tests it chose cost ₹3,087 of regret on average (true P(loss) 6.1%), against ₹2,249 for Balanced; what the test teaches is not credited.
+- **Archetypes.** No policy can tell them apart at launch. The Balanced price is 1.05–1.07 × median for every archetype, while the best price ranges from 0.96 (commodity) to 1.18–1.19 (insensitive, premium signal). This is exactly where a price test is meant to help.
+
+**Reading these numbers honestly.**
+
+- **Forecasting.** v2 is clearly better than the averages and the pooled model in every task, and better than the v1 specification one week ahead. From launch, v2 and the v1 specification trade places between validation and holdout, so the honest summary is "comparable point accuracy, much less bias, plus calibrated intervals".
+- **Decisions.** Risk-aware pricing did **not** beat the v1 decision rule in this world. On the same listings, the v1 rule has slightly lower mean regret and a slightly lower loss rate than Balanced. Conservative is within ₹21 of it on mean regret and has the lowest median regret and the most picks within 10% of the best.
+- **What v2 adds for decisions** is information rather than profit: a probability of loss (roughly calibrated, a little optimistic), refusal to price 13 listings with a 22% loss rate, and an explicit "we don't know, test it" for over half the listings.
+
+We did not change the policies, limits or defaults after seeing these results.
 
 ## 6. Risk formulas and policy rules (`engine.js`, `assumptions.json`)
 
@@ -219,7 +228,9 @@ cost     = dispatched × (shipping + packaging + gift) + returns × shipping × 
          + resold × refurbishment + ad spend
 contribution per placed order = expected contribution of one order at the moment it is placed
 contribution per retained sale = contribution per placed order / share of orders kept
-cumulative contribution = running sum of weekly contribution; cash exposure = its lowest point after launch cost and up-front stock
+cumulative contribution = running sum of weekly contribution
+cash exposure = lowest point of the running cash position: the engine counts a one-off launch cost; economics.cash_exposure()
+               also handles stock bought up front (not yet an app input)
 break-even price = lowest whole-rupee price with expected contribution per placed order ≥ 0
 ```
 
@@ -233,7 +244,7 @@ The break-even price is never called safe: above it, an average order makes mone
 
 - **Balanced:** the eligible price with the highest mean (tie-break parameter set to 0, i.e. pure maximisation). Good range: eligible neighbours with mean ≥ 90% of the best.
 - **Conservative ("Careful" in the app):** the eligible price with the highest P10.
-- **Learning ("Test first"):** for J = 60 draws, the best price of the expected (noise-free) path is found; if P90 − P10 of those best prices ≤ 20% of the market median, the recommendation is confident and equals Balanced. Otherwise a test is designed: three distinct prices (around P10, P50, P90 of the best prices, at least two grid steps apart, all eligible on break-even, cap and observed range), 2 weeks each over 8 weeks (middle, low, high, middle), then the Balanced price. It is simulated under the same draws; if its P(loss) and P(budget breach) pass the limits the app recommends it, with its cost against holding the Balanced price and the expected narrowing of the listing's price-slope uncertainty (posterior SD = 1 / √(1/τ² + I), I = Σ_w μ_w/(1 + d·μ_w)·(x_w − x̄)²). Otherwise it **abstains**: no recommended price, the reason, and the Conservative price as the steadiest option.
+- **Learning ("Test first"):** for J = 60 draws, the best price of the expected (noise-free) path is found among all prices inside the observed range, including those above the cap (the question is where the optimum is, not what we may recommend); if P90 − P10 of those best prices ≤ 20% of the market median, the recommendation is confident and equals Balanced. Otherwise a test is designed: three distinct prices (around P10, P50, P90 of the best prices, two grid steps apart when at least five prices qualify, otherwise one; all at or above break-even, at or below the cap and inside the observed range), 2 weeks each over 8 weeks (middle, low, high, middle), then the Balanced price. It is simulated under the same draws; if its P(loss) and P(budget breach) pass the limits the app recommends it, with its cost against holding the Balanced price and the expected narrowing of the listing's price-slope uncertainty (posterior SD = 1 / √(1/τ² + I), I = Σ_w μ_w/(1 + d·μ_w)·(x_w − x̄)²). Otherwise it **abstains**: `recommended` is null, the reason is given, and the Conservative price is shown as the steadiest option. (`start` still carries the Balanced price so the comparison views have a reference; the app does not present it as a recommendation.)
 - **Nothing eligible:** status `no_feasible_candidate`, message "No feasible candidate under current constraints", reasons (how many in-range prices fail each limit, or break-even above the cap) and trade-offs (the probability of loss you would have to accept, the budget that would make a price workable, the unit cost at which the median breaks even). Limits are never relaxed silently; the returned constraints equal the configured ones (tested).
 
 **Boundary report.** Eligible range, whether the chosen price is at its top or bottom and what sets each end (`cap`, `observed_prices`, `risk_limits`, `break_even`), and whether a price above the cap but inside the observed range has a higher mean (`optimumBeyondCap`, with that price).
@@ -255,14 +266,14 @@ The break-even price is never called safe: above it, an average order makes mone
 | Seller 6 (soap, ₹64 + ₹12 + ₹15 gift) | floor ₹145, start ₹209, range ₹189–229 | break-even ₹145 (likely ₹139–153), Balanced ₹219 at the cap, range ₹189–219, Careful ₹209; best price uncertain (₹178–229), so Test first proposes ₹179 / ₹199 / ₹219 |
 | `recommend()` time | 1.5 ms | 0.4–0.7 s (Node 22, 400 simulations) |
 
-Measured against v1's own specification refitted on the same data: one-week-ahead WAPE 29.4% vs 47.6% (and v1's figure needs same-week market data it would not have); 12-week recursive WAPE 74% vs 93%. On decisions, see the honest reading in section 5.
+Measured against v1's own specification refitted on the same data: one-week-ahead WAPE 29.4% vs 50.3% (and v1's figure needs same-week market data it would not have); from launch the two are comparable (12-week WAPE 73.8% vs 80.1% on the holdout, 73.3% vs 65.3% on validation) but v1 under-predicts by 38–48% and gives no intervals. On decisions, v2's policies did not beat the v1 rule on profit (section 5).
 
 ## 8. Test results
 
 ```
 $ python -m pytest tests -q
 ................................................                         [100%]
-48 passed in 15s
+48 passed
 ```
 
 48 pytest items = 47 Python tests + one item that runs `tests/engine.test.js` under node (16 JavaScript tests: determinism, common random numbers, metric ordering, constraints honoured, Balanced = max mean and Conservative = max P10, break-even sign change and no "safe" field, infeasible status with reasons, a strict loss limit reported not relaxed, **a higher price optimal for one product and a lower for another**, **no confident recommendation when price response is very uncertain**, boundary flags above the cap, common conditions in the strategy comparison, forecast quantiles, category detection, fields the app reads).
@@ -304,20 +315,21 @@ python build_workbook.py --out ../Price_Confidence_Synthetic_Dataset.xlsx
 **Limitations.**
 
 1. Synthetic data only. The models can only rediscover what `synth_market.py` assumes; good scores here are not evidence about Meesho buyers.
-2. Price effects are within-listing associations. Fixed effects remove fixed product differences, not reactive price cuts (12% of changes here) or campaign timing. Only randomised tests identify causal effects.
-3. The simulated right tail is too heavy (Task C mean bias +64–91%), so mean-based figures, including the Balanced objective, are optimistic; the app leads with the median.
+2. Price effects are within-listing associations. Fixed effects remove fixed product differences, not price changes made in reaction to sales (12% of changes here, half of them reactive cuts) or campaign timing. Only randomised tests identify causal effects.
+3. The simulated right tail is too heavy (Task C mean bias +64–91%), so mean-based figures, including the Balanced objective, are optimistic; the app leads with the median. The probability of loss is too low in the 0–30% range that decides eligibility (e.g. predicted 21.6%, observed 26.9%), so the 25% loss limit is effectively looser than it reads.
 4. One-week intervals are a little narrow (74–75% coverage for 80%); listing-level price sensitivity is under-dispersed (fitted spread 0.7–1.2 vs true 0.9–2.0) and tier slopes are biased for budget and premium listings.
-5. Risk-aware policies did not beat the v1 point rule on mean regret in this world (section 5).
-6. Market is frozen at launch for 12 weeks; competitors do not react to the seller; stock-outs are an average, not simulated; ads are modelled only as a fixed weekly budget.
-7. Fees, shipping, GST treatment and policies are team assumptions (`assumptions.json`), not Meesho's.
-8. Small evaluation samples for launch-time tasks (50–57 listings per split); slices by archetype have single-digit counts.
-9. `recommend()` takes about half a second in a browser; fine for a demo, not for batch pricing of a catalogue without moving the simulation server-side.
+5. Risk-aware policies did not beat the v1 point rule on profit or loss rate in this world (section 5), and from launch the v2 forecast is not consistently more accurate than the v1 specification.
+6. Tasks B and C use the listing's realised weekly prices and live weeks (section 5), which give every method a little hindsight. The evaluation model's descriptive cohort table uses final ratings that extend past the cutoff; it is display-only and not used by any decision.
+7. Market is frozen at launch for 12 weeks; competitors do not react to the seller; stock-outs are an average, not simulated; ads are modelled only as a fixed weekly budget.
+8. Fees, shipping, GST treatment and policies are team assumptions (`assumptions.json`), not Meesho's.
+9. Small evaluation samples for launch-time tasks (50–57 listings per split); slices by archetype have single-digit counts.
+10. `recommend()` takes about half a second in a browser; fine for a demo, not for batch pricing of a catalogue without moving the simulation server-side.
 
 **Roadmap for real data** (only with authorised access):
 
 1. Map Meesho's listing-week tables onto `schema.py` roles before any modelling; run `data_quality.py` and treat its price-variation and exogenous-change checks as a gate.
 2. Replace `assumptions.json` values with authorised fee, shipping, return and RTO policies, versioned with the model.
-3. Refit with the same whitelist and splits; add a rolling-origin backtest over several cutoffs; recalibrate interval width and the listing-effect tails on a validation period.
+3. Refit with the same whitelist and splits; add a rolling-origin backtest over several cutoffs; recalibrate interval width, the listing-effect tails and the loss probability on a validation period.
 4. Run seller-consented randomised price tests (the Learning policy's design) to estimate causal price effects by category and tier, and use them to correct the observational slopes.
 5. Choose the default policy and the risk limits (`max_loss_probability`, budget breach) with sellers and on a pilot with a control group, not on synthetic results.
 6. Monitor live: predicted vs realised orders and loss rates per week, drift in return and RTO rates, and the share of sellers the tool declines to price.

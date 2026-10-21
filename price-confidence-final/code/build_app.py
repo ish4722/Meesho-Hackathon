@@ -20,7 +20,8 @@ def eval_summary(path):
     d = ev["decisions"]["policies"]
     return dict(a_wape=h["v2, online listing effect"]["wape"], a_persist=h["last week's orders"]["wape"],
                 c_wape=c["v2 engine, recursive (median)"]["wape"], c_cat=c["category x week average"]["wape"],
-                within10=d["Balanced (v2)"]["share_within_10pct_of_best"], synthetic=True)
+                within10=d["Balanced (v2)"]["share_within_10pct_of_best"],
+                within10_v1=d["v1 rule (point estimate, no risk limits)"]["share_within_10pct_of_best"], synthetic=True)
 
 
 def main():
